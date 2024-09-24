@@ -1,0 +1,883 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Sky Login Redirect\n"
+"POT-Creation-Date: 2022-11-17 12:35+0100\n"
+"PO-Revision-Date: 2022-11-17 12:37+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Poedit 3.0.1\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-Flags-xgettext: --add-comments=translators:\n"
+"X-Poedit-WPHeader: sky-login-redirect.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.min.js\n"
+
+#: includes/login-customizer.php:124
+msgid "Save your settings first to see changes &#8623;"
+msgstr "Enregistrez vos paramètres pour voir les modifications  &#8623;"
+
+#: includes/notices.php:112
+#, php-format
+msgid "End of year sale: save %s on"
+msgstr "Vente de fin d’année : économisez %s sur"
+
+#: includes/notices.php:114
+msgid "Sky Login Redirect Pro"
+msgstr "Sky Login Redirect Pro"
+
+#. Plugin Name of the plugin/theme
+#: includes/options.php:50 sky-login-redirect.php:221
+msgid "Sky Login Redirect"
+msgstr "Sky Login Redirect"
+
+#: includes/options.php:57
+msgid "Login Redirect"
+msgstr "Login Redirect"
+
+#: includes/options.php:121
+msgid "Redirects"
+msgstr "Redirections"
+
+#: includes/options.php:122
+msgid "Customizer"
+msgstr "Personnaliser"
+
+#: includes/options.php:123 includes/options.php:785
+msgid "Tweaks"
+msgstr "Réglages"
+
+#: includes/options.php:124
+msgid "Shop"
+msgstr "Boutique"
+
+#: includes/options.php:125
+msgid "Blocks"
+msgstr "Blocs"
+
+#: includes/options.php:126
+msgid "Modal"
+msgstr "Modale"
+
+#: includes/options.php:127
+msgid "Restrict"
+msgstr "Restreindre"
+
+#: includes/options.php:128
+msgid "Plugins"
+msgstr "Extensions"
+
+#: includes/options.php:147
+msgid "Login and logout redirects"
+msgstr "Redirections de connexion et déconnexion"
+
+#: includes/options.php:155
+msgid ""
+"Set your login and logout redirects rules below. Prioritise them with drag "
+"and drop."
+msgstr ""
+"Définissez vos règles de redirection de connexion et de déconnexion ci-"
+"dessous. Priorisez-les par glisser-déposer."
+
+#: includes/options.php:157
+msgid ""
+"<strong>Important:</strong> one catch-all rule for <strong>all users</"
+"strong> must be set."
+msgstr ""
+"<strong>Important :</strong> une règle fourre-tout doit être définie pour "
+"<strong>tous les utilisateurs</strong> ."
+
+#: includes/options.php:162
+msgid "all users"
+msgstr "tous les utilisateurs"
+
+#: includes/options.php:163 includes/options.php:1063
+msgid "specific user(s)"
+msgstr "utilisateur(s) spécifique(s)"
+
+#: includes/options.php:164 includes/options.php:1064
+msgid "specific user role(s)"
+msgstr "rôle(s) utilisateur(s) spécifique(s)"
+
+#: includes/options.php:168 includes/options.php:1068
+msgid "the previous page"
+msgstr "la page précédente"
+
+#: includes/options.php:169 includes/options.php:1068
+msgid "a custom URL"
+msgstr "une URL personnalisée"
+
+#: includes/options.php:170
+msgid "a custom page"
+msgstr "une page personnalisée"
+
+#: includes/options.php:172 includes/options.php:1068
+msgid "WP admin (default)"
+msgstr "WP admin (défault)"
+
+#: includes/options.php:177 includes/options.php:1069
+msgid "Upgrade for more rules."
+msgstr "Obtenir davantage de règles."
+
+#: includes/options.php:183
+msgid "Add a new rule:"
+msgstr "Ajoutez une nouvelle règle :"
+
+#: includes/options.php:201
+msgid "Redirect:"
+msgstr "Rediriger :"
+
+#: includes/options.php:209 includes/options.php:1100
+msgid "User(s):"
+msgstr "Utilisateur(s) :"
+
+#: includes/options.php:229 includes/options.php:1116
+msgid "Role(s):"
+msgstr "Rôle(s) :"
+
+#: includes/options.php:248 includes/options.php:256
+msgid "Redirect login to:"
+msgstr "Rediriger le login vers :"
+
+#: includes/options.php:258
+msgid "Redirect to this URL after a successful login."
+msgstr "Rediriger vers cette URL après une connexion réussie."
+
+#: includes/options.php:269 includes/options.php:349
+msgid "Page:"
+msgstr "Page:"
+
+#: includes/options.php:309 includes/options.php:320
+msgid "Redirect logout to:"
+msgstr "Rediriger le logout vers :"
+
+#: includes/options.php:326
+msgid "Redirect to this URL after a successful logout."
+msgstr "Rediriger vers cette URL après une déconnexion réussie."
+
+#: includes/options.php:404
+msgid "Extra Login tweaks"
+msgstr "Réglages de connexion supplémentaires"
+
+#: includes/options.php:406
+msgid "Point login logo link to the site's URL"
+msgstr "Pointer le logo de connexion vers l'URL de votre site"
+
+#: includes/options.php:410
+msgid "Set site's name to login logo text"
+msgstr "Définir le nom du site pour le texte du logo de connexion"
+
+#: includes/options.php:414
+msgid "Check the Remember Me checkbox by default"
+msgstr "Cocher la case Se souvenir de moi par défaut"
+
+#: includes/options.php:418
+msgid "Hide the Remember Me checkbox"
+msgstr "Masquer la case Se souvenir de moi"
+
+#: includes/options.php:426
+msgid "Remove privacy policy link"
+msgstr "Supprimer le lien de politique de confidentialité"
+
+#: includes/options.php:430
+msgid "Remove language switcher dropdown"
+msgstr "Supprimer la liste déroulante du sélecteur de langue"
+
+#: includes/options.php:435
+msgid "Admin tweaks"
+msgstr "Réglages admin"
+
+#: includes/options.php:437
+msgid "Remove login error shake effect"
+msgstr "Supprimer l’effet de secousse d’erreur de connexion"
+
+#: includes/options.php:441
+msgid "Noindex and nofollow login page"
+msgstr "Ne pas indexer la page de connexion"
+
+#: includes/options.php:445
+msgid "Change user's session timeout"
+msgstr "Modifier l’expiration de la session de l’utilisateur"
+
+#: includes/options.php:448
+msgid "Session timeout"
+msgstr "Délai d’expiration de la session"
+
+#: includes/options.php:450
+msgid "WordPress default is 2 days."
+msgstr "La valeur défaut de WordPress est 2 jours."
+
+#: includes/options.php:454 includes/options.php:750 includes/options.php:922
+msgid "default"
+msgstr "défaut"
+
+#: includes/options.php:455
+msgid "1 hour"
+msgstr "1 heure"
+
+#: includes/options.php:456
+msgid "1 day"
+msgstr "1 jour"
+
+#: includes/options.php:457
+msgid "1 week"
+msgstr "1 semaine"
+
+#: includes/options.php:458
+msgid "2 weeks"
+msgstr "2 semaines"
+
+#: includes/options.php:459
+msgid "1 month"
+msgstr "1 mois"
+
+#: includes/options.php:460
+msgid "6 months"
+msgstr "6 mois"
+
+#: includes/options.php:461
+msgid "1 year"
+msgstr "1 an"
+
+#: includes/options.php:467
+msgid "Custom login page code"
+msgstr "Code personnalisé sur la page de connexion"
+
+#: includes/options.php:469
+msgid "Add CSS code"
+msgstr "Ajouter du code CSS"
+
+#: includes/options.php:472
+msgid "Add login header code"
+msgstr "Ajouter du code d’en-tête à la page de  connexion"
+
+#: includes/options.php:475
+msgid "Add login form code"
+msgstr "Ajouter du code au formulaire de connexion"
+
+#: includes/options.php:478
+msgid "Add login footer code"
+msgstr "Ajouter du code dans le pied de page de la page de connexion"
+
+#: includes/options.php:482 includes/options.php:817 includes/options.php:1188
+#: includes/options.php:1433 includes/options.php:1613
+msgid "Upgrade your plan"
+msgstr "Mettre à niveau"
+
+#: includes/options.php:505
+msgid "wp-login.php (default)"
+msgstr "wp-login.php (par défaut)"
+
+#: includes/options.php:513
+msgid "Easy Digital Downloads"
+msgstr "Easy Digital Downloads"
+
+#: includes/options.php:517
+#, php-format
+msgid ""
+"These options require Easy Digital Downloads to be active. <a href=\"%s"
+"\">Enable Easy Digital Downloads here</a>."
+msgstr ""
+"Ces options nécessitent qu’Easy Digital Downloads soit actif. <a href=\"%s"
+"\">Activez Easy Digital Downloads ici</a>."
+
+#: includes/options.php:521
+#, php-format
+msgid ""
+"These options require Easy Digital Downloads to be installed and active. You "
+"can <a href=\"%s\">download Easy Digital Downloads here</a>."
+msgstr ""
+"Ces options nécessitent qu’Easy Digital Downloads soit installé et actif. "
+"Vous pouvez <a href=\"%s\">télécharger Easy Digital Downloads ici</a>."
+
+#: includes/options.php:532
+msgid "Custom URL"
+msgstr "URL personnalisée"
+
+#: includes/options.php:535
+msgid "Redirect Easy Digital Downloads customers after they register"
+msgstr "Rediriger les clients Easy Digital Downloads après leur inscription"
+
+#: includes/options.php:539 includes/options.php:555 includes/options.php:598
+#: includes/options.php:617
+msgid "Redirect to:"
+msgstr "Redirection vers :"
+
+#: includes/options.php:550
+msgid "Redirect Easy Digital Downloads customers after they login"
+msgstr "Rediriger les clients Easy Digital Downloads après leur connexion"
+
+#: includes/options.php:565
+msgid "WooCommerce"
+msgstr "WooCommerce"
+
+#: includes/options.php:570
+#, php-format
+msgid ""
+"These options require WooCommerce to be active. <a href=\"%s\">Enable "
+"WooCommerce here</a>."
+msgstr ""
+"Ces options exigent que WooCommerce soit actif. <a href=\"%s\">Activer "
+"WooCommerce ici</a>."
+
+#: includes/options.php:576
+#, php-format
+msgid ""
+"These options require WooCommerce to be installed and active. You can <a "
+"href=\"%s\">download WooCommerce here</a>."
+msgstr ""
+"Ces options nécessitent que WooCommerce soit installé et actif. Vous pouvez "
+"<a href=\"%s\">télécharger WooCommerce ici</a>."
+
+#: includes/options.php:590
+msgid "WooCommerce: My Account"
+msgstr "WooCommerce : Mon compte"
+
+#: includes/options.php:594
+msgid "Redirect WooCommerce customers after they register"
+msgstr "Rediriger les clients WooCommerce après leur inscription"
+
+#: includes/options.php:606
+msgid ""
+"Enable registration in WooCommerce → Settings → Account → Enable "
+"registration on the My Account page"
+msgstr ""
+"Activer l’inscription dans WooCommerce → Settings → Account → activer "
+"l’inscription sur la page Mon compte"
+
+#: includes/options.php:613
+msgid "Redirect WooCommerce customers after they login"
+msgstr "Rediriger les clients WooCommerce après leur connexion"
+
+#: includes/options.php:631
+msgid "WooCommerce Customizer"
+msgstr "Customizer WooCommerce"
+
+#: includes/options.php:633
+msgid "Customize WooCommerce login"
+msgstr "Personnaliser la connexion WooCommerce"
+
+#: includes/options.php:639
+msgid "Login block"
+msgstr "Bloc de connexion"
+
+#: includes/options.php:642 includes/options.php:661 includes/options.php:704
+#: includes/options.php:857 includes/options.php:867 includes/options.php:889
+#: includes/options.php:1238 includes/options.php:1287
+#: includes/options.php:1343
+msgid "Background color"
+msgstr "Couleur d’arrière-plan"
+
+#: includes/options.php:648 includes/options.php:667 includes/options.php:734
+#: includes/options.php:898 includes/options.php:1244 includes/options.php:1317
+#: includes/options.php:1373
+msgid "Border radius (px)"
+msgstr "Rayon de bordure (px)"
+
+#: includes/options.php:659 includes/options.php:865 includes/options.php:1236
+#: includes/options.php:1585
+msgid "Login form"
+msgstr "Formulaire de connexion"
+
+#: includes/options.php:677 includes/options.php:1254 includes/options.php:1383
+msgid "Padding (px)"
+msgstr "Marge (px)"
+
+#: includes/options.php:687 includes/options.php:874 includes/options.php:1270
+msgid "Labels color"
+msgstr "Couleur des labels"
+
+#: includes/options.php:693 includes/options.php:1276
+msgid "Links color"
+msgstr "Couleur des liens"
+
+#: includes/options.php:701 includes/options.php:887 includes/options.php:1284
+msgid "Login button"
+msgstr "Bouton de connexion"
+
+#: includes/options.php:710 includes/options.php:892 includes/options.php:1293
+#: includes/options.php:1349
+msgid "Background color (hover)"
+msgstr "Couleur d’arrière-plan (au survol)"
+
+#: includes/options.php:716 includes/options.php:912 includes/options.php:1299
+#: includes/options.php:1355 includes/options.php:1557
+msgid "Text color"
+msgstr "Couleur du texte"
+
+#: includes/options.php:722 includes/options.php:915 includes/options.php:1305
+#: includes/options.php:1361 includes/options.php:1564
+msgid "Text color (hover)"
+msgstr "Couleur de texte (hover)"
+
+#: includes/options.php:728 includes/options.php:895 includes/options.php:1311
+#: includes/options.php:1367
+msgid "Border color"
+msgstr "Couleur de bordure"
+
+#: includes/options.php:746 includes/options.php:918 includes/options.php:1389
+msgid "Alignment"
+msgstr "Alignement"
+
+#: includes/options.php:750 includes/options.php:922 includes/options.php:1393
+msgid "end"
+msgstr "fin"
+
+#: includes/options.php:750 includes/options.php:922 includes/options.php:1393
+msgid "start"
+msgstr "début"
+
+#: includes/options.php:750 includes/options.php:922 includes/options.php:1393
+msgid "center"
+msgstr "centré"
+
+#: includes/options.php:756 includes/options.php:925
+msgid "Button size"
+msgstr "Taille du bouton"
+
+#: includes/options.php:763 includes/options.php:931
+msgid "Custom width (px)"
+msgstr "Largeur personnalisée (px)"
+
+#: includes/options.php:773 includes/options.php:941
+msgid "Custom height (px)"
+msgstr "Hauteur personnalisée (px)"
+
+#: includes/options.php:787
+msgid "Set login URL to:"
+msgstr "Définir l’URL de connexion vers :"
+
+#: includes/options.php:792
+msgid "Login page:"
+msgstr "Page de connexion :"
+
+#: includes/options.php:799
+msgid "Page URL where users login to the site."
+msgstr "URL de la page sur laquelle les utilisateurs se connectent au site."
+
+#: includes/options.php:846
+msgid "Login customizer preview"
+msgstr "Aperçu du personnaliseur de login"
+
+#: includes/options.php:850
+msgid "Login page"
+msgstr "Page de connexion"
+
+#: includes/options.php:853
+msgid "Login logo"
+msgstr "Logo de connexion"
+
+#: includes/options.php:860 includes/options.php:870
+msgid "Background image"
+msgstr "Image de fond"
+
+#: includes/options.php:877
+msgid "Navigation links color"
+msgstr "Couleur des liens de navigation"
+
+#: includes/options.php:880
+msgid "Back to blog link color"
+msgstr "Couleur du lien Retour vers le site"
+
+#: includes/options.php:883
+msgid "Privacy page link color"
+msgstr "Couleur du lien de la page de confidentialité"
+
+#: includes/options.php:905
+msgid "Border width (px)"
+msgstr "Largeur de la bordure (px)"
+
+#: includes/options.php:968
+msgid "✔ Plugin is installed and active."
+msgstr "✔ L’extension est installée et active."
+
+#: includes/options.php:978
+msgid "Install Better Comments"
+msgstr "Installer Better Comments"
+
+#: includes/options.php:983
+msgid "Activate Better Comments"
+msgstr "Activer Better Comments"
+
+#: includes/options.php:1009
+msgid "Utopique Plugins"
+msgstr "Utopique Plugins"
+
+#: includes/options.php:1019
+msgid "Login security plugins"
+msgstr "Extensions de sécurité de connexion"
+
+#: includes/options.php:1054
+msgid "Restrict content"
+msgstr "Restreindre le contenu"
+
+#: includes/options.php:1058
+msgid ""
+"You can restrict content by forcing users to log in on your posts, pages or "
+"custom post types."
+msgstr ""
+"Vous pouvez restreindre le contenu en obligeant vos visiteurs à se connecter "
+"à vos articles, pages et types de contenus personnalisés."
+
+#: includes/options.php:1058
+msgid ""
+"Create a rule to start restricting content to logged-in users, roles and "
+"specific users."
+msgstr ""
+"Créez une règle pour commencer à restreindre le contenu aux utilisateurs "
+"connectés, aux rôles et aux utilisateurs spécifiques."
+
+#: includes/options.php:1062
+msgid "all logged-out users"
+msgstr "tous les utilisateurs déconnectés"
+
+#: includes/options.php:1072
+msgid "Create a new rule:"
+msgstr "Ajouter une nouvelle règle :"
+
+#: includes/options.php:1074
+msgid "Click on [+] to add a new rule. Reorder rules via drag and drop."
+msgstr ""
+"Cliquez sur [+] pour ajouter une nouvelle règle. Classez les règles via "
+"glisser-déposer."
+
+#: includes/options.php:1082
+msgid "Content to restrict:"
+msgstr "Contenu à restreindre:"
+
+#: includes/options.php:1096
+msgid "Restrict for:"
+msgstr "Restreindre pour:"
+
+#: includes/options.php:1129
+msgid "Custom message"
+msgstr "Message personnalisé"
+
+#: includes/options.php:1212
+msgid "Modal login"
+msgstr "Connexion modale"
+
+#: includes/options.php:1214
+msgid "Enable modal login link"
+msgstr "Activer le lien de connexion modale"
+
+#: includes/options.php:1222
+msgid "Add a login/logout link opening a modal login form with this shortcode:"
+msgstr ""
+"Ajoutez un lien connexion/déconnexion ouvrant un formulaire modal avec ce "
+"code court :"
+
+#: includes/options.php:1223 includes/options.php:1592
+msgid "Posts, pages, and custom post types:"
+msgstr "Publications, pages et types de publications personnalisés :"
+
+#: includes/options.php:1223 includes/options.php:1464
+#: includes/options.php:1594
+msgid "Theme templates:"
+msgstr "Modèles de thème :"
+
+#: includes/options.php:1229
+msgid "Modal login form customizer"
+msgstr "Personnaliseur du formulaire de la connexion modale"
+
+#: includes/options.php:1231
+msgid "Customize modal login form"
+msgstr "Personnaliser le formulaire de connexion modale"
+
+#: includes/options.php:1264
+msgid "Title color"
+msgstr "Couleur du titre"
+
+#: includes/options.php:1331
+msgid "Modal login/logout button"
+msgstr "Bouton de connexion/déconnexion modale"
+
+#: includes/options.php:1336
+msgid ""
+"This setting turns the login/logout link into a button in content only (i.e. "
+"menu links are not targeted)."
+msgstr ""
+"Ce paramètre transforme le lien connexion/déconnexion en un bouton dans le "
+"contenu uniquement (c’est-à-dire que les liens de menu ne sont pas ciblés)."
+
+#: includes/options.php:1339
+msgid "Turn modal login/logout into a button"
+msgstr "Transforme le lien login/logout en bouton"
+
+#: includes/options.php:1393
+msgid "default (none)"
+msgstr "par défaut (aucun)"
+
+#: includes/options.php:1456
+msgid "Login/Logout link"
+msgstr "Lien Login/Logout"
+
+#: includes/options.php:1461
+msgid "Add a login/logout link with this shortcode:"
+msgstr "Ajoutez un lien connexion/déconnexion avec ce code court :"
+
+#: includes/options.php:1463
+msgid "Posts, pages, custom post types, and widgets:"
+msgstr "Publications, pages, types de publications personnalisés et widgets :"
+
+#: includes/options.php:1472
+msgid "Login/Logout link in menu(s)"
+msgstr "Lien login/logout dans les menus"
+
+#: includes/options.php:1482
+#, php-format
+msgid ""
+"No menu has been created yet. Head over to <a href=\"%s\">%s</a> to create a "
+"menu and add elements."
+msgstr ""
+"Aucun menu n’a encore été créé. Dirigez-vous <a href=\"%s\">%s</a> pour "
+"créer un menu et ajouter des éléments."
+
+#: includes/options.php:1485
+msgid "Appearance &rarr; Widgets"
+msgstr "Apparence &rarr; Widgets"
+
+#: includes/options.php:1491
+msgid "Select the menu(s) where to add the login/logout link."
+msgstr "Sélectionnez le(s) menu(s) où ajouter le lien connexion/déconnexion."
+
+#: includes/options.php:1505
+msgid "Link position in menu"
+msgstr "Position du lien dans le menu"
+
+#: includes/options.php:1527
+msgid "Link type"
+msgstr "Type de lien"
+
+#: includes/options.php:1536
+msgid "Link class"
+msgstr "Classe du lien"
+
+#: includes/options.php:1543
+msgid "Custom login text"
+msgstr "Texte de connexion personnalisé"
+
+#: includes/options.php:1550
+msgid "Custom logout text"
+msgstr "Texte de déconnexion personnalisé"
+
+#: includes/options.php:1571
+msgid "Font size (px)"
+msgstr "Taille du texte (px)"
+
+#: includes/options.php:1590
+msgid "Add a login form in your post or page content with this shortcode:"
+msgstr ""
+"Ajoutez un formulaire de connexion dans le contenu de votre publication ou "
+"de votre page avec ce code court :"
+
+#: includes/options.php:1601
+msgid "Custom blocks CSS"
+msgstr "CSS personnalisé"
+
+#: includes/options.php:1604
+msgid "Custom CSS"
+msgstr "CSS personnalisé"
+
+#: includes/options.php:1653
+msgid "Valeur du champ \"Champ WYSIWYG\""
+msgstr "Valeur du champ \"Champ WYSIWYG\""
+
+#: includes/options.php:1662
+msgid "Valeur du champ \"Champs menu déroulant\""
+msgstr "Valeur du champ \"Champs menu déroulant\""
+
+#: includes/options.php:1684
+msgid "WooCommerce redirects"
+msgstr "Redirections WooCommerce"
+
+#: includes/options.php:1685
+msgid "Easy Digital Downloads redirects"
+msgstr "Redirections Easy Digital Downloads"
+
+#: includes/options.php:1686
+msgid "Additional login options"
+msgstr "Options de connexion supplémentaires"
+
+#: includes/options.php:1690
+msgid "WooCommerce login customizer"
+msgstr "Personnaliseur de formulaire de connexion WooCommerce"
+
+#: includes/options.php:1691
+msgid "Login form shortcode"
+msgstr "Code court de formulaire de connexion"
+
+#: includes/options.php:1692
+msgid "Login & logout shortcode"
+msgstr "Code court Login/logout"
+
+#: includes/options.php:1693
+msgid "Automatic login and logout links in menus"
+msgstr "Liens de connexion et de déconnexion automatiques dans les menus"
+
+#: includes/options.php:1697
+msgid "Modal login form"
+msgstr "Formulaire modal de connexion"
+
+#: includes/options.php:1698
+msgid "Modal login customizer"
+msgstr "Personnaliseur de connexion modale"
+
+#: includes/options.php:1699
+msgid "Custom CSS block"
+msgstr "Bloc CSS personnalisé"
+
+#: includes/options.php:1700
+msgid "Restrict content to logged-in users or roles"
+msgstr "Restreindre le contenu aux utilisateurs ou rôles connectés"
+
+#: includes/options.php:1730 sky-login-redirect.php:240
+msgid "Go Pro"
+msgstr "Obtenez Pro"
+
+#: includes/options.php:1732
+msgid "And get access to:"
+msgstr "Et accédez à :"
+
+#: premium/menu-link-shortcode.php:106 premium/menu-link-shortcode.php:127
+msgid "Log in"
+msgstr "Se connecter"
+
+#: premium/menu-link-shortcode.php:107 premium/menu-link-shortcode.php:120
+msgid "Log out"
+msgstr "Se déconnecter"
+
+#: premium/menu-link-shortcode.php:261
+msgid "Username or Email Address"
+msgstr "Identifiant ou adresse email"
+
+#: premium/menu-link-shortcode.php:262
+msgid "Password"
+msgstr "Mot de passe"
+
+#: premium/menu-link-shortcode.php:263
+msgid "Remember Me"
+msgstr "Se souvenir de moi"
+
+#: premium/menu-link-shortcode.php:264
+msgid "Log In"
+msgstr "Connexion"
+
+#: premium/modal.php:96
+msgid "Sending user info, please wait..."
+msgstr "Envoi d'informations utilisateur, veuillez patienter…"
+
+#: premium/modal.php:128
+msgid "Wrong username or password."
+msgstr "Utilisateur ou mot de passe incorrect."
+
+#: premium/modal.php:140
+msgid "Login successful, redirecting..."
+msgstr "Connexion réussie, redirection en cours..."
+
+#: sky-login-redirect.php:141
+msgid "Settings"
+msgstr "Réglages"
+
+#: sky-login-redirect.php:170
+msgid "View Documentation"
+msgstr "Voir la documentation"
+
+#: sky-login-redirect.php:171
+msgid "Docs"
+msgstr "Documentation"
+
+#: sky-login-redirect.php:178
+msgid "Contact support"
+msgstr "Contacter le support"
+
+#: sky-login-redirect.php:179
+msgid "Support"
+msgstr "Soutien"
+
+#: sky-login-redirect.php:186
+msgid "Rate Sky Login Redirect"
+msgstr "Noter Sky Login Redirect"
+
+#: sky-login-redirect.php:187
+msgid "Rate us"
+msgstr "Évaluez nous"
+
+#: sky-login-redirect.php:217
+#, php-format
+msgid "Thank you for using <a href=\"%s\" target=\"_blank\">%s</a>"
+msgstr "Merci d’utiliser <a href=\"%s\" target=\"_blank\">%s</a>"
+
+#: sky-login-redirect.php:226
+#, php-format
+msgid "Check out the <a href=\"%s\" target=\"_blank\">%s</a>"
+msgstr "Consultez la <a href=\"%s\" target=\"_blank\">%s</a>"
+
+#: sky-login-redirect.php:230
+msgid "documentation"
+msgstr "documentation"
+
+#: sky-login-redirect.php:238
+#, php-format
+msgid "<strong><a href=\"%s\">%s</strong></a>"
+msgstr "<strong><a href=\"%s\">%s</a></strong>"
+
+#: sky-login-redirect.php:747
+msgid "Logout"
+msgstr "Déconnexion"
+
+#: sky-login-redirect.php:752
+msgid "Login"
+msgstr "Connexion"
+
+#: sky-login-redirect.php:939
+msgid "unlock with Pro version"
+msgstr "déverrouiller avec la version Pro"
+
+#: sky-login-redirect.php:943
+msgid "unlock with Business version"
+msgstr "déverrouiller avec la version Business"
+
+#. Plugin URI of the plugin/theme
+msgid "https://utopique.net/products/sky-login-redirect-premium/"
+msgstr "https://utopique.net/products/sky-login-redirect-premium/"
+
+#. Description of the plugin/theme
+msgid "Redirects users to the page they were prior to logging in or out."
+msgstr ""
+"Redirige les utilisateurs vers la page qu’ils étaient avant de se connecter "
+"ou de se déconnecter."
+
+#. Author of the plugin/theme
+msgid "Utopique"
+msgstr "Utopique"
+
+#. Author URI of the plugin/theme
+msgid "https://utopique.net/"
+msgstr "https://utopique.net/"
+
+#~ msgid "Go Pro!"
+#~ msgstr "Passez Pro !"
+
+#~ msgid "More redirects rules"
+#~ msgstr "Davantage de règles de redirection"
+
+#~ msgid "Login/logout shortcode for your posts, pages or CPT"
+#~ msgstr "Codes courts login/logout pour vos articles, pages ou CPT"
+
+#~ msgid "Login/logout link position in menus"
+#~ msgstr "Position du lien connexion/déconnexion dans les menus"
+
+#~ msgid "More redirection rules"
+#~ msgstr "Davantage de règles de redirection"
+
+#~ msgid "Priority premium support"
+#~ msgstr "Support premium prioritaire"

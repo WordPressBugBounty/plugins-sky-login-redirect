@@ -1,0 +1,183 @@
+/* radio */
+div.radio {
+  margin-left: 1em;
+}
+
+/* add rule button */
+.cf-complex__tabs--tabbed-vertical .cf-complex__inserter {
+  margin-top: 1rem;
+}
+
+.cf-complex__tabs--tabbed-vertical .cf-complex__inserter-button {
+  background-color: lightgreen !important;
+}
+
+/* help inline */
+em.cf-field__help {
+  display: block ruby;
+  margin-top: 1px;
+}
+
+/* hide elements that should be hidden: conditional logic */
+.content-login [hidden] {
+  display: none !important;
+}
+
+/* align p */
+.cf-html__content p {
+  margin-left: .8em;
+  font-size: 15px;
+}
+
+/* shortcode */
+.slr-shortcode {
+  list-style: inside;
+  margin-left: 2em;
+  font-size: 15px;
+}
+
+.widgets,
+.slr-shortcode li {
+  margin-bottom: 1rem;
+  padding-left: 1rem;
+}
+
+/* Pro upsell */
+input:disabled+label,
+.free .cf-textarea label,
+.upgrade,
+.free .starter .cf-field__label,
+.free .business .cf-field__label,
+.free .platinum .cf-field__label,
+.plan-starter .business .cf-field__label,
+.plan-starter .platinum .cf-field__label,
+.plan-business .platinum .cf-field__label,
+.free p.business,
+.free ul.business,
+.free p.platinum,
+.free ul.platinum,
+.plan-starter p.business,
+.plan-starter ul.business,
+.plan-starter p.platinum,
+.plan-starter ul.platinum,
+.plan-business p.platinum,
+.plan-business ul.platinum {
+  opacity: .8;
+  cursor: default;
+}
+
+/* fade tabs */
+.free .tab-tweaks,
+.free .tab-woocommerce,
+.free .tab-blocks,
+.plan-starter .tab-blocks {
+  opacity: .8
+}
+
+/* indicators */
+.free .starter .cf-multiselect__indicators,
+.free .business .cf-multiselect__indicators,
+.plan-starter .business .cf-multiselect__indicators {
+  display: none;
+}
+
+/* more rules */
+.more-rules {
+  display: none;
+}
+
+/* security */
+div.security-block {
+  margin: 2rem 1rem
+}
+
+div.security-block:not(:last-child) {
+  margin-bottom: 4em;
+}
+
+img.security {
+  width: 128px;
+  margin: 0 2rem 2rem 0;
+}
+
+.security-block span.plugin-installed {
+  color: green;
+}
+
+.security-block span.plugin-installed a {
+  display: block;
+  margin-top: 1em;
+  padding: 1rem;
+  background: #007cba;
+  border-color: #007cba;
+  color: #fff;
+  text-decoration: none;
+  text-shadow: none;
+  margin-left: 170px;
+  width: max-content;
+  min-height: 32px;
+  line-height: 2.30769231;
+  padding: 0 12px;
+  cursor: pointer;
+  border-width: 1px;
+  border-style: solid;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 3px;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.security-block span.plugin-installed a:hover {
+  background: #0071a1;
+  border-color: #0071a1;
+  color: #fff;
+}
+
+.installed {
+  display: table-cell;
+  padding-top: 1rem;
+}
+
+#footer-upgrade {
+  display: none;
+}
+
+/* tab space after SVG icons */
+.cf-container__tabs-list .cf-container__tabs-item button {
+  padding-left: 8px !important;
+}
+
+/* promo */
+#promo-box {
+  position: relative;
+}
+
+.minimize-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+
+.minimized {
+  display: none;
+}
+
+.maximize-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  display: none;
+}
+
+@media (max-width: 768px) {
+
+  .carbon-theme-options #post-body.columns-2 #postbox-container-1.fixed,
+  .carbon-network #post-body.columns-2 #postbox-container-1.fixed {
+    position: static !important;
+    right: auto !important;
+    margin-right: auto !important;
+  }
+}

@@ -1,0 +1,12 @@
+{
+    "name": "skyminds/zen-settings",
+    "description": "Settings helper for WordPress plugins.",
+    "version": "1.0.0",
+    "type": "wordpress-plugin",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "ZenSettings\\": ""
+        }
+    }
+}
