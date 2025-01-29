@@ -3,9 +3,9 @@ Contributors: skyminds
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DNSC3NVBWR66L
 Tags: login redirect, login customizer, login menu, woocommerce login, login, edd login, modal login, modal customizer
 Requires at least: 3.0
-Tested up to: 6.3.1
+Tested up to: 6.8
 Requires PHP: 7
-Stable tag: 3.7.4
+Stable tag: 3.7.5
 License: GPLv3 or later
 
 Redirect all users, specific users, or roles to the page they were reading prior to logging in or logging out or to a custom page. Features an awesome login page customizer.
@@ -26,7 +26,7 @@ The settings page allow you to configure everything related to login in WordPres
 [Sky Login Redirect Pro](https://utopique.net/products/sky-login-redirect-premium/ "Sky Login Redirect Pro") adds even more options and functionalities, among which you can find:
 
 *   More rules for WordPress login and logout
-*   Easy Digital Downloads redirects 
+*   Easy Digital Downloads redirects
 *   WooCommerce redirects
 *   WooCommerce login customizer: you can now style My Account page to your colors
 *   Additional UX/UI settings for the login page
@@ -61,18 +61,9 @@ If redirections have been set already, re-validate your permalinks (WordPress an
 
 == Changelog ==
 
-= 3.7.4 - 2023-09-05 =
-*   New - FS is now managed through Composer
-*   Enhancement - improve UX on mobile view so that the Save button does not overlap settings (thanks MBV for reporting)
-
-= 3.7.3 - 2023-07-03 =
-*   New - much more robust referer URL tracking function
-*   New - add more pre-redirect functions for edge cases
-*   New - clear cookies on logout
-*   New - add Clear-Site-Data header
-*   Enhancement - prepare and refactor menu query
-*   Enhancement - add plugin meta in their own module
-*   Enhancement - simplify premium code loading
+= 3.7.5 - 2025-01-28 =
+*   Add - Declare HPOS (High-Performance Order Storage) compatibility
+*   Update - CF
 *   Update - FS
 
 Older versions changes can be found in [the changelog](https://utopique.net/products/sky-login-redirect-premium/#changelog "Sky Login Redirect changelog")

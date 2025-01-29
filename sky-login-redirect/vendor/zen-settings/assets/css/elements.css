@@ -682,17 +682,21 @@ textarea[disabled="disabled"] {
 }
 
 /* options page header */
-.wrap.zen-settings {
+.zen-settings-header {
   background-color: #fff;
   border-bottom: 1px solid greenyellow;
+  padding: 0px 10px 10px 10px;
 }
 
 .wrap.zen-settings h1 {
-  padding-left: 10px;
-  width: 16%;
+  width: 25%;
 }
 
 .wrap.zen-settings .notice,
 .wrap.zen-settings .fs-notice {
   margin: 5px 10px 0 10px;
+}
+
+.zen-settings .form-table th {
+  width: 240px;
 }

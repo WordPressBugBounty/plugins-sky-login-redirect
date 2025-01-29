@@ -40,11 +40,15 @@ class Fields
      *
      * @return html
      */
-    public function checkmate($key, $args=[])
+    public function checkmate($key, $args = [])
     {
         $options = get_option($this->_option_name);
         $key = esc_attr($key);
-        ?>
+        $class = isset($args['class']) ? sanitize_html_class($args['class']) : '';
+        $help = isset($args['help']) ? esc_attr($args['help']) : '';
+        if (!empty($help)) { ?>
+            <span data-text="<?php echo $help; ?>" class="tooltip">i</span> 
+        <?php } ?>
         <input type="checkbox" id="<?php echo $key; ?>" name="<?php echo $this->_option_name; ?>[<?php echo $key; ?>]" <?php (isset($options[$key]) ? checked(1, $options[$key]) : ''); ?> value="1" />
             <?php
     }
@@ -52,16 +56,21 @@ class Fields
     /**
      * TextInput
      *
-     * @param string $key option key
+     * @param string $key  option key
+     * @param string $args args
      *
      * @return html
      */
-    public function textInput($key)
+    public function textInput($key, $args = [])
     {
         $options = get_option($this->_option_name);
         $key = esc_attr($key);
         $value = isset($options[$key]) ? esc_attr($options[$key]) : '';
-        ?>
+        $class = isset($args['class']) ? sanitize_html_class($args['class']) : '';
+        $help = isset($args['help']) ? esc_attr($args['help']) : '';
+        if (!empty($help)) { ?>
+            <span data-text="<?php echo $help; ?>" class="tooltip">i</span> 
+        <?php } ?>
         <input type="text" id="<?php echo $key; ?>" name="<?php echo $this->_option_name; ?>[<?php echo $key; ?>]" value="<?php echo $value; ?>">
         <?php
     }
@@ -74,15 +83,17 @@ class Fields
      *
      * @return html
      */
-    public function numberInput($key, $args)
+    public function numberInput($key, $args = [])
     {
         $options = get_option($this->_option_name);
         $key = esc_attr($key);
-        // <span class="symbol-wrap"><span class="symbol-code">s</span></span>
-        if (isset($args['help'])) { ?>
-        <span data-text="<?php echo esc_attr($args['help']); ?>" class="tooltip">i</span> 
+        $default_value = isset($args['default']) ? $args['default'] : 0;
+        $class = isset($args['class']) ? sanitize_html_class($args['class']) : '';
+        $help = isset($args['help']) ? esc_attr($args['help']) : '';
+        if (!empty($help)) { ?>
+            <span data-text="<?php echo $help; ?>" class="tooltip">i</span> 
         <?php } ?>
-        <input type="number" id="<?php echo $key; ?>" name="<?php echo $this->_option_name; ?>[<?php echo $key; ?>]" value="<?php echo isset($options[$key]) ? (int)$options[$key] : $args['default']; ?>" size="6" class="symbol" />
+        <input type="number" id="<?php echo $key; ?>" name="<?php echo $this->_option_name; ?>[<?php echo $key; ?>]" value="<?php echo isset($options[$key]) ? (int)$options[$key] : $default_value; ?>" size="6" class="symbol" />
         <?php if (isset($args['summary'])) { ?>
         <span class="summary"><?php echo esc_html($args['summary']); ?></span>
             <?php
@@ -94,13 +105,19 @@ class Fields
      *
      * @param string $key   option key
      * @param array  $items items
+     * @param string $args  args
      *
      * @return html
      */
-    public function dropDown($key, $items)
+    public function dropDown($key, $items, $args = [])
     {
         $options = get_option($this->_option_name);
         $key = esc_attr($key);
+        $class = isset($args['class']) ? sanitize_html_class($args['class']) : '';
+        $help = isset($args['help']) ? esc_attr($args['help']) : '';
+        if (!empty($help)) { ?>
+            <span data-text="<?php echo $help; ?>" class="tooltip">i</span> 
+        <?php }
         echo '<select id="' . $key . '" name="' . $this->_option_name . '[' . $key . ']">';
         foreach ($items as $k => $v) {
             printf(
@@ -118,14 +135,19 @@ class Fields
      *
      * @param string $key   option key
      * @param array  $items items
+     * @param string $args  args
      *
      * @return html
      */
-    public function selectMultiple($key, $items)
+    public function selectMultiple($key, $items, $args = [])
     {
         $options = get_option($this->_option_name);
         $key = esc_attr($key);
-        ?>
+        $class = isset($args['class']) ? sanitize_html_class($args['class']) : '';
+        $help = isset($args['help']) ? esc_attr($args['help']) : '';
+        if (!empty($help)) { ?>
+            <span data-text="<?php echo $help; ?>" class="tooltip">i</span> 
+        <?php } ?>
         <select id="<?php echo $key; ?>" name="<?php echo $this->_option_name; ?>[<?php echo $key; ?>][]" multiple>
         <?php foreach ($items as $k => $v) {
             ?>
@@ -138,19 +160,17 @@ class Fields
     /**
      * TextArea
      *
-     * @param string $key   option key
-     * @param string $class class
-     * @param string $help  help text
+     * @param string $key  option key
+     * @param string $args args
      *
      * @return html
      */
-    public function textArea($key, $class = '', $help = '')
+    public function textArea($key, $args = [])
     {
         $options = get_option($this->_option_name);
-        $class = sanitize_html_class($class);
-        $help = esc_attr($help);
-        ?>
-        <?php if (!empty($help)) { ?>
+        $class = isset($args['class']) ? $this->sanitize_html_classes($args['class']) : '';
+        $help = isset($args['help']) ? esc_attr($args['help']) : '';
+        if (!empty($help)) { ?>
             <span data-text="<?php echo $help; ?>" class="tooltip">i</span> 
         <?php } ?>
         <textarea id="<?php echo esc_attr($key); ?>" 
@@ -163,21 +183,39 @@ class Fields
     }
 
     /**
-     * Renders a color picker field.
+     * Sanitize string of classes
      *
-     * @param string $key   The unique key for the field.
-     * @param string $label The label for the field.
+     * @param string $class_string
      *
      * @return void
      */
-    public function colorField($key, $label)
+    private function sanitize_html_classes($class_string)
+    {
+        $classes = explode(' ', $class_string);
+        $sanitized_classes = array_map('sanitize_html_class', $classes);
+        return implode(' ', $sanitized_classes);
+    }
+
+    /**
+     * Renders a color picker field.
+     *
+     * @param string $key  The unique key for the field.
+     * @param string $args args
+     *
+     * @return void
+     */
+    public function colorPicker($key, $args = [])
     {
         $options = get_option($this->_option_name);
         $key = esc_attr($key);
-        $value = isset($options[$key]) ? $options[$key] : '';
-        ?>
-        <div class="color-field">
-            <label for="<?php echo $key; ?>"><?php echo esc_html($label); ?></label>
+        $default_color = isset($args['default']) ? $args['default'] : '#ffffff'; // Set a default hex color
+        $value = isset($options[$key]) ? $options[$key] : $default_color;
+        $class = isset($args['class']) ? sanitize_html_class($args['class']) : '';
+        $help = isset($args['help']) ? esc_attr($args['help']) : '';
+        if (!empty($help)) { ?>
+            <span data-text="<?php echo $help; ?>" class="tooltip">i</span> 
+        <?php } ?>
+        <div class="color-picker">
             <input type="text" id="<?php echo $key; ?>" name="<?php echo $this->_option_name; ?>[<?php echo $key; ?>]" value="<?php echo esc_attr($value); ?>" class="colorpicker" />
         </div>
         <?php
@@ -186,17 +224,22 @@ class Fields
     /**
      * File upload field
      *
-     * @param string $key The unique key for the field.
+     * @param string $key  The unique key for the field.
+     * @param string $args args
      *
      * @return void
      */
-    public function fileUploadField($key)
+    public function fileUploadField($key, $args = [])
     {
         $options = get_option($this->_option_name);
         $key = esc_attr($key);
         $value = isset($options[$key]) ? esc_url_raw($options[$key]) : '';
         wp_enqueue_media();
-        ?>
+        $class = isset($args['class']) ? sanitize_html_class($args['class']) : '';
+        $help = isset($args['help']) ? esc_attr($args['help']) : '';
+        if (!empty($help)) { ?>
+            <span data-text="<?php echo $help; ?>" class="tooltip">i</span> 
+        <?php } ?>
         <input type="text" id="<?php echo $key; ?>" name="<?php echo $this->_option_name; ?>[<?php echo $key; ?>]" value="<?php echo $value; ?>" class="regular-text" readonly />
         <input type="button" name="upload-btn" id="upload-btn-<?php echo $key; ?>" class="button-secondary" value="<?php esc_attr_e('Upload File', 'flashspeed'); ?>" />
 

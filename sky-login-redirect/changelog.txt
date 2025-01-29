@@ -1,5 +1,14 @@
 == Changelog ==
 
+= 3.7.5 - 2025-01-28 =
+*   Add - Declare HPOS (High-Performance Order Storage) compatibility
+*   Update - CF
+*   Update - FS
+
+= 3.7.4 - 2023-09-05 =
+*   New - FS is now managed through Composer
+*   Enhancement - improve UX on mobile view so that the Save button does not overlap settings (thanks MBV for reporting)
+
 = 3.7.3 - 2023-07-03 =
 *   New - much more robust referer URL tracking function
 *   New - add more pre-redirect functions for edge cases
@@ -40,8 +49,8 @@
 
 = 3.6.7 - 2022-11-17 =
 *   Enhancement - reword the redirects tab options
-*   Enhancement - set the "Add rule" button to make it stand out in the page 
-*   Enhancement - remove help text as the button is now more obvious 
+*   Enhancement - set the "Add rule" button to make it stand out in the page
+*   Enhancement - remove help text as the button is now more obvious
 *   Fix - ensure rules message can be shown
 *   Update - POT file and translations
 *   Update - tested comptability with WP 6.1.1
