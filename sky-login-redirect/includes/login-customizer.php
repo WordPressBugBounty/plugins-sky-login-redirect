@@ -241,8 +241,8 @@ function Slr_Customizer_css()
     /* label colors */
     $slr_form_labels_color = carbonade('slr_form_labels_color');
     if (!empty($slr_form_labels_color)) {
-        $style .= "body.login div#login form#loginform label { 
-            color: {$slr_form_labels_color} 
+        $style .= "body.login div#login form#loginform label {
+            color: {$slr_form_labels_color}
         }";
     }
 
@@ -261,8 +261,8 @@ function Slr_Customizer_css()
     /* privacy-policy-page-link */
     $slr_form_privacy_color = carbonade('slr_form_privacy_color');
     if (!empty($slr_form_privacy_color)) {
-        $style .= "body.login .privacy-policy-page-link a { 
-            color: {$slr_form_privacy_color} 
+        $style .= "body.login .privacy-policy-page-link a {
+            color: {$slr_form_privacy_color}
         }";
     }
 
@@ -294,7 +294,7 @@ function Slr_Customizer_css()
     // align
     $submit_align = carbonade('slr_form_submit_align');
     if ($submit_align != 'default') {
-        $style .= "body.login #login form p.submit { 
+        $style .= "body.login #login form p.submit {
             display: grid; place-items: {$submit_align};
         }";
     }
@@ -322,14 +322,14 @@ function Slr_Customizer_css()
     ) {
         $style .= "body.login #wp-submit {
             {$submit_bg_color} {$submit_text_color}
-            {$submit_border_color} {$submit_border_width} 
+            {$submit_border_color} {$submit_border_width}
             {$submit_border_style} {$submit_border_radius}
-            {$height} {$width} 
+            {$height} {$width}
         }";
     }
 
     if ($submit_bg_color_hover || $submit_text_color_hover) {
-        $style .= "body.login #wp-submit:hover { 
+        $style .= "body.login #wp-submit:hover {
             {$submit_bg_color_hover} {$submit_text_color_hover}
         }";
     }
@@ -404,9 +404,10 @@ function Slr_Check_Remember_me()
 {
     $slr_check_remember_me = carbonade('slr_check_remember_me');
     if ($slr_check_remember_me == 'yes') {
-        echo "<script>
-        const rememberme = document.getElementById('rememberme'); 
+        echo "<script>document.addEventListener('DOMContentLoaded', function() {
+        const rememberme = document.getElementById('rememberme');
         if(rememberme){ rememberme.checked = true; }
+		});
         </script>";
     }
 }
@@ -428,10 +429,10 @@ function Slr_Edd_Check_Remember_me($var)
 {
     $slr_check_remember_me = carbonade('slr_check_remember_me');
     if ($slr_check_remember_me == 'yes') {
-        $var .= "<script>
-        const rememberme = document.getElementById('rememberme'); 
+        $var .= "<script>document.addEventListener('DOMContentLoaded', function() {
+        const rememberme = document.getElementById('rememberme');
         if(rememberme){ rememberme.checked = true; }
-        </script>";
+        });</script>";
     }
     // default return
     return $var;

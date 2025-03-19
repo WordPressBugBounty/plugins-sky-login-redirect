@@ -9,42 +9,42 @@ function SLR_Options_page()
     ?>
     <div class="wrap slider-checkbox sky-login-redirect-settings">
     <h1>Sky Login Redirect settings 🪃</h1>
-        
-        <?php settings_errors(); ?>  
-        <?php SLR_Admin_tabs(); ?> 
+
+        <?php settings_errors(); ?>
+        <?php SLR_Admin_tabs(); ?>
 
     <form method="post" action="options.php">
     <div id="main-content" class="main">
         <div class="tab-content">
-        
+
             <div id="tab-1" class="tab-pane active metatags">
         <?php
     settings_fields('metatags');
     do_settings_sections('metatags');
     ?>
             </div>
-        
+
             <div id="tab-2" class="tab-pane assets">
         <?php
     settings_fields('assets');
     do_settings_sections('assets');
     ?>
             </div>
-        
+
             <div id="tab-3" class="tab-pane analytics">
         <?php
     settings_fields('analytics');
     do_settings_sections('analytics');
     ?>
             </div>
-        
+
             <div id="tab-4" class="tab-pane cache">
         <?php
     settings_fields('cache');
     do_settings_sections('cache');
     ?>
             </div>
-        
+
             <div id="tab-5" class="tab-pane security-headers">
         <?php
     settings_fields('headers');
@@ -67,8 +67,8 @@ function SLR_Options_page()
             </div>
 
         </div>
-        
-        
+
+
         <div class="metabox-holder has-right-sidebar" id="sidebar">
     <?php
     SLR_Settings_Page_sidebar();
@@ -152,7 +152,7 @@ function SLR_Settings_Promo_sidebar()
 {
     /* business users : bail early */
     if (Sky_Login_Redirect_fs()->is_plan('agency')) {
-        //return;
+        return;
     }
 
     /* define all plans */
@@ -175,10 +175,10 @@ function SLR_Settings_Promo_sidebar()
 
     $agency = [
         __('Advanced options for agencies and clients', 'flashspeed'),
-        //__('Debugging management', 'flashspeed'),
-        //__('Restrict plugin options for clients', 'flashspeed'),
-        //__('Core, plugins, themes updates management', 'flashspeed'),
-        //__('Email notifications management', 'flashspeed'),
+        __('Debugging management', 'flashspeed'),
+        __('Restrict plugin options for clients', 'flashspeed'),
+        __('Core, plugins, themes updates management', 'flashspeed'),
+        __('Email notifications management', 'flashspeed'),
     ];
 
     /* Free plan or non-paying user */

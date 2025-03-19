@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<ruleset name="CustomWordPressProject">
+    <description>Custom ruleset for WordPress development.</description>
+
+	<!--
+	############################################################################
+	COMMAND LINE ARGUMENTS
+	For help understanding this file: https://github.com/squizlabs/PHP_CodeSniffer/wiki/Annotated-ruleset.xml
+	For help using PHPCS: https://github.com/squizlabs/PHP_CodeSniffer/wiki/Usage	############################################################################
+	-->
+
+	<!-- What to scan. -->
+    <file>.</file>
+
+    <!-- Exclude patterns -->
+    <exclude-pattern>vendor/*</exclude-pattern>
+    <exclude-pattern>node_modules/*</exclude-pattern>
+
+	<!-- Show progress. -->
+	<arg value="p"/>
+
+	<!-- Strip the filepaths down to the relevant bit. -->
+	<arg name="basepath" value="./"/>
+
+	<!-- Check up to 8 files simultaneously. -->
+	<arg name="parallel" value="8"/>
+
+	<!-- Exclude the rules that enforce space indentations -->
+    <rule ref="Generic.WhiteSpace.DisallowSpaceIndent">
+        <severity>0</severity>
+    </rule>
+
+    <!-- Include and configure rules to enforce tab indentations -->
+    <rule ref="Generic.WhiteSpace.ScopeIndent">
+        <properties>
+            <property name="indent" value="\t"/>
+        </properties>
+    </rule>
+    <rule ref="Generic.WhiteSpace.DisallowTabIndent" severity="0"/>
+
+	<!-- Allow short syntax arrays. -->
+	<rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
+
+	<!-- Disallow long array syntax -->
+	<rule ref="Generic.Arrays.DisallowShortArraySyntax.Found">
+		<exclude-pattern>*</exclude-pattern>
+	</rule>
+
+
+    <!-- Include the whole WordPress Coding Standards -->
+    <rule ref="WordPress">
+        <!-- Exclude the WordPress array declaration rules. -->
+        <exclude name="WordPress.Arrays.ArrayDeclarationSpacing"/>
+		<!-- Exclude check for short syntax arrays. -->
+		 <exclude name="Universal.Arrays.DisallowShortArraySyntax"/>
+    </rule>
+
+</ruleset>

@@ -1,7 +1,14 @@
 == Changelog ==
 
+= 3.7.6 - 2025-03-19 =
+*   Add - Remove the 'redirect_to' parameter from the logout URL.
+*   Add - Implement rate limiting and security headers for modal login.
+*   Enhancement - remove promo box for Agencies.
+*   Enhancement - Better customizer script.
+*   Enhancement - validate URLs for EDD and WC.
+
 = 3.7.5 - 2025-01-28 =
-*   Add - Declare HPOS (High-Performance Order Storage) compatibility
+*   Add - Declare HPOS (High-Performance Order Storage) compatibility for WooCommerce.
 *   Update - CF
 *   Update - FS
 

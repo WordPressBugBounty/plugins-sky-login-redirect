@@ -3,8 +3,8 @@
 /**
  * Plugin Name: Sky Login Redirect
  * Plugin URI: https://utopique.net/products/sky-login-redirect-premium/
- * Description: Redirects users to the page they were prior to logging in or out. Features an awesome login customizer.
- * Version: 3.7.5
+ * Description: Redirects users to the page they were prior to logging in or out. Features a great login customizer.
+ * Version: 3.7.6
  * Author: Utopique
  * Author URI: https://utopique.net/
  * Developer: Utopique
@@ -33,7 +33,7 @@ if ( !defined( 'ABSPATH' ) ) {
     // Exit if accessed directly
 }
 // current version
-define( 'SLR_VERSION', '3.7.5' );
+define( 'SLR_VERSION', '3.7.6' );
 // Plugin root path
 define( "SLR_ROOT", trailingslashit( plugin_dir_path( __FILE__ ) ) );
 /**
@@ -296,6 +296,26 @@ if ( function_exists( __NAMESPACE__ . '\\Sky_Login_Redirect_fs' ) ) {
     }
 
     /**
+     * Removes the 'redirect_to' parameter from the logout URL.
+     *
+     * This function filters the WordPress logout URL to remove the 'redirect_to'
+     * GET parameter, resulting in a cleaner URL.
+     *
+     * @param string $logout_url The original logout URL.
+     * @param string $redirect   The redirect URL (not used in this function).
+     * @return string The modified logout URL without the 'redirect_to' parameter.
+     */
+    function Slr_clean_logout_url(  $logout_url, $redirect  ) {
+        return remove_query_arg( 'redirect_to', $logout_url );
+    }
+
+    add_filter(
+        'logout_url',
+        __NAMESPACE__ . '\\Slr_clean_logout_url',
+        10,
+        2
+    );
+    /**
      * Redirection for login and logout
      *
      * @param mixed $redirect_to           the redirect
@@ -491,11 +511,11 @@ if ( function_exists( __NAMESPACE__ . '\\Sky_Login_Redirect_fs' ) ) {
             $redirect_to = esc_url_raw( $redirect_to );
             return $redirect_to;
         }
-        // If the referer is empty, use $redirect_to as it it set via the cookie.
+        // If the referer is empty, use $redirect_to as it is set via the cookie.
         if ( !$referer ) {
             return esc_url_raw( $redirect_to );
         }
-        // Otherwise, go back to referring page.
+        // Otherwise, go back to the referring page.
         return esc_url_raw( $referer );
     }
 

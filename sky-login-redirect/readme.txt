@@ -5,7 +5,7 @@ Tags: login redirect, login customizer, login menu, woocommerce login, login, ed
 Requires at least: 3.0
 Tested up to: 6.8
 Requires PHP: 7
-Stable tag: 3.7.5
+Stable tag: 3.7.6
 License: GPLv3 or later
 
 Redirect all users, specific users, or roles to the page they were reading prior to logging in or logging out or to a custom page. Features an awesome login page customizer.
@@ -61,8 +61,16 @@ If redirections have been set already, re-validate your permalinks (WordPress an
 
 == Changelog ==
 
+= 3.7.6 - 2025-03-19 =
+*   Add - Remove the 'redirect_to' parameter from the logout URL.
+*   Add - Implement rate limiting and security headers for modal login.
+*   Enhancement - remove promo box for Agencies.
+*   Enhancement - Better customizer script.
+*   Enhancement - validate URLs for EDD and WC.
+
+
 = 3.7.5 - 2025-01-28 =
-*   Add - Declare HPOS (High-Performance Order Storage) compatibility
+*   Add - Declare HPOS (High-Performance Order Storage) compatibility for WooCommerce.
 *   Update - CF
 *   Update - FS
 
