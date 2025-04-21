@@ -1,0 +1,6 @@
+/vendor/
+.idea
+*.tar.gz
+*.zip
+*.code-workspace
+svn-clean-and-install.sh

@@ -2,7 +2,7 @@
     "name": "skyminds/sky-login-redirect",
     "type": "wordpress-plugin",
     "description": "WordPress and Woocommerce Login Redirects made easy",
-    "version": "3.7.6",
+    "version": "3.7.7",
     "license": "SaaS",
     "authors": [
         {

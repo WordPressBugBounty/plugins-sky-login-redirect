@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "88feb611a7162242cfea7187910ec0be",
+    "content-hash": "2d1da12220b95576f3b99e06c7c20bb8",
     "packages": [
         {
             "name": "collizo4sky/persist-admin-notices-dismissal",
@@ -254,16 +254,16 @@
         },
         {
             "name": "htmlburger/carbon-fields",
-            "version": "v3.6.5",
+            "version": "v3.6.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/htmlburger/carbon-fields.git",
-                "reference": "b18f8e2a2cc4cc976306eb867ad1d740a8e7c1d9"
+                "reference": "9cb536e775f3c0688e18fca39445326521197220"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/htmlburger/carbon-fields/zipball/b18f8e2a2cc4cc976306eb867ad1d740a8e7c1d9",
-                "reference": "b18f8e2a2cc4cc976306eb867ad1d740a8e7c1d9",
+                "url": "https://api.github.com/repos/htmlburger/carbon-fields/zipball/9cb536e775f3c0688e18fca39445326521197220",
+                "reference": "9cb536e775f3c0688e18fca39445326521197220",
                 "shasum": ""
             },
             "require": {
@@ -390,7 +390,7 @@
                 "issues": "https://github.com/htmlburger/carbon-fields/issues",
                 "source": "https://github.com/htmlburger/carbon-fields"
             },
-            "time": "2024-07-31T08:17:38+00:00"
+            "time": "2025-04-17T11:56:23+00:00"
         },
         {
             "name": "skyminds/zen-settings",
@@ -755,22 +755,22 @@
         },
         {
             "name": "phpcsstandards/phpcsextra",
-            "version": "1.2.1",
+            "version": "1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHPCSExtra.git",
-                "reference": "11d387c6642b6e4acaf0bd9bf5203b8cca1ec489"
+                "reference": "46d08eb86eec622b96c466adec3063adfed280dd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSExtra/zipball/11d387c6642b6e4acaf0bd9bf5203b8cca1ec489",
-                "reference": "11d387c6642b6e4acaf0bd9bf5203b8cca1ec489",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSExtra/zipball/46d08eb86eec622b96c466adec3063adfed280dd",
+                "reference": "46d08eb86eec622b96c466adec3063adfed280dd",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4",
                 "phpcsstandards/phpcsutils": "^1.0.9",
-                "squizlabs/php_codesniffer": "^3.8.0"
+                "squizlabs/php_codesniffer": "^3.12.1"
             },
             "require-dev": {
                 "php-parallel-lint/php-console-highlighter": "^1.0",
@@ -827,9 +827,13 @@
                 {
                     "url": "https://opencollective.com/php_codesniffer",
                     "type": "open_collective"
+                },
+                {
+                    "url": "https://thanks.dev/u/gh/phpcsstandards",
+                    "type": "thanks_dev"
                 }
             ],
-            "time": "2023-12-08T16:49:07+00:00"
+            "time": "2025-04-20T23:35:32+00:00"
         },
         {
             "name": "phpcsstandards/phpcsutils",
@@ -921,16 +925,16 @@
         },
         {
             "name": "squizlabs/php_codesniffer",
-            "version": "3.12.0",
+            "version": "3.12.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHP_CodeSniffer.git",
-                "reference": "2d1b63db139c3c6ea0c927698e5160f8b3b8d630"
+                "reference": "6d4cf6032d4b718f168c90a96e36c7d0eaacb2aa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/2d1b63db139c3c6ea0c927698e5160f8b3b8d630",
-                "reference": "2d1b63db139c3c6ea0c927698e5160f8b3b8d630",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/6d4cf6032d4b718f168c90a96e36c7d0eaacb2aa",
+                "reference": "6d4cf6032d4b718f168c90a96e36c7d0eaacb2aa",
                 "shasum": ""
             },
             "require": {
@@ -1001,7 +1005,7 @@
                     "type": "thanks_dev"
                 }
             ],
-            "time": "2025-03-18T05:04:51+00:00"
+            "time": "2025-04-13T04:10:18+00:00"
         },
         {
             "name": "wp-coding-standards/wpcs",
@@ -1073,12 +1077,12 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "skyminds/zen-settings": 20,
-        "freemius/wordpress-sdk": 20
+        "freemius/wordpress-sdk": 20,
+        "skyminds/zen-settings": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
-    "platform-dev": [],
+    "platform": {},
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }
