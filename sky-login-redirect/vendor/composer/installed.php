@@ -31,7 +31,7 @@
         'freemius/wordpress-sdk' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '9ad5477e4f0a39999b96bb21d0327bc6841d4590',
+            'reference' => 'db6f35a2b3d318a53330409dbeab49156ee76dd8',
             'type' => 'library',
             'install_path' => __DIR__ . '/../freemius/wordpress-sdk',
             'aliases' => array(
@@ -40,9 +40,9 @@
             'dev_requirement' => false,
         ),
         'htmlburger/carbon-fields' => array(
-            'pretty_version' => 'v3.6.6',
-            'version' => '3.6.6.0',
-            'reference' => '9cb536e775f3c0688e18fca39445326521197220',
+            'pretty_version' => 'v3.6.9',
+            'version' => '3.6.9.0',
+            'reference' => 'f82e80e3e3469d6e86cc17a8950b918ad448a059',
             'type' => 'library',
             'install_path' => __DIR__ . '/../htmlburger/carbon-fields',
             'aliases' => array(),
@@ -81,9 +81,9 @@
             'dev_requirement' => false,
         ),
         'wp-cli/wp-config-transformer' => array(
-            'pretty_version' => 'v1.4.1',
-            'version' => '1.4.1.0',
-            'reference' => '9da378b5a4e28bba3bce4ff4ff04a54d8c9f1a01',
+            'pretty_version' => 'v1.4.2',
+            'version' => '1.4.2.0',
+            'reference' => 'b78cab1159b43eb5ee097e2cfafe5eab573d2a8a',
             'type' => 'library',
             'install_path' => __DIR__ . '/../wp-cli/wp-config-transformer',
             'aliases' => array(),

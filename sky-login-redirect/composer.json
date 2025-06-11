@@ -42,6 +42,9 @@
 		  "phpcbf": "phpcbf --standard=phpcs.xml.dist",
 	    "post-update-cmd": [
 		    "cp ./assets/img/sky-login-redirect.png ./vendor/freemius/wordpress-sdk/assets/img/sky-login-redirect.png"
+	    ],
+      "post-install-cmd": [
+		    "cp ./assets/img/sky-login-redirect.png ./vendor/freemius/wordpress-sdk/assets/img/sky-login-redirect.png"
 	    ]
     },
     "require-dev": {

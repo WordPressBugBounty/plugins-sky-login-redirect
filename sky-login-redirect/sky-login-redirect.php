@@ -4,7 +4,7 @@
  * Plugin Name: Sky Login Redirect
  * Plugin URI: https://utopique.net/products/sky-login-redirect-premium/
  * Description: Redirects users to the page they were prior to logging in or out. Features an awesome login customizer.
- * Version: 3.7.7
+ * Version: 3.7.8
  * Author: Utopique
  * Author URI: https://utopique.net/
  * Developer: Utopique
@@ -14,7 +14,7 @@
  * Domain Path: /languages
  * License: GPLv2 or later
  * Requires at least: 4.7
- * Tested up to: 6.8
+ * Tested up to: 6.8.1
  * Requires PHP: 7
  * WC requires at least: 3.3
  * WC tested up to: 9.7
@@ -33,7 +33,7 @@ if ( !defined( 'ABSPATH' ) ) {
     // Exit if accessed directly
 }
 // current version
-define( 'SLR_VERSION', '3.7.7' );
+define( 'SLR_VERSION', '3.7.8' );
 // Plugin root path
 define( "SLR_ROOT", trailingslashit( plugin_dir_path( __FILE__ ) ) );
 /**

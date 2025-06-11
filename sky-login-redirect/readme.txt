@@ -3,9 +3,9 @@ Contributors: skyminds
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DNSC3NVBWR66L
 Tags: login redirect, login customizer, login menu, woocommerce login, login, edd login, modal login, modal customizer
 Requires at least: 3.0
-Tested up to: 6.8
+Tested up to: 6.8.1
 Requires PHP: 7
-Stable tag: 3.7.7
+Stable tag: 3.7.8
 License: GPLv3 or later
 
 Redirect all users, specific users, or roles to the page they were reading prior to logging in or logging out or to a custom page. Features an awesome login page customizer.
@@ -60,6 +60,12 @@ If redirections have been set already, re-validate your permalinks (WordPress an
 4. The submit button customizer allows you to customize the login submit button.
 
 == Changelog ==
+
+= 3.7.8 - 2025-06-11 =
+*   Update - CF
+*   Update - FS
+*   Update - Composer
+*   Update - Tested compatibility with WP 6.8.1
 
 = 3.7.7 - 2025-04-17 =
 *   Update - CF
