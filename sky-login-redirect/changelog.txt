@@ -1,5 +1,17 @@
 == Changelog ==
 
+= 3.7.9 - 2025-09-02 =
+*   Update - CF, FS, Composer
+*   Update - Tested compatibility with WP 6.8.2
+*   Improvement - move text domain loading to init hook
+*   Improvement - replace inline script tag with proper WordPress script enqueuing for login redirect
+*   Improvement - honour ?redirect_to when present
+*   Improvement - improve cookie security and redirect handling in login flow
+*   Improvement - improve CF loading
+*   Improvement - improve menu icon animation with CSS custom properties and reduced motion support
+*   Fix - use current URL instead of permalink for last_page_visited cookie
+*   Fix - improve cookie handling
+
 = 3.7.8 - 2025-06-11 =
 *   Update - CF
 *   Update - FS

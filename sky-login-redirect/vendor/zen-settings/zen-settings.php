@@ -3,7 +3,7 @@
  * Plugin Name: Zen Settings
  * Plugin URI: https://utopiqe.net/zen-settings/
  * Description: Create beautiful WordPress settings pages.
- * Version: 1.0.5
+ * Version: 1.0.7
  * Author: Utopique Plugins
  * Author URI: https://utopique.net/
  * License: SaaS
@@ -27,7 +27,7 @@ namespace ZenSettings;
  * @since 1.0.0
  */
 if (!defined('ZEN_SETTINGS_VERSION')) {
-    define('ZEN_SETTINGS_VERSION', '1.0.5');
+    define('ZEN_SETTINGS_VERSION', '1.0.7');
 }
 
 
@@ -92,7 +92,8 @@ if (!class_exists('ZenSettings\ZenSettings')) {
         ) {
             // $args
             $this->_namespace   = $args['namespace'] ?? '';
-            $this->_textdomain  = $args['textdomain'] ?? '';
+			// Set textdomain from the plugin's args or use a default
+            $this->_textdomain  = !empty($args['textdomain']) ? $args['textdomain'] : 'zen-settings';
             $this->_version     = $args['version'] ?? '';
             $this->_page_title  = $args['page_title'] ?? '';
             $this->_menu_title  = $args['menu_title'] ?? '';
@@ -121,11 +122,11 @@ if (!class_exists('ZenSettings\ZenSettings')) {
             $this->textdomain = 'zen-settings';
 
             // Debugging code here
-            error_log(print_r($args, true));
+            //error_log(print_r($args, true));
             //...
 
             // Register the text domain for localization
-            add_action('plugins_loaded', array($this, 'load_plugin_textdomain'));
+            add_action('init', array($this, 'load_plugin_textdomain'), 5);
 
             // Register your plugin's initialization function
             add_action('init', array($this, 'init'));

@@ -1,8 +1,8 @@
 <?php return array(
     'root' => array(
         'name' => 'skyminds/sky-login-redirect',
-        'pretty_version' => '3.7.7',
-        'version' => '3.7.7.0',
+        'pretty_version' => '3.7.9',
+        'version' => '3.7.9.0',
         'reference' => null,
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
@@ -31,7 +31,7 @@
         'freemius/wordpress-sdk' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => 'db6f35a2b3d318a53330409dbeab49156ee76dd8',
+            'reference' => 'fedeba08eb3e62af5f84bd6d602f98636467cffc',
             'type' => 'library',
             'install_path' => __DIR__ . '/../freemius/wordpress-sdk',
             'aliases' => array(
@@ -61,8 +61,8 @@
             ),
         ),
         'skyminds/sky-login-redirect' => array(
-            'pretty_version' => '3.7.7',
-            'version' => '3.7.7.0',
+            'pretty_version' => '3.7.9',
+            'version' => '3.7.9.0',
             'reference' => null,
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
@@ -72,7 +72,7 @@
         'skyminds/zen-settings' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => 'd43c5640966074c7e31070ef3aa893ea92989cee',
+            'reference' => '85d7dc92b50113c5bc189f0ce9131230d6f7c9fe',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../zen-settings',
             'aliases' => array(

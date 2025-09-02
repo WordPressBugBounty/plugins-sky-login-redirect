@@ -3,9 +3,9 @@ Contributors: skyminds
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DNSC3NVBWR66L
 Tags: login redirect, login customizer, login menu, woocommerce login, login, edd login, modal login, modal customizer
 Requires at least: 3.0
-Tested up to: 6.8.1
+Tested up to: 6.8.2
 Requires PHP: 7
-Stable tag: 3.7.8
+Stable tag: 3.7.9
 License: GPLv3 or later
 
 Redirect all users, specific users, or roles to the page they were reading prior to logging in or logging out or to a custom page. Features an awesome login page customizer.
@@ -61,29 +61,21 @@ If redirections have been set already, re-validate your permalinks (WordPress an
 
 == Changelog ==
 
-= 3.7.8 - 2025-06-11 =
-*   Update - CF
-*   Update - FS
-*   Update - Composer
-*   Update - Tested compatibility with WP 6.8.1
+= 3.7.9 - 2025-09-02 =
+*   Update - CF, FS, Composer
+*   Update - Tested compatibility with WP 6.8.2
+*   Improvement - move text domain loading to init hook
+*   Improvement - replace inline script tag with proper WordPress script enqueuing for login redirect
+*   Improvement - honour ?redirect_to when present
+*   Improvement - improve cookie security and redirect handling in login flow
+*   Improvement - improve CF loading
+*   Improvement - improve menu icon animation with CSS custom properties and reduced motion support
+*   Fix - use current URL instead of permalink for last_page_visited cookie
+*   Fix - improve cookie handling
 
-= 3.7.7 - 2025-04-17 =
-*   Update - CF
-*   Update - Tested compatibility with WP 6.8
-
-= 3.7.6 - 2025-03-19 =
-*   Add - Remove the 'redirect_to' parameter from the logout URL.
-*   Add - Implement rate limiting and security headers for modal login.
-*   Enhancement - remove promo box for Agencies.
-*   Enhancement - Better customizer script.
-*   Enhancement - validate URLs for EDD and WC.
-
-
-= 3.7.5 - 2025-01-28 =
-*   Add - Declare HPOS (High-Performance Order Storage) compatibility for WooCommerce.
-*   Update - CF
-*   Update - FS
 
 Older versions changes can be found in [the changelog](https://utopique.net/products/sky-login-redirect-premium/#changelog "Sky Login Redirect changelog")
 
 == Upgrade Notice ==
+
+Security improvements. Update to the latest version to benefit from these improvements.

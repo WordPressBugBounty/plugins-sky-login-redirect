@@ -205,12 +205,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Freemius/wordpress-sdk.git",
-                "reference": "db6f35a2b3d318a53330409dbeab49156ee76dd8"
+                "reference": "fedeba08eb3e62af5f84bd6d602f98636467cffc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Freemius/wordpress-sdk/zipball/db6f35a2b3d318a53330409dbeab49156ee76dd8",
-                "reference": "db6f35a2b3d318a53330409dbeab49156ee76dd8",
+                "url": "https://api.github.com/repos/Freemius/wordpress-sdk/zipball/fedeba08eb3e62af5f84bd6d602f98636467cffc",
+                "reference": "fedeba08eb3e62af5f84bd6d602f98636467cffc",
                 "shasum": ""
             },
             "require": {
@@ -225,7 +225,7 @@
                 "szepeviktor/phpstan-wordpress": "^1.3",
                 "wp-coding-standards/wpcs": "^2.3"
             },
-            "time": "2025-05-11T07:07:09+00:00",
+            "time": "2025-07-06T13:27:13+00:00",
             "default-branch": true,
             "type": "library",
             "installation-source": "dist",
@@ -251,7 +251,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Freemius/wordpress-sdk/issues",
-                "source": "https://github.com/Freemius/wordpress-sdk/tree/2.12.0"
+                "source": "https://github.com/Freemius/wordpress-sdk/tree/2.12.1"
             },
             "install-path": "../freemius/wordpress-sdk"
         },
@@ -405,15 +405,15 @@
             "source": {
                 "type": "git",
                 "url": "git@github.com:skyminds/zen-settings.git",
-                "reference": "d43c5640966074c7e31070ef3aa893ea92989cee"
+                "reference": "85d7dc92b50113c5bc189f0ce9131230d6f7c9fe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/skyminds/zen-settings/zipball/d43c5640966074c7e31070ef3aa893ea92989cee",
-                "reference": "d43c5640966074c7e31070ef3aa893ea92989cee",
+                "url": "https://api.github.com/repos/skyminds/zen-settings/zipball/85d7dc92b50113c5bc189f0ce9131230d6f7c9fe",
+                "reference": "85d7dc92b50113c5bc189f0ce9131230d6f7c9fe",
                 "shasum": ""
             },
-            "time": "2023-12-01T08:57:46+00:00",
+            "time": "2025-06-16T16:15:33+00:00",
             "default-branch": true,
             "type": "wordpress-plugin",
             "installation-source": "dist",

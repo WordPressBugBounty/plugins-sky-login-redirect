@@ -22,7 +22,7 @@ function Slr_Activation_time()
     $get_activation_time = strtotime("now");
     add_option('SLR_activation_time', $get_activation_time);
 }
-register_activation_hook(__FILE__, __NAMESPACE__ . '\\Slr_Activation_time');
+register_activation_hook(dirname(__DIR__) . '/sky-login-redirect.php', __NAMESPACE__ . '\\Slr_Activation_time');
 
 /**
  * Slr_Add_Notices_script
@@ -35,7 +35,7 @@ function Slr_Add_Notices_script()
 {
     wp_register_script(
         'slr-notice-update',
-        plugins_url('lib/js/admin-notices.js', __FILE__),
+        plugins_url('lib/js/admin-notices.js', dirname(__DIR__) . '/sky-login-redirect.php'),
         ['jquery'],
         SLR_VERSION,
         true
@@ -44,7 +44,8 @@ function Slr_Add_Notices_script()
         'slr-notice-update',
         'notice_params',
         array(
-            'ajaxurl' => get_admin_url() . 'admin-ajax.php',
+            'ajaxurl' => admin_url('admin-ajax.php'),
+            'nonce'   => wp_create_nonce('slr_notice'),
         )
     );
     wp_enqueue_script('slr-notice-update');
@@ -61,7 +62,15 @@ add_action('admin_enqueue_scripts', __NAMESPACE__ . '\\Slr_Add_Notices_script');
  */
 function Slr_Dismiss_notice()
 {
+    check_ajax_referer('slr_notice');
+
+    if (! current_user_can('manage_options')) {
+        wp_send_json_error(['message' => 'forbidden'], 403);
+    }
+
     update_option('SLR_EOY_2020', true);
+
+    wp_send_json_success();
 }
 add_action('wp_ajax_SLR_EOY_2020', __NAMESPACE__ . '\\Slr_Dismiss_notice');
 

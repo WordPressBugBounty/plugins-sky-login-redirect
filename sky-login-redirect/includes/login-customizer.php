@@ -40,15 +40,16 @@ function Slr_Custom_Login_page($url, $redirect, $force_reauth)
     $page = carbonade('slr_custom_login_url');
     if ($page) {
         // get slug
-        $page = trailingslashit(basename(parse_url($page, PHP_URL_PATH)));
-        $url = site_url($page);
+		$slug = trailingslashit( basename( (string) parse_url( (string) $page, PHP_URL_PATH ) ) );
+		$url  = site_url( $slug );
 
-        if (! empty($redirect)) {
-            $url = add_query_arg('redirect_to', urlencode($redirect), $url);
-        }
-        if ($force_reauth) {
-            $url = add_query_arg('reauth', '1', $url);
-        }
+		if ( ! empty( $redirect ) ) {
+			$safe = wp_validate_redirect( (string) $redirect, $url );
+			$url  = add_query_arg( 'redirect_to', rawurlencode( $safe ), $url );
+		}
+		if ( $force_reauth ) {
+			$url = add_query_arg( 'reauth', '1', $url );
+		}
     }
     return $url;
 }
@@ -124,7 +125,7 @@ function Slr_Login_preview($hook)
 <h3 style="margin-left: 1.4rem;font-weight: 400;">
     <?php _e('Save your settings first to see changes &#8623;', 'sky-login-redirect'); ?>
 </h3>
-<iframe src="<?php echo home_url('/wp-login.php'); ?>" height="540px" width="100%" sandbox="allow-scripts allow-popups"></iframe>
+<iframe src="<?php echo esc_url( home_url('/wp-login.php') ); ?>" height="540px" width="100%" sandbox="allow-scripts allow-popups allow-same-origin"></iframe>
 </div>
         <?php
         //sandbox="allow-same-origin allow-scripts allow-popups"
@@ -169,18 +170,49 @@ function Slr_Customizer_css()
     /* custom login logo */
     $slr_logo = carbonade('slr_custom_logo');
     if (!empty($slr_logo)) {
-        $imagedata = @getimagesize($slr_logo);
-        // width : $imagedata[0];
-        // height: $imagedata[1]
-        $height = ((is_array($imagedata) && $imagedata[1]) ? 'height: '. $imagedata[1] . 'px;' : 'padding-bottom: 56.25%; height: 0;');
+        $logo_url   = $slr_logo;
+        $logo_h     = 0;
+
+        // If a numeric value is stored, treat it as an attachment ID
+        if (is_numeric($slr_logo)) {
+            $attachment_id = (int) $slr_logo;
+            $src = wp_get_attachment_image_src($attachment_id, 'full');
+            if ($src && is_array($src)) {
+                $logo_url = $src[0];
+                // $src[1] width, $src[2] height
+                $logo_h   = isset($src[2]) ? (int) $src[2] : 0;
+            }
+        } else {
+            // Attempt to map URL to attachment ID only for local uploads host
+            $uploads   = wp_get_upload_dir();
+            $logo_host = (string) wp_parse_url((string) $slr_logo, PHP_URL_HOST);
+            $upl_host  = (string) wp_parse_url((string) $uploads['baseurl'], PHP_URL_HOST);
+            if ($logo_host && $upl_host && strcasecmp($logo_host, $upl_host) === 0) {
+                $attachment_id = attachment_url_to_postid((string) $slr_logo);
+                if ($attachment_id) {
+                    $src = wp_get_attachment_image_src($attachment_id, 'full');
+                    if ($src && is_array($src)) {
+                        $logo_url = $src[0];
+                        $logo_h   = isset($src[2]) ? (int) $src[2] : 0;
+                    }
+                }
+            }
+        }
+
+        // Height CSS: use metadata height if available, otherwise a safe default
+        $height_css = $logo_h > 0
+            ? 'height: ' . $logo_h . 'px;'
+            : 'padding-bottom: 56.25%; height: 0;';
+
+        $logo_url_css = esc_url($logo_url);
 
         $style .= ".login h1 {
                 position: relative;
-                {$height}
+                {$height_css}
                 overflow: hidden;
             }
             .login h1 a{
-                background-image:none,url('{$slr_logo}') !important;
+                background-image:none,url('{$logo_url_css}') !important;
                 background-size: auto;
                 background-position: center top;
                 background-repeat: no-repeat;
@@ -212,8 +244,9 @@ function Slr_Customizer_css()
     /* page background image */
     $slr_page_background_image = carbonade('slr_page_background_image');
     if (!empty($slr_page_background_image)) {
+        $bg_url = esc_url($slr_page_background_image);
         $style .= "body.login {
-                background-image: url('{$slr_page_background_image}');
+                background-image: url('{$bg_url}');
                 background-repeat: no-repeat;
                 background-attachment: fixed;
                 background-position: center;
@@ -230,8 +263,9 @@ function Slr_Customizer_css()
     /* Login page background image */
     $slr_form_background_image = carbonade('slr_form_background_image');
     if (!empty($slr_form_background_image)) {
+        $form_bg_url = esc_url($slr_form_background_image);
         $style .= "body.login #loginform {
-                background-image: url('{$slr_form_background_image}');
+                background-image: url('{$form_bg_url}');
                 background-repeat: no-repeat;
                 b__ackground-attachment: fixed;
                 background-position: center;
