@@ -1,5 +1,9 @@
 == Changelog ==
 
+= 3.7.10 - 2025-09-02 =
+*   Fix - Carbon Fields compatibility
+*   Improvement - modal login form now using vanilla JS
+
 = 3.7.9 - 2025-09-02 =
 *   Update - CF, FS, Composer
 *   Update - Tested compatibility with WP 6.8.2

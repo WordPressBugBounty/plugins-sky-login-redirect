@@ -5,7 +5,7 @@ Tags: login redirect, login customizer, login menu, woocommerce login, login, ed
 Requires at least: 3.0
 Tested up to: 6.8.2
 Requires PHP: 7
-Stable tag: 3.7.9
+Stable tag: 3.7.10
 License: GPLv3 or later
 
 Redirect all users, specific users, or roles to the page they were reading prior to logging in or logging out or to a custom page. Features an awesome login page customizer.
@@ -60,6 +60,10 @@ If redirections have been set already, re-validate your permalinks (WordPress an
 4. The submit button customizer allows you to customize the login submit button.
 
 == Changelog ==
+
+= 3.7.10 - 2025-09-02 =
+*   Fix - Carbon Fields compatibility
+*   Improvement - modal login form now using vanilla JS
 
 = 3.7.9 - 2025-09-02 =
 *   Update - CF, FS, Composer

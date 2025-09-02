@@ -4,7 +4,7 @@
  * Plugin Name: Sky Login Redirect
  * Plugin URI: https://utopique.net/products/sky-login-redirect-premium/
  * Description: Redirects users to the page they were prior to logging in or out. Features an awesome login customizer.
- * Version: 3.7.9
+ * Version: 3.7.10
  * Author: Utopique
  * Author URI: https://utopique.net/
  * Developer: Utopique
@@ -33,7 +33,7 @@ if ( !defined( 'ABSPATH' ) ) {
     // Exit if accessed directly
 }
 // current version
-define( 'SLR_VERSION', '3.7.9' );
+define( 'SLR_VERSION', '3.7.10' );
 // Plugin root path
 define( "SLR_ROOT", trailingslashit( plugin_dir_path( __FILE__ ) ) );
 /**
@@ -138,17 +138,15 @@ if ( function_exists( __NAMESPACE__ . '\\Sky_Login_Redirect_fs' ) ) {
      * @return void
      */
     function Sky_Load_carbonfields() {
-        if ( !is_admin() ) {
-            return;
-        }
         include_once plugin_dir_path( __FILE__ ) . 'vendor/autoload.php';
         \Carbon_Fields\Carbon_Fields::boot();
         /**
          * Remove sidebar creation
          */
-        // immediately after calling \Carbon_Fields\Carbon_Fields::boot();
-        $sidebar_manager = \Carbon_Fields\Carbon_Fields::resolve( 'sidebar_manager' );
-        remove_action( 'admin_enqueue_scripts', array($sidebar_manager, 'enqueue_scripts') );
+        if ( is_admin() ) {
+            $sidebar_manager = \Carbon_Fields\Carbon_Fields::resolve( 'sidebar_manager' );
+            remove_action( 'admin_enqueue_scripts', array($sidebar_manager, 'enqueue_scripts') );
+        }
     }
 
     add_action( 'after_setup_theme', __NAMESPACE__ . '\\Sky_Load_carbonfields' );
