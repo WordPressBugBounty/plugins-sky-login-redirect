@@ -1,7 +1,8 @@
 <?php
 /**
- * Options page
- * php version 7
+ * Options page configuration using Carbon Fields.
+ *
+ * Modern PHP 8.1+ implementation with strict types.
  *
  * @category Options
  * @package  Sky_Login_Redirect
@@ -10,10 +11,12 @@
  * @link     https://utopique.net
  */
 
+declare(strict_types=1);
+
 namespace SkyLoginRedirect\Options;
 
-if (! defined('ABSPATH')) {
-    exit; // Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
 }
 
 use Carbon_Fields\Carbon_Fields;
@@ -29,9 +32,9 @@ use Carbon_Fields\Field\Complex_Field;
 use function SkyLoginRedirect\Sky_Login_Redirect_fs as SLR_FS;
 
 /**
- * Créée une page d'options pour notre plugin.
- * Les onglets sont initialement vides mais sont définis
- * et remplis de champs via des filtres définis plus bas.
+ * Create the plugin options page.
+ * Tabs are initially empty but defined and populated
+ * with fields via filters below.
  *
  * @link https://carbonfields.net/docs/containers-theme-options/
  *
@@ -77,23 +80,20 @@ function options_initialize_admin_page()
     // WP6.0+ : use CSS only, defined inline in the main plugin file
     $theme_options->set_icon('none');
 
-    // On gère les classes
+    // Set CSS class based on user's plan
     if (SLR_FS()->is_plan('platinum', true)) {
         $plan = 'plan-platinum';
-    }
-    if (SLR_FS()->is_plan('business', true)) {
+    } elseif (SLR_FS()->is_plan('business', true)) {
         $plan = 'plan-business';
-    }
-    if (SLR_FS()->is_plan('pro', true)) {
+    } elseif (SLR_FS()->is_plan('pro', true)) {
         // pro has been renamed to starter
         $plan = 'plan-starter';
-    }
-    if (SLR_FS()->is_not_paying() || SLR_FS()->is_free_plan()) {
+    } else {
         $plan = 'free';
     }
     $theme_options->set_classes($plan);
 
-    // Et enfin, pour chaque onglet, on charge les champs de l'onglet concerné.
+    // For each tab, load its fields via the corresponding filter.
     foreach ($tabs as $tab_slug => $tab_title) {
         $theme_options->add_tab(
             esc_html($tab_title),
@@ -211,7 +211,8 @@ function options_login_logout_tab_theme_fields()
             )->add_options(
                 function () {
                     $usr = [];
-                    $users = get_users();
+                    // Limit to 1000 users to prevent memory exhaustion on large sites
+                    $users = get_users( [ 'number' => 1000 ] );
                     foreach ($users as $user) {
                         $usr[$user->display_name . ' (ID=' . $user->ID .')'] = $user->display_name;
                     }
@@ -271,10 +272,16 @@ function options_login_logout_tab_theme_fields()
                 ->add_options(
                     function () {
                         $usr = [];
-                        $posts = get_posts([ 'post_type' => 'page' ]);
+                        // Optimize query: limit results and only fetch necessary fields
+                        $posts = get_posts([
+                            'post_type' => 'page',
+                            'posts_per_page' => 500,
+                            'orderby' => 'title',
+                            'order' => 'ASC',
+                            'post_status' => 'publish'
+                        ]);
                         foreach ($posts as $post) {
                             $usr[$post->ID] = $post->post_title;
-                            //$usr[$post->post_title . ' (ID=' . $post->ID .')'] = $post->post_title;
                         }
                         return $usr;
                     }
@@ -354,7 +361,14 @@ function options_login_logout_tab_theme_fields()
                     ->add_options(
                         function () {
                             $usr = [];
-                            $posts = get_posts([ 'post_type' => 'page' ]);
+                            // Optimize query: limit results and only fetch necessary fields
+                            $posts = get_posts([
+                                'post_type' => 'page',
+                                'posts_per_page' => 500,
+                                'orderby' => 'title',
+                                'order' => 'ASC',
+                                'post_status' => 'publish'
+                            ]);
                             foreach ($posts as $post) {
                                 $usr[$post->ID] = $post->post_title;
                             }
@@ -515,13 +529,20 @@ function options_woocommerce_tab_theme_fields()
 
     // EDD is simply installed, not active
     if (array_key_exists('easy-digital-downloads/easy-digital-downloads.php', $plugins)) {
-        $edd = sprintf('<h2 class="woocommerce-install">' . __('These options require Easy Digital Downloads to be active. <a href="%s">Enable Easy Digital Downloads here</a>.', 'sky-login-redirect') . '</h2>', esc_url(admin_url('/plugins.php')));
+        $edd_msg = sprintf(
+            /* translators: %s: URL to the Plugins screen to enable Easy Digital Downloads */
+            __('These options require Easy Digital Downloads to be active. <a href="%s">Enable Easy Digital Downloads here</a>.', 'sky-login-redirect'),
+            esc_url(admin_url('/plugins.php'))
+        );
+        $edd = '<h2 class="woocommerce-install">' . $edd_msg . '</h2>';
     } else {
         // EDD is not installed
-        $edd = sprintf(
-            '<h2 class="woocommerce-install">' . __('These options require Easy Digital Downloads to be installed and active. You can <a href="%s">download Easy Digital Downloads here</a>.', 'sky-login-redirect') . '</h2>',
+        $edd_msg = sprintf(
+            /* translators: %s: URL to install Easy Digital Downloads */
+            __('These options require Easy Digital Downloads to be installed and active. You can <a href="%s">download Easy Digital Downloads here</a>.', 'sky-login-redirect'),
             esc_url(admin_url('/plugin-install.php?s=edd&tab=search&type=term'))
         );
+        $edd = '<h2 class="woocommerce-install">' . $edd_msg . '</h2>';
     }
 
     if (!class_exists('Easy_Digital_Downloads')) {
@@ -567,16 +588,20 @@ function options_woocommerce_tab_theme_fields()
 
     // WooCommerce is simply installed, not active
     if (array_key_exists('woocommerce/woocommerce.php', $plugins)) {
-        $woocommerce = sprintf(
-            '<h2 class="woocommerce-install">' . __('These options require WooCommerce to be active. <a href="%s">Enable WooCommerce here</a>.', 'sky-login-redirect') . '</h2>',
+        $wc_msg = sprintf(
+            /* translators: %s: URL to the Plugins screen to enable WooCommerce */
+            __('These options require WooCommerce to be active. <a href="%s">Enable WooCommerce here</a>.', 'sky-login-redirect'),
             esc_url(admin_url('/plugins.php'))
         );
+        $woocommerce = '<h2 class="woocommerce-install">' . $wc_msg . '</h2>';
     } else {
         // Woocommerce is not installed
-        $woocommerce = sprintf(
-            '<h2 class="woocommerce-install">' . __('These options require WooCommerce to be installed and active. You can <a href="%s">download WooCommerce here</a>.', 'sky-login-redirect') . '</h2>',
+        $wc_msg = sprintf(
+            /* translators: %s: URL to install WooCommerce */
+            __('These options require WooCommerce to be installed and active. You can <a href="%s">download WooCommerce here</a>.', 'sky-login-redirect'),
             esc_url(admin_url('/plugin-install.php?s=woocommerce&tab=search&type=term'))
         );
+        $woocommerce = '<h2 class="woocommerce-install">' . $wc_msg . '</h2>';
     }
 
     if (!class_exists('WooCommerce')) {
@@ -856,7 +881,8 @@ function options_customizer_tab_theme_fields()
         ->set_value_type('url');
 
     $fields[] = Field::make('color', 'slr_page_background_color', __('Background color', 'sky-login-redirect'))
-        ->set_classes('indent');
+        ->set_classes('indent')
+        ->set_default_value('#f0f0f1');
 
     $fields[] = Field::make('image', 'slr_page_background_image', __('Background image', 'sky-login-redirect'))
         ->set_classes('indent')
@@ -866,35 +892,43 @@ function options_customizer_tab_theme_fields()
         ->set_html(sprintf('<h2>%s</h2>', __('Login form', 'sky-login-redirect')));
 
     $fields[] = Field::make('color', 'slr_form_background_color', __('Background color', 'sky-login-redirect'))
-        ->set_classes('indent');
+        ->set_classes('indent')
+        ->set_default_value('#ffffff');
 
     $fields[] = Field::make('image', 'slr_form_background_image', __('Background image', 'sky-login-redirect'))
         ->set_classes('indent')
         ->set_value_type('url');
 
     $fields[] = Field::make('color', 'slr_form_labels_color', __('Labels color', 'sky-login-redirect'))
-        ->set_classes('indent');
+        ->set_classes('indent')
+        ->set_default_value('#3c434a');
 
     $fields[] = Field::make('color', 'slr_form_nav_color', __('Navigation links color', 'sky-login-redirect'))
-        ->set_classes('indent');
+        ->set_classes('indent')
+        ->set_default_value('#50575e');
 
     $fields[] = Field::make('color', 'slr_form_backtoblog_color', __('Back to blog link color', 'sky-login-redirect'))
-        ->set_classes('indent');
+        ->set_classes('indent')
+        ->set_default_value('#50575e');
 
     $fields[] = Field::make('color', 'slr_form_privacy_color', __('Privacy page link color', 'sky-login-redirect'))
-        ->set_classes('indent');
+        ->set_classes('indent')
+        ->set_default_value('#50575e');
 
     $fields[] = Field::make('html', 'customizer_submit')
         ->set_html(sprintf('<h2>%s</h2>', __('Login button', 'sky-login-redirect')));
 
     $fields[] = Field::make('color', 'slr_form_submit_background_color', __('Background color', 'sky-login-redirect'))
-        ->set_classes('indent');
+        ->set_classes('indent')
+        ->set_default_value('#2271b1');
 
     $fields[] = Field::make('color', 'slr_form_submit_background_color_hover', __('Background color (hover)', 'sky-login-redirect'))
-        ->set_classes('indent');
+        ->set_classes('indent')
+        ->set_default_value('#135e96');
 
     $fields[] = Field::make('color', 'slr_form_submit_border_color', __('Border color', 'sky-login-redirect'))
-        ->set_classes('indent');
+        ->set_classes('indent')
+        ->set_default_value('#2271b1');
 
     $fields[] = Field::make('text', 'slr_form_submit_radius', __('Border radius (px)', 'sky-login-redirect'))
         ->set_classes('indent inline-flex')
@@ -911,10 +945,12 @@ function options_customizer_tab_theme_fields()
         ->set_attribute('step', 0.1);
 
     $fields[] = Field::make('color', 'slr_form_submit_text_color', __('Text color', 'sky-login-redirect'))
-        ->set_classes('indent');
+        ->set_classes('indent')
+        ->set_default_value('#ffffff');
 
     $fields[] = Field::make('color', 'slr_form_submit_text_color_hover', __('Text color (hover)', 'sky-login-redirect'))
-        ->set_classes('indent');
+        ->set_classes('indent')
+        ->set_default_value('#ffffff');
 
     $fields[] = Field::make('select', 'slr_form_submit_align', __('Alignment', 'sky-login-redirect'))
         ->set_classes('indent')
@@ -1055,7 +1091,11 @@ function options_restrict_tab_theme_fields()
 
         $fields[] = Field::make('html', 'slr_restrict_p')
                                 ->set_html(
-                                    sprintf('<p class="widgets platinum">%s<p><p class="widgets platinum">%s<p>', __('You can restrict content by forcing users to log in on your posts, pages or custom post types.', 'sky-login-redirect'), __('Create a rule to start restricting content to logged-in users, roles and specific users.', 'sky-login-redirect'))
+                                    sprintf(
+                                        '<p class="widgets platinum">%s<p><p class="widgets platinum">%s<p>',
+                                        __('You can restrict content by forcing users to log in on your posts, pages or custom post types.', 'sky-login-redirect'),
+                                        __('Create a rule to start restricting content to logged-in users, roles and specific users.', 'sky-login-redirect')
+                                    )
                                 );
         // user categories dropdown
         $categories = [
@@ -1083,10 +1123,16 @@ function options_restrict_tab_theme_fields()
                         ->add_options(
                             function () {
                                 $usr = [];
-                                $posts = get_posts([ 'post_type' => 'any' ]);
+                                // Optimize query: limit results to prevent memory issues
+                                $posts = get_posts([
+                                    'post_type' => ['post', 'page'],
+                                    'posts_per_page' => 500,
+                                    'orderby' => 'title',
+                                    'order' => 'ASC',
+                                    'post_status' => 'publish'
+                                ]);
                                 foreach ($posts as $post) {
                                     $usr[$post->post_title . ' (ID=' . $post->ID .')'] = $post->post_title;
-                                    //$usr[$post->ID] = $post->post_title;
                                 }
                                 return $usr;
                             }
@@ -1233,7 +1279,9 @@ function options_modal_tab_theme_fields()
         ->set_option_value('yes');
 
     $fields[] = Field::make('html', 'modal_login_form')
-        ->set_html(sprintf('<h3 class="separator">%s</h3>', __('Login form', 'sky-login-redirect')));
+        ->set_html(
+            sprintf('<h3 class="separator">%s</h3>', __('Login form', 'sky-login-redirect'))
+        );
 
     $fields[] = Field::make('color', 'slr_modal_login_form_color', __('Background color', 'sky-login-redirect'))
         ->set_classes('indent')
@@ -1460,7 +1508,7 @@ function options_blocks_tab_theme_fields()
         ->set_html(
             sprintf('<p class="widgets">%s<p>', __('Add a login/logout link with this shortcode:', 'sky-login-redirect'))
             . '<ul class="slr-shortcode"><li>'
-            . __('Posts, pages, custom post types, and widgets:', 'sky-login-redirect') . ' <code>[login-logout]</code></li><li>'
+            . __('Posts, pages, and custom post types:', 'sky-login-redirect') . ' <code>[login-logout]</code></li><li>'
             . __('Theme templates:', 'sky-login-redirect')
             . ' <code>&lt;?php echo do_shortcode( \'[login-logout]\' ); ?&gt;</code></li></ul>'
         );
@@ -1477,14 +1525,16 @@ function options_blocks_tab_theme_fields()
     if (empty($menus)) {
         $fields[] = Field::make('html', 'slr_link_menu_choice')
             ->set_html(
-                sprintf(
-                    '<span class="widgets business">'
-                    . __('No menu has been created yet. Head over to <a href="%s">%s</a> to create a menu and add elements.', 'sky-login-redirect')
-                    . '</span>',
-                    esc_url(admin_url('nav-menus.php')),
-                    __('Appearance &rarr; Widgets', 'sky-login-redirect')
-                )
-            );
+				sprintf(
+					'<span class="widgets business">%s</span>',
+					sprintf(
+						/* translators: 1: URL to the Appearance > Menus admin page, 2: link label */
+						__( 'No menu has been created yet. Head over to <a href="%1$s">%2$s</a> to create a menu and add elements.', 'sky-login-redirect' ),
+						esc_url( admin_url( 'nav-menus.php' ) ),
+						esc_html__( 'Appearance &rarr; Menus', 'sky-login-redirect' )
+					)
+				)
+			);
     } else {
         $fields[] = Field::make('html', 'slr_link_menu_choice')
             ->set_html(
@@ -1650,8 +1700,8 @@ function display_content_after_fields()
 		<h4>%1$s</h4>
 		%2$s
 		</div>',
-        __('Valeur du champ "Champ WYSIWYG"', 'sky-login-redirect'),
-        \carbon_get_theme_option('champ_riche')
+        esc_html__( 'Valeur du champ "Champ WYSIWYG"', 'sky-login-redirect' ),
+        wp_kses_post( (string) \carbon_get_theme_option( 'champ_riche' ) )
     );
 
     printf(
@@ -1659,8 +1709,8 @@ function display_content_after_fields()
 		<h4>%1$s</h4>
 		%2$s
 		</div>',
-        __('Valeur du champ "Champs menu déroulant"', 'sky-login-redirect'),
-        \carbon_get_theme_option('champ_select')
+        esc_html__( 'Valeur du champ "Champs menu déroulant"', 'sky-login-redirect' ),
+        esc_html( (string) \carbon_get_theme_option( 'champ_select' ) )
     );
 }
 //add_action( 'carbon_fields_container_options_du_plugin_after_fields', __NAMESPACE__ . '\\display_content_after_fields' );
@@ -1736,14 +1786,14 @@ function Slr_Upsell_features()
             <path d="M19 13H5v-2h14v2z"></path>
         </svg>
     </div>
-    <div id="buy"><a class="button" href="<?php echo SLR_FS()->get_upgrade_url(); ?>">
-    <span>🚀</span> <?php _e('Go Pro', 'sky-login-redirect'); ?>
+    <div id="buy"><a class="button" href="<?php echo esc_url( SLR_FS()->get_upgrade_url() ); ?>">
+    <span>🚀</span> <?php esc_html_e( 'Go Pro', 'sky-login-redirect' ); ?>
     </a></div>
-    <p><strong><?php _e('And get access to:', 'sky-login-redirect'); ?></strong></p>
+    <p><strong><?php esc_html_e( 'And get access to:', 'sky-login-redirect' ); ?></strong></p>
     <ul>
     <?php
     foreach ($features as $f) {
-        printf('<li>✔ ' . $f . '</li>');
+        printf('<li>✔ %s</li>', esc_html( $f ) );
     }
     ?>
     </ul>

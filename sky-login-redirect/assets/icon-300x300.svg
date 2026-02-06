@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" fill="none">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="iconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f093fb;stop-opacity:0.9" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background with rounded corners -->
+  <rect width="300" height="300" rx="30" fill="url(#bgGrad)"/>
+
+  <!-- Decorative circles -->
+  <circle cx="240" cy="60" r="50" fill="#ffffff" opacity="0.08"/>
+  <circle cx="60" cy="240" r="40" fill="#ffffff" opacity="0.08"/>
+  <circle cx="250" cy="250" r="35" fill="#ffffff" opacity="0.06"/>
+
+  <!-- Central icon container -->
+  <circle cx="150" cy="150" r="85" fill="#ffffff" opacity="0.12"/>
+
+  <!-- Main redirect icon (scaled and centered) -->
+  <g transform="translate(90, 90)">
+    <path d="M57.885 36a2.112 2.112 0 0 1 2.115 2.127v9.612a2.112 2.112 0 0 1-2.1 2.127a2.112 2.112 0 0 1-2.1-2.127v-3.375C50.337 53.532 40.197 60 29.271 60c-13.23 0-24.318-8.163-29.127-20.745a2.136 2.136 0 0 1 1.2-2.751c1.08-.423 2.298.12 2.718 1.215c4.2 10.986 13.764 18.03 25.209 18.03c10.113 0 19.56-6.546 23.961-15.462l-4.413.03a2.112 2.112 0 0 1-2.115-2.112a2.115 2.115 0 0 1 2.085-2.142L57.885 36ZM29.235 0c13.224 0 24.315 8.163 29.124 20.745a2.136 2.136 0 0 1-1.2 2.751a2.091 2.091 0 0 1-2.718-1.215c-4.2-10.986-13.764-18.03-25.209-18.03c-10.113 0-19.56 6.546-23.961 15.462l4.413-.03a2.112 2.112 0 0 1 2.115 2.112a2.115 2.115 0 0 1-2.085 2.142L2.115 24A2.112 2.112 0 0 1 0 21.873V12.261c0-1.176.939-2.127 2.1-2.127c1.158 0 2.1.951 2.1 2.127v3.375C7.663 6.468 17.803 0 29.235 0Z"
+          fill="url(#iconGrad)" opacity="0.95" transform="scale(2)"/>
+  </g>
+
+  <!-- Bottom text -->
+  <text x="150" y="245" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#ffffff" text-anchor="middle" opacity="0.95">
+    Sky Login
+  </text>
+  <text x="150" y="270" font-family="Arial, sans-serif" font-size="18" font-weight="500" fill="#ffffff" text-anchor="middle" opacity="0.85">
+    Redirect
+  </text>
+</svg>

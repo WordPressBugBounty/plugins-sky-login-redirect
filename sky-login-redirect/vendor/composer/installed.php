@@ -1,8 +1,8 @@
 <?php return array(
     'root' => array(
         'name' => 'skyminds/sky-login-redirect',
-        'pretty_version' => '3.7.10',
-        'version' => '3.7.10.0',
+        'pretty_version' => '4.0.0',
+        'version' => '4.0.0.0',
         'reference' => null,
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
@@ -31,7 +31,7 @@
         'freemius/wordpress-sdk' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => 'fedeba08eb3e62af5f84bd6d602f98636467cffc',
+            'reference' => '3cbe98b5bd0b0fb5ca4df97b8088592737ea4375',
             'type' => 'library',
             'install_path' => __DIR__ . '/../freemius/wordpress-sdk',
             'aliases' => array(
@@ -61,29 +61,18 @@
             ),
         ),
         'skyminds/sky-login-redirect' => array(
-            'pretty_version' => '3.7.10',
-            'version' => '3.7.10.0',
+            'pretty_version' => '4.0.0',
+            'version' => '4.0.0.0',
             'reference' => null,
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
-        'skyminds/zen-settings' => array(
-            'pretty_version' => 'dev-master',
-            'version' => 'dev-master',
-            'reference' => '85d7dc92b50113c5bc189f0ce9131230d6f7c9fe',
-            'type' => 'wordpress-plugin',
-            'install_path' => __DIR__ . '/../zen-settings',
-            'aliases' => array(
-                0 => '9999999-dev',
-            ),
-            'dev_requirement' => false,
-        ),
         'wp-cli/wp-config-transformer' => array(
-            'pretty_version' => 'v1.4.2',
-            'version' => '1.4.2.0',
-            'reference' => 'b78cab1159b43eb5ee097e2cfafe5eab573d2a8a',
+            'pretty_version' => 'v1.4.3',
+            'version' => '1.4.3.0',
+            'reference' => '5ade4e70349a1d5cd07efc33880ceb5eebb9e9fa',
             'type' => 'library',
             'install_path' => __DIR__ . '/../wp-cli/wp-config-transformer',
             'aliases' => array(),

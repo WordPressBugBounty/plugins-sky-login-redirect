@@ -1,7 +1,8 @@
 <?php
 /**
- * Admin: meta
- * PHP version 7
+ * Admin meta links and credits.
+ *
+ * Modern PHP 8.1+ implementation with strict types.
  *
  * @category Admin_Meta
  * @package  Sky_Login_Redirect
@@ -10,135 +11,138 @@
  * @link     https://utopique.net
  */
 
+declare(strict_types=1);
+
 namespace SkyLoginRedirect\Admin\Meta;
 
-if (! defined('ABSPATH')) {
-    exit; // Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
 }
 
-use function SkyLoginRedirect\Sky_Login_Redirect_fs as Sky_Login_Redirect_fs;
+use function SkyLoginRedirect\Sky_Login_Redirect_fs;
+
+/** Allowed HTML for links in footer. */
+const LINK_ALLOWED_HTML = [
+    'a'      => [ 'href' => [], 'target' => [], 'rel' => [] ],
+    'strong' => [],
+];
+
+/** Plugin admin screens. */
+const ADMIN_SCREENS = [
+    'toplevel_page_sky-login-redirect',
+    'login-redirect_page_sky-login-redirect-account',
+    'login-redirect_page_sky-login-redirect-contact',
+];
 
 /**
- * Add settings link to plugins page
+ * Get plugin basename (works for both free and pro versions).
  *
- * @param $links the existing links underneath the plugin name
- *
- * @return $links
+ * @return string Plugin basename.
  */
-function Slr_Settings_link($links)
-{
-    $settings_link = sprintf(
-        '<a href="%s">%s</a>',
-        esc_url(admin_url('admin.php?page=sky-login-redirect')),
-        __('Settings', 'sky-login-redirect')
+function get_plugin_basename(): string {
+    return plugin_basename( plugin_dir_path( dirname( __FILE__, 2 ) ) . 'sky-login-redirect.php' );
+}
+
+/**
+ * Add settings link to plugins page.
+ *
+ * @param array $links Existing links.
+ * @return array Modified links.
+ */
+function Slr_Settings_link( array $links ): array {
+    array_unshift(
+        $links,
+        sprintf(
+            '<a href="%s">%s</a>',
+            esc_url( admin_url( 'admin.php?page=sky-login-redirect' ) ),
+            esc_html__( 'Settings', 'sky-login-redirect' )
+        )
     );
-    array_unshift($links, $settings_link); // or array_push
     return $links;
 }
-//$plugin = plugin_basename(__FILE__);
-
-$plugin_dir_path = plugin_dir_path(dirname(__FILE__, 2));
-$plugin = plugin_basename($plugin_dir_path . '/sky-login-redirect.php');
-
-add_filter(
-    "plugin_action_links_{$plugin}",
-    __NAMESPACE__ . '\\Slr_Settings_link',
-    10,
-    1
-);
+add_filter( 'plugin_action_links_' . get_plugin_basename(), __NAMESPACE__ . '\\Slr_Settings_link' );
 
 /**
- * Add additional useful links to plugins page
+ * Add row meta links to plugins page.
  *
- * @param $links the links array
- * @param $file  the plugin file
- *
- * @return array
+ * @param array  $links Existing links.
+ * @param string $file  Plugin file.
+ * @return array Modified links.
  */
-function Slr_Row_meta($links, $file)
-{
-    $plugin_dir_path = plugin_dir_path(dirname(__FILE__, 2));
-    //if ($file === plugin_basename(__FILE__)) {
-    if ($file === plugin_basename($plugin_dir_path . '/sky-login-redirect.php')) {
-        $support = 'https://wordpress.org/support/plugin/sky-login-redirect/';
-        $row_meta = array(
-            'docs'    => '<a href="' . esc_url(
-                apply_filters('slr_docs_url', 'https://utopique.net/docs/')
-            ) . '" title="' . esc_attr(
-                __('View Documentation', 'sky-login-redirect')
-            ) . '">' . __('Docs', 'sky-login-redirect') . '</a>',
-            'support' => '<a href="' . esc_url(
-                apply_filters(
-                    'slr_support_url',
-                    $support
-                )
-            ) . '" title="' . esc_attr(
-                __('Contact support', 'sky-login-redirect')
-            ) . '">' . __('Support', 'sky-login-redirect') . '</a>',
-            'rate' => '<a href="' . esc_url(
-                apply_filters(
-                    'slr_rate',
-                    $support . 'reviews/?rate=5#new-post'
-                )
-            ) . '" target="_blank" title="' . esc_attr(
-                __('Rate Sky Login Redirect', 'sky-login-redirect')
-            ) . '">' . __('Rate us', 'sky-login-redirect') . '</a>',
-        );
-        return array_merge($links, $row_meta);
+function Slr_Row_meta( array $links, string $file ): array {
+    if ( $file !== get_plugin_basename() ) {
+        return $links;
     }
-    return (array) $links;
+
+    $support = 'https://wordpress.org/support/plugin/sky-login-redirect/';
+
+    return array_merge( $links, [
+        'docs'    => sprintf(
+            '<a href="%s" title="%s">%s</a>',
+            esc_url( apply_filters( 'slr_docs_url', 'https://utopique.net/docs/' ) ),
+            esc_attr__( 'View Documentation', 'sky-login-redirect' ),
+            esc_html__( 'Docs', 'sky-login-redirect' )
+        ),
+        'support' => sprintf(
+            '<a href="%s" title="%s">%s</a>',
+            esc_url( apply_filters( 'slr_support_url', $support ) ),
+            esc_attr__( 'Contact support', 'sky-login-redirect' ),
+            esc_html__( 'Support', 'sky-login-redirect' )
+        ),
+        'rate'    => sprintf(
+            '<a href="%s" target="_blank" title="%s">%s</a>',
+            esc_url( apply_filters( 'slr_rate', $support . 'reviews/?rate=5#new-post' ) ),
+            esc_attr__( 'Rate Sky Login Redirect', 'sky-login-redirect' ),
+            esc_html__( 'Rate us', 'sky-login-redirect' )
+        ),
+    ] );
 }
-add_filter('plugin_row_meta', __NAMESPACE__ . '\\Slr_Row_meta', 10, 2);
+add_filter( 'plugin_row_meta', __NAMESPACE__ . '\\Slr_Row_meta', 10, 2 );
 
 /**
- * Show credits line
+ * Show custom credits in admin footer.
  *
- * @param $footer_text the footer text
- *
- * @return mixed
+ * @param string $footer_text Default footer text.
+ * @return string Modified footer text.
  */
-function Slr_Admin_credits($footer_text)
-{
-    $current_screen = get_current_screen();
-    $hook = $current_screen->id;
-    $array = [
-        'toplevel_page_sky-login-redirect',
-        'login-redirect_page_sky-login-redirect-account',
-        'login-redirect_page_sky-login-redirect-contact',
-    ];
-    if (!in_array($hook, $array)) {
+function Slr_Admin_credits( string $footer_text ): string {
+    $screen = get_current_screen();
+    if ( ! $screen || ! in_array( $screen->id, ADMIN_SCREENS, true ) ) {
         return $footer_text;
     }
 
-    $footer_text = sprintf(
-        __(
-            'Thank you for using <a href="%s" target="_blank">%s</a>',
-            'sky-login-redirect'
+    $text = wp_kses(
+        sprintf(
+            /* translators: 1: Product URL, 2: Product name */
+            __( 'Thank you for using <a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>', 'sky-login-redirect' ),
+            'https://utopique.net/products/sky-login-redirect-premium/',
+            esc_html__( 'Sky Login Redirect', 'sky-login-redirect' )
         ),
-        'https://utopique.net/products/sky-login-redirect-premium/',
-        __('Sky Login Redirect', 'sky-login-redirect')
+        LINK_ALLOWED_HTML
     );
 
-    $footer_text .= ' &bull; ' . sprintf(
-        __(
-            'Check out the <a href="%s" target="_blank">%s</a>',
-            'sky-login-redirect'
+    $text .= ' &bull; ' . wp_kses(
+        sprintf(
+            /* translators: 1: Documentation URL, 2: Link label */
+            __( 'Check out the <a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>', 'sky-login-redirect' ),
+            'https://utopique.net/docs-category/login-redirect-pro/',
+            esc_html__( 'documentation', 'sky-login-redirect' )
         ),
-        'https://utopique.net/docs-category/login-redirect-pro/',
-        __('documentation', 'sky-login-redirect')
+        LINK_ALLOWED_HTML
     );
 
-    $Sky_Login_Redirect_fs = Sky_Login_Redirect_fs();
-    if ($Sky_Login_Redirect_fs->is_not_paying()
-        || $Sky_Login_Redirect_fs->is_free_plan()
-    ) {
-        $footer_text .= ' &bull; ' . sprintf(
-            __('<strong><a href="%s">%s</strong></a>', 'sky-login-redirect'),
-            $Sky_Login_Redirect_fs->get_upgrade_url(),
-            __('Go Pro', 'sky-login-redirect')
+    $fs = Sky_Login_Redirect_fs();
+    if ( $fs->is_not_paying() || $fs->is_free_plan() ) {
+        $text .= ' &bull; ' . wp_kses(
+            sprintf(
+                '<strong><a href="%s" target="_blank" rel="noopener noreferrer">%s</a></strong>',
+                esc_url( $fs->get_upgrade_url() ),
+                esc_html__( 'Go Pro', 'sky-login-redirect' )
+            ),
+            LINK_ALLOWED_HTML
         );
     }
 
-    return $footer_text;
+    return $text;
 }
-add_filter('admin_footer_text', __NAMESPACE__ . '\\Slr_Admin_credits');
+add_filter( 'admin_footer_text', __NAMESPACE__ . '\\Slr_Admin_credits' );

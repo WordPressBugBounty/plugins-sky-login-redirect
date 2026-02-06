@@ -46,13 +46,14 @@
 		<exclude-pattern>*</exclude-pattern>
 	</rule>
 
-
     <!-- Include the whole WordPress Coding Standards -->
     <rule ref="WordPress">
         <!-- Exclude the WordPress array declaration rules. -->
         <exclude name="WordPress.Arrays.ArrayDeclarationSpacing"/>
 		<!-- Exclude check for short syntax arrays. -->
 		 <exclude name="Universal.Arrays.DisallowShortArraySyntax"/>
+         <!-- Disable inline comment terminal punctuation rule -->
+         <exclude name="Squiz.Commenting.InlineComment"/>
     </rule>
 
 </ruleset>

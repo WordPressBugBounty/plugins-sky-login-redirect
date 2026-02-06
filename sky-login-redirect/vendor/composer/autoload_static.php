@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit1e0d6814fa7468754307c81997409d74
+class ComposerStaticInit2d1da12220b95576f3b99e06c7c20bb8
 {
     public static $files = array (
         '8d50dc88e56bace65e1e72f6017983ed' => __DIR__ . '/..' . '/freemius/wordpress-sdk/start.php',
@@ -12,11 +12,7 @@ class ComposerStaticInit1e0d6814fa7468754307c81997409d74
     );
 
     public static $prefixLengthsPsr4 = array (
-        'Z' => 
-        array (
-            'ZenSettings\\' => 12,
-        ),
-        'C' => 
+        'C' =>
         array (
             'Composer\\Installers\\' => 20,
             'Carbon_Fields\\' => 14,
@@ -24,15 +20,11 @@ class ComposerStaticInit1e0d6814fa7468754307c81997409d74
     );
 
     public static $prefixDirsPsr4 = array (
-        'ZenSettings\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/zen-settings',
-        ),
-        'Composer\\Installers\\' => 
+        'Composer\\Installers\\' =>
         array (
             0 => __DIR__ . '/..' . '/composer/installers/src/Composer/Installers',
         ),
-        'Carbon_Fields\\' => 
+        'Carbon_Fields\\' =>
         array (
             0 => __DIR__ . '/..' . '/htmlburger/carbon-fields/core',
         ),
@@ -277,9 +269,9 @@ class ComposerStaticInit1e0d6814fa7468754307c81997409d74
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit1e0d6814fa7468754307c81997409d74::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit1e0d6814fa7468754307c81997409d74::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit1e0d6814fa7468754307c81997409d74::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit2d1da12220b95576f3b99e06c7c20bb8::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit2d1da12220b95576f3b99e06c7c20bb8::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit2d1da12220b95576f3b99e06c7c20bb8::$classMap;
 
         }, null, ClassLoader::class);
     }

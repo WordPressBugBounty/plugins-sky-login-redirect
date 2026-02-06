@@ -4,21 +4,22 @@
  * Plugin Name: Sky Login Redirect
  * Plugin URI: https://utopique.net/products/sky-login-redirect-premium/
  * Description: Redirects users to the page they were prior to logging in or out. Features an awesome login customizer.
- * Version: 3.7.10
+ * Version: 4.1.5
  * Author: Utopique
  * Author URI: https://utopique.net/
  * Developer: Utopique
  * Developer URI: https://utopique.net/
- * Copyright: (c) 2009-2025 Utopique
+ * Copyright: (c) 2009-2026 Utopique
  * Text Domain: sky-login-redirect
  * Domain Path: /languages
- * License: GPLv2 or later
- * Requires at least: 3.0
- * Tested up to: 6.8.2
- * Requires PHP: 7
+ * License: GPLv3 or later
+ * Requires at least: 5.6
+ * Tested up to: 6.9
+ * Requires PHP: 8.1
  * WC requires at least: 3.3
- * WC tested up to: 10.1
- * PHP version 7
+ * WC tested up to: 11
+ *
+ * Modern PHP 8.1+ implementation with strict types and enums.
  *
  * @category        Login_Redirect
  * @package         Sky_Login_Redirect
@@ -26,16 +27,49 @@
  * @license         GPL https://utopique.net
  * @link            https://utopique.net
  */
+declare (strict_types = 1);
 namespace SkyLoginRedirect;
 
 if ( !defined( 'ABSPATH' ) ) {
     exit;
-    // Exit if accessed directly
 }
-// current version
-define( 'SLR_VERSION', '3.7.10' );
+/**
+ * Redirect type enumeration.
+ */
+if ( !enum_exists( 'SkyLoginRedirect\\RedirectType' ) ) {
+    enum RedirectType : string
+    {
+        case PREVIOUS = 'previous';
+        case CUSTOM = 'custom';
+        case DEFAULT = 'default';
+    }
+}
+/**
+ * User selection type enumeration.
+ */
+if ( !enum_exists( 'SkyLoginRedirect\\UserSelectionType' ) ) {
+    enum UserSelectionType : string
+    {
+        case USER = 'user';
+        case ROLE = 'role';
+        case ALL = 'all';
+    }
+}
+/**
+ * WordPress action type enumeration.
+ */
+if ( !enum_exists( 'SkyLoginRedirect\\ActionType' ) ) {
+    enum ActionType : string
+    {
+        case LOGIN = 'login';
+        case LOGOUT = 'logout';
+        case REGISTER = 'register';
+    }
+}
+// Current version
+define( 'SLR_VERSION', '4.1.5' );
 // Plugin root path
-define( "SLR_ROOT", trailingslashit( plugin_dir_path( __FILE__ ) ) );
+define( 'SLR_ROOT', trailingslashit( plugin_dir_path( __FILE__ ) ) );
 /**
  * FS
  */
@@ -77,63 +111,31 @@ if ( function_exists( __NAMESPACE__ . '\\Sky_Login_Redirect_fs' ) ) {
         Sky_Login_Redirect_fs();
         // Signal that SDK was initiated.
         do_action( 'Sky_Login_Redirect_fs_loaded' );
-    }
-    //include_once plugin_dir_path(__FILE__) . 'vendor/zen-settings/zen-settings.php';
-    /*
-    // Check if the ZenSettings class exists
-    if (!class_exists('ZenSettings\ZenSettings')) {
-        // Only then require Composer autoloader
-        include __DIR__ . '/vendor/autoload.php';
-    }
-    */
-    /*
-        class SkyLoginRedirect
-        {
-            public function __construct()
-            {
-                add_action('init', array( $this, 'initialize_zen_settings' ));
-            }
-    
-            public function initialize_zen_settings()
-            {
-    
-                // Load plugin config
-                include_once plugin_dir_path(__FILE__) . 'includes/config.php';
-    
-                global $zen_settings;  // Make it global
-                $zen_settings = new \ZenSettings\ZenSettings(
-                    $args,
-                    $menu_icon,
-                    $tabs,
-                    $icons,
-                    $features
-                );
-                $zen_settings->init();
-            }
+        /**
+         * Clean up all plugin data on uninstall.
+         * Hooked to Freemius after_uninstall to allow uninstall tracking.
+         *
+         * @return void
+         */
+        function sky_login_redirect_fs_uninstall_cleanup() : void {
+            global $wpdb;
+            // Delete main plugin options.
+            delete_option( 'sky_login_redirect' );
+            delete_option( 'SLR_BFCM' );
+            // Delete all Carbon Fields options (prefixed with _slr_).
+            $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s", $wpdb->esc_like( '_slr_' ) . '%' ) );
+            // Delete transients.
+            delete_transient( 'sky_login_redirect' );
+            // Clear object cache.
+            wp_cache_delete( 'sky_login_redirect', 'slr' );
         }
-    
-        // Initialize your plugin
-        new SkyLoginRedirect();
-    */
-    /**
-     * Load functions
-     */
-    //include_once plugin_dir_path(__FILE__) . 'includes/functions.php';
-    /**
-     * Register the plugin text domain.
-     *
-     * WordPress 6.7+ expects translations to load on or after `init`.
-     * If you bundle .mo files in /languages, this makes them available.
-     *
-     * @return void
-     */
-    function slr_load_plugin_textdomain() : void {
-        load_plugin_textdomain( 'sky-login-redirect', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
-    }
 
-    add_action( 'init', __NAMESPACE__ . '\\slr_load_plugin_textdomain', 0 );
+        // Hook uninstall cleanup to Freemius after_uninstall action.
+        Sky_Login_Redirect_fs()->add_action( 'after_uninstall', __NAMESPACE__ . '\\sky_login_redirect_fs_uninstall_cleanup' );
+    }
+    // Translations are automatically loaded by WordPress for plugins hosted on WordPress.org
     /**
-     * Charge notre dépendance Carbon Fields via Composer
+     * Load Carbon Fields dependency via Composer.
      *
      * @return void
      */
@@ -151,7 +153,7 @@ if ( function_exists( __NAMESPACE__ . '\\Sky_Login_Redirect_fs' ) ) {
 
     add_action( 'after_setup_theme', __NAMESPACE__ . '\\Sky_Load_carbonfields' );
     /**
-     * Charge notre fichier de plugin
+     * Load plugin options file.
      *
      * @return void
      */
@@ -161,8 +163,9 @@ if ( function_exists( __NAMESPACE__ . '\\Sky_Login_Redirect_fs' ) ) {
 
     add_action( 'plugins_loaded', __NAMESPACE__ . '\\Sky_Load_plugin' );
     include_once plugin_dir_path( __FILE__ ) . 'lib/admin/meta.php';
-    //include_once plugin_dir_path(__FILE__) . 'lib/admin/core.php';
-    //include_once plugin_dir_path(__FILE__) . 'lib/admin/settings.php';
+    include_once plugin_dir_path( __FILE__ ) . 'includes/notices.php';
+    include_once plugin_dir_path( __FILE__ ) . 'includes/ajax-handlers.php';
+    include_once plugin_dir_path( __FILE__ ) . 'includes/class-redirect-manager.php';
     /**
      * Sky_Maybe_Is_ssl
      *
@@ -199,33 +202,14 @@ if ( function_exists( __NAMESPACE__ . '\\Sky_Login_Redirect_fs' ) ) {
         return false;
     }
 
-    /**
-     * Set a cookie with the current page on all pages but the login page
-     * If a login page, change the value of redirect_to with the last
-     * cookie value
-     *
-     * @return void
-     */
-    function Sky_set_current_page_cookie() : void {
-        if ( is_admin() || is_user_logged_in() || is_login_page() ) {
-            return;
-        }
-        $current_url = home_url( $_SERVER['REQUEST_URI'] ?? '/' );
-        $cookie_options = [
-            'expires'  => time() + HOUR_IN_SECONDS,
-            'path'     => '/',
-            'secure'   => Sky_Maybe_Is_ssl(),
-            'httponly' => true,
-            'samesite' => 'Lax',
-        ];
-        // Only set a domain if WP defined a usable one.
-        if ( defined( 'COOKIE_DOMAIN' ) && COOKIE_DOMAIN ) {
-            $cookie_options['domain'] = COOKIE_DOMAIN;
-        }
-        setcookie( 'last_page_visited', $current_url, $cookie_options );
-    }
-
-    add_action( 'template_redirect', __NAMESPACE__ . '\\Sky_set_current_page_cookie' );
+    // Load cookie manager
+    require_once SLR_ROOT . 'includes/class-cookie-manager.php';
+    $cookie_manager = new CookieManager();
+    add_action( 'template_redirect', $cookie_manager->setLastVisitedPage( ... ) );
+    // Load security header manager
+    require_once SLR_ROOT . 'includes/class-security-header-manager.php';
+    $security_manager = new SecurityHeaderManager();
+    add_action( 'send_headers', $security_manager->addSecurityHeaders( ... ) );
     /**
      * Set redirect field on login page to last visited page URL
      *
@@ -236,7 +220,13 @@ if ( function_exists( __NAMESPACE__ . '\\Sky_Login_Redirect_fs' ) ) {
             return;
         }
         $redirect_to = Sky_get_last_page_visited_cookie();
-        wp_register_script( 'slr-inline', '' );
+        wp_register_script(
+            'slr-inline',
+            false,
+            array(),
+            ( defined( 'SLR_VERSION' ) ? SLR_VERSION : null ),
+            true
+        );
         wp_enqueue_script( 'slr-inline' );
         wp_add_inline_script( 'slr-inline', 'document.addEventListener("DOMContentLoaded",function(){var f=document.getElementById("redirect_to");if(f){f.value=' . wp_json_encode( esc_url_raw( $redirect_to ) ) . ';}});', 'after' );
     }
@@ -264,7 +254,9 @@ if ( function_exists( __NAMESPACE__ . '\\Sky_Login_Redirect_fs' ) ) {
         // Loop through the cookie prefixes and clear any matching cookies
         foreach ( $cookie_prefixes as $prefix ) {
             foreach ( $_COOKIE as $cookie_key => $cookie_value ) {
-                if ( strpos( $cookie_key, $prefix ) === 0 ) {
+                // Sanitize cookie key to prevent injection attacks
+                $sanitized_key = sanitize_key( $cookie_key );
+                if ( strpos( $sanitized_key, $prefix ) === 0 ) {
                     $opts = array(
                         'expires'  => $expiration_time,
                         'path'     => '/',
@@ -275,7 +267,7 @@ if ( function_exists( __NAMESPACE__ . '\\Sky_Login_Redirect_fs' ) ) {
                     if ( defined( 'COOKIE_DOMAIN' ) && COOKIE_DOMAIN ) {
                         $opts['domain'] = COOKIE_DOMAIN;
                     }
-                    setcookie( $cookie_key, '', $opts );
+                    setcookie( $sanitized_key, '', $opts );
                 }
             }
         }
@@ -293,14 +285,15 @@ if ( function_exists( __NAMESPACE__ . '\\Sky_Login_Redirect_fs' ) ) {
      * @return string The referer URL if it exists, otherwise an empty string.
      */
     function Sky_get_last_page_visited_cookie() : string {
-        if ( isset( $_COOKIE['last_page_visited'] ) ) {
-            $referer_url = sanitize_url( $_COOKIE['last_page_visited'] );
-            //$referer_url = $_COOKIE['last-page-visited'];
+        $raw_cookie = filter_input( INPUT_COOKIE, 'last_page_visited', FILTER_UNSAFE_RAW );
+        if ( $raw_cookie ) {
+            $raw_cookie = wp_unslash( (string) $raw_cookie );
+            $referer_url = sanitize_url( $raw_cookie );
             return esc_url_raw( $referer_url );
-        } else {
-            return wp_get_referer();
         }
-        return '';
+        // wp_get_referer() can return false, so we need to handle that case
+        $referer = wp_get_referer();
+        return ( $referer ? (string) $referer : '' );
     }
 
     /**
@@ -324,146 +317,19 @@ if ( function_exists( __NAMESPACE__ . '\\Sky_Login_Redirect_fs' ) ) {
         2
     );
     /**
-     * Redirection for login and logout
+     * Redirection for login and logout using RedirectManager.
      *
-     * @param mixed $redirect_to           the redirect
-     * @param mixed $requested_redirect_to the requested redirect
-     * @param array $user                  the current user
-     *
-     * @return $redirect
+     * @param mixed $redirect_to           Default redirect URL.
+     * @param mixed $requested_redirect_to Requested redirect URL.
+     * @param mixed $user                  Current user object.
+     * @return string Validated redirect URL.
      */
-    function Slr_redirection(  $redirect_to, $requested_redirect_to, $user  ) {
-        $slr_xselect_redirect = carbon_get_theme_option( 'slr_xlogin_logout' );
-        // If a redirect_to parameter exists in the URL, honour it safely (internal/allowed hosts only)
-        $default_redirect = admin_url( '/' );
-        if ( isset( $_GET['redirect_to'] ) && '' !== $_GET['redirect_to'] ) {
-            $requested = wp_unslash( (string) $_GET['redirect_to'] );
-            return wp_validate_redirect( $requested, $default_redirect );
+    function Slr_redirection(  $redirect_to, $requested_redirect_to, $user  ) : string {
+        static $redirect_manager = null;
+        if ( null === $redirect_manager ) {
+            $redirect_manager = new RedirectManager();
         }
-        // bypass wp-admin for login
-        // disabled in 3.6.0 as it was taking precedence over rules
-        /*
-        if (preg_match(
-            "/wp-admin/",
-            $requested_redirect_to
-        ) && current_filter() === 'login_redirect') {
-            $redirect_to = esc_url_raw($requested_redirect_to);
-            return $redirect_to;
-        }
-        */
-        // in case no rule were created, redirect all users to homepage
-        if ( empty( $slr_xselect_redirect ) ) {
-            return esc_url_raw( home_url( '/' ) );
-        }
-        foreach ( $slr_xselect_redirect as $rule ) {
-            // user
-            if ( $rule['slr_xselect_redirect'] == 'user' ) {
-                //$current_user = wp_get_current_user();
-                $current_user = $user;
-                if ( $current_user && is_object( $current_user ) && is_a( $current_user, 'WP_User' ) ) {
-                    foreach ( $rule['slr_xuser'] as $usr ) {
-                        $usrID = $usr;
-                        $str = $usrID;
-                        $start = strpos( $str, '(' );
-                        $end = strpos( $str, ')', $start + 1 );
-                        $length = $end - $start;
-                        $result = substr( $str, $start + 1, $length - 1 );
-                        $result = str_replace( 'ID=', '', $result );
-                        $arr[$result] = array(
-                            'name'   => $usrID,
-                            'login'  => $rule['slr_xlogin_url'],
-                            'logout' => $rule['slr_xlogout_url'],
-                        );
-                        foreach ( $arr as $key => $value ) {
-                            if ( $key == $current_user->ID ) {
-                                $diff = str_replace( ['_redirect', 'wp_ajax_nopriv_ajax'], '', current_filter() );
-                                // prior
-                                if ( $rule["slr_xselect_{$diff}"] == 'prior' ) {
-                                    $link = Slr_Get_Prior_url( $redirect_to, $requested_redirect_to, $user );
-                                    return $link;
-                                    break;
-                                } elseif ( $rule["slr_xselect_{$diff}"] == 'page' ) {
-                                    // page
-                                    $link = get_permalink( $rule["slr_x{$diff}_page"] );
-                                    return $link;
-                                    break;
-                                } elseif ( $rule["slr_xselect_{$diff}"] == 'custom' ) {
-                                    // custom
-                                    $link = $rule["slr_x{$diff}_url"];
-                                    return $link;
-                                    break;
-                                } else {
-                                    // WP defaults
-                                    return admin_url( '/' );
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            /* role */
-            if ( $rule['slr_xselect_redirect'] == 'role' ) {
-                foreach ( $rule['slr_xrole'] as $role ) {
-                    //retrieve current user info
-                    global $wp_roles;
-                    //$current_user = wp_get_current_user();
-                    $current_user = $user;
-                    $roles = $wp_roles->roles;
-                    //is there a user to check?
-                    if ( isset( $current_user->roles ) && is_array( $current_user->roles ) ) {
-                        if ( in_array( $current_user->roles[0], $rule['slr_xrole'] ) ) {
-                            $diff = str_replace( ['_redirect', 'wp_ajax_nopriv_ajax'], '', current_filter() );
-                            if ( $rule["slr_xselect_{$diff}"] == 'prior' ) {
-                                // prior
-                                $link = Slr_Get_Prior_url( $redirect_to, $requested_redirect_to, $user );
-                                return $link;
-                                break;
-                            } elseif ( $rule["slr_xselect_{$diff}"] == 'page' ) {
-                                // page
-                                $link = get_permalink( $rule["slr_x{$diff}_page"] );
-                                return $link;
-                                break;
-                            } elseif ( $rule["slr_xselect_{$diff}"] == 'custom' ) {
-                                // custom
-                                $link = $rule["slr_x{$diff}_url"];
-                                return $link;
-                                break;
-                            } else {
-                                // WP defaults
-                                return admin_url( '/' );
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            // all
-            if ( $rule['slr_xselect_redirect'] == 'all' ) {
-                //$diff = str_replace( ['_redirect'], '', current_filter());
-                $diff = str_replace( ['_redirect', 'wp_ajax_nopriv_ajax'], '', current_filter() );
-                if ( $rule["slr_xselect_{$diff}"] == 'prior' ) {
-                    // prior
-                    $link = Slr_Get_Prior_url( $redirect_to, $requested_redirect_to, $user );
-                    return $link;
-                    break;
-                } elseif ( $rule["slr_xselect_{$diff}"] == 'page' ) {
-                    // page
-                    $link = get_permalink( $rule["slr_x{$diff}_page"] );
-                    return $link;
-                    break;
-                } elseif ( $rule["slr_xselect_{$diff}"] == 'custom' ) {
-                    // custom
-                    $link = $rule["slr_x{$diff}_url"];
-                    return $link;
-                    break;
-                } else {
-                    // WP defaults
-                    return admin_url( '/' );
-                    break;
-                }
-            }
-        }
+        return $redirect_manager->processRedirect( $redirect_to, $requested_redirect_to, $user );
     }
 
     add_filter(
@@ -479,70 +345,15 @@ if ( function_exists( __NAMESPACE__ . '\\Sky_Login_Redirect_fs' ) ) {
         3
     );
     /**
-     * Get prior URL
-     *
-     * @param string $redirect_to           the redirect
-     * @param string $requested_redirect_to the requested redirect
-     * @param array  $user                  the current user
-     *
-     * @return $redirect_to
-     */
-    function Slr_Get_Prior_url(  ?string $redirect_to, ?string $requested_redirect_to, $user  ) : ?string {
-        $referer = Sky_get_last_page_visited_cookie();
-        /**
-         * If the login page calls itself in $redirect_to,
-         * avoid the loop and redirect to the homepage.
-         * This would happen w/ password recovery and registration links.
-         * It only concerns login, not logout
-         * (otherwise it breaks the logout referer)
-         */
-        if ( preg_match( "/wp-login\\.php/", $redirect_to ) && current_filter() === 'login_redirect' ) {
-            $redirect_to = home_url( '/' );
-            return wp_validate_redirect( (string) $redirect_to, home_url( '/' ) );
-            //return '';
-            //this will blank out if user has clicked on register link
-            //or password recovery links before landing on the login page
-        }
-        // bypass wp-admin for login
-        if ( preg_match( "/wp-admin/", $requested_redirect_to ) && current_filter() === 'login_redirect' ) {
-            $redirect_to = esc_url_raw( $requested_redirect_to );
-            //return $redirect_to;
-            return wp_validate_redirect( (string) $redirect_to, home_url( '/' ) );
-        }
-        // logout: if we log out from wp-admin, redirect to homepage
-        if ( preg_match( "/wp-admin/", $referer ) && current_filter() === 'logout_redirect' ) {
-            $redirect_to = home_url( '/' );
-            return wp_validate_redirect( (string) $redirect_to, home_url( '/' ) );
-        }
-        // this bit is for when WP is installed in a subdirectory
-        // if $referer equals the login page, get value from $redirect_to
-        if ( preg_match( "/wp-login\\.php/", $referer ) && current_filter() === 'login_redirect' ) {
-            $redirect_to = esc_url_raw( $redirect_to );
-            return wp_validate_redirect( (string) $redirect_to, home_url( '/' ) );
-        }
-        // If the referer is empty, use $redirect_to as it is set via the cookie.
-        if ( !$referer ) {
-            return wp_validate_redirect( (string) $redirect_to, home_url( '/' ) );
-        }
-        // Otherwise, go back to the referring page.
-        return wp_validate_redirect( (string) $referer, home_url( '/' ) );
-    }
-
-    /**
      * Shortcode : [login-logout]
      *
-     * @return mixed
+     * @return string Login or logout link.
      */
-    function Slr_Login_Logout_shortcode() {
+    function Slr_Login_Logout_shortcode() : string {
         if ( is_user_logged_in() ) {
-            // user is logged in, therefore display the logout link
-            // If you want to redirect the user to the same page after logout,
-            // then use this line below instead
-            return '<a class="logout-btn slr-lilo-shortcode" href="' . esc_url( wp_logout_url() ) . '">' . esc_html__( 'Logout', 'sky-login-redirect' ) . '</a>';
-        } else {
-            // user is logged out, therefore display the login link
-            return '<a class="login-btn slr-lilo-shortcode" href="' . esc_url( wp_login_url() ) . '">' . esc_html__( 'Login', 'sky-login-redirect' ) . '</a>';
+            return sprintf( '<a class="logout-btn slr-lilo-shortcode" href="%s">%s</a>', esc_url( wp_logout_url() ), esc_html__( 'Logout', 'sky-login-redirect' ) );
         }
+        return sprintf( '<a class="login-btn slr-lilo-shortcode" href="%s">%s</a>', esc_url( wp_login_url() ), esc_html__( 'Login', 'sky-login-redirect' ) );
     }
 
     add_shortcode( 'login-logout', __NAMESPACE__ . '\\Slr_Login_Logout_shortcode' );
@@ -561,17 +372,35 @@ if ( function_exists( __NAMESPACE__ . '\\Sky_Login_Redirect_fs' ) ) {
     /**
      * Get cached options from transient
      *
-     * @return void
+     * @return array
      */
     function Slr_Get_Cached_options() : array {
         global $wpdb;
+        // Try object cache first to avoid direct DB queries when possible.
+        $cached = wp_cache_get( 'sky_login_redirect', 'slr' );
+        if ( false !== $cached && is_array( $cached ) && $cached ) {
+            return $cached;
+        }
+        // Try transient cache as second layer (survives object cache purges)
+        $transient_cache = get_transient( 'slr_options_cache' );
+        if ( false !== $transient_cache && is_array( $transient_cache ) && $transient_cache ) {
+            wp_cache_set(
+                'sky_login_redirect',
+                $transient_cache,
+                'slr',
+                HOUR_IN_SECONDS
+            );
+            return $transient_cache;
+        }
+        // Only query database if both caches miss
         $rows = $wpdb->get_results( $wpdb->prepare( "SELECT option_name, option_value FROM {$wpdb->options} WHERE option_name LIKE %s", $wpdb->esc_like( '_slr_' ) . '%' ), ARRAY_A );
         $cache = array();
         foreach ( $rows as $row ) {
             $cache[$row['option_name']] = maybe_unserialize( $row['option_value'] );
         }
-        // Create with autoload=no, then update thereafter.
-        if ( false === get_option( 'sky_login_redirect', false ) ) {
+        // Only update option if it doesn't exist or has changed
+        $existing_option = get_option( 'sky_login_redirect', false );
+        if ( false === $existing_option ) {
             add_option(
                 'sky_login_redirect',
                 $cache,
@@ -579,9 +408,17 @@ if ( function_exists( __NAMESPACE__ . '\\Sky_Login_Redirect_fs' ) ) {
                 false
             );
             // autoload=no
-        } else {
-            update_option( 'sky_login_redirect', $cache );
+        } elseif ( $existing_option !== $cache ) {
+            update_option( 'sky_login_redirect', $cache, false );
         }
+        // Populate both cache layers
+        wp_cache_set(
+            'sky_login_redirect',
+            $cache,
+            'slr',
+            HOUR_IN_SECONDS
+        );
+        set_transient( 'slr_options_cache', $cache, DAY_IN_SECONDS );
         return $cache;
     }
 
@@ -594,13 +431,14 @@ if ( function_exists( __NAMESPACE__ . '\\Sky_Login_Redirect_fs' ) ) {
      *
      * @return mixed the value for a given key
      */
-    function carbonade(  $key, $default = 'false'  ) {
+    function carbonade(  string $key, $default = false  ) {
         static $cache;
         if ( null === $cache ) {
-            $cache = (array) get_option( 'sky_login_redirect', array() );
+            $cache = (array) get_option( 'sky_login_redirect', [] );
         }
         $k = '_' . $key;
-        return ( array_key_exists( $k, $cache ) ? esc_html( $cache[$k] ) : $default );
+        // Return raw value - escaping should be done at output time, not retrieval
+        return ( array_key_exists( $k, $cache ) ? $cache[$k] : $default );
     }
 
     /**
@@ -637,16 +475,16 @@ if ( function_exists( __NAMESPACE__ . '\\Sky_Login_Redirect_fs' ) ) {
         );
         // empty style as a target for inline CSS
         wp_enqueue_style( $handle );
-        wp_add_inline_style( $handle, "\n:root{\n\t--slr-accent:#a2ff37;\n\t--slr-icon-size:16px;\n}\n\n#toplevel_page_sky-login-redirect .wp-menu-image{\n\tbackground-color:var(--slr-accent);\n\tmask-image:url('{$svg}');\n\tmask-repeat:no-repeat;\n\tmask-position:center;\n\tmask-size:var(--slr-icon-size);\n\t-webkit-mask-image:url('{$svg}');\n\t-webkit-mask-repeat:no-repeat;\n\t-webkit-mask-position:center;\n\t-webkit-mask-size:var(--slr-icon-size);\n\ttransition:transform .9s ease;\n\twill-change:transform;\n}\n\n/* Hover / focus rotates the icon. */\n#toplevel_page_sky-login-redirect:hover .wp-menu-image,\n#toplevel_page_sky-login-redirect .wp-menu-image:hover,\na.toplevel_page_sky-login-redirect:hover .wp-menu-image{\n\ttransform:rotate(180deg);\n}\n\n/* Respect reduced motion: no transition. */\n@media (prefers-reduced-motion: reduce){\n\t#toplevel_page_sky-login-redirect .wp-menu-image{\n\t\ttransition:none;\n\t}\n}\n\n/* Fallback when CSS masks aren't supported. */\n@supports not ((mask-image:url('')) or (-webkit-mask-image:url(''))){\n\t#toplevel_page_sky-login-redirect .wp-menu-image{\n\t\tbackground-color:transparent;\n\t\tbackground-image:url('{$svg}');\n\t\tbackground-repeat:no-repeat;\n\t\tbackground-position:center;\n\t\tbackground-size:var(--slr-icon-size);\n\t}\n}" );
-        $array = [
+        wp_add_inline_style( $handle, "\n:root{\n    --slr-accent:#a2ff37;\n    --slr-icon-size:16px;\n}\n\n#toplevel_page_sky-login-redirect .wp-menu-image{\n    background-color:var(--slr-accent);\n    mask-image:url('{$svg}');\n    mask-repeat:no-repeat;\n    mask-position:center;\n    mask-size:var(--slr-icon-size);\n    -webkit-mask-image:url('{$svg}');\n    -webkit-mask-repeat:no-repeat;\n    -webkit-mask-position:center;\n    -webkit-mask-size:var(--slr-icon-size);\n    transition:transform .9s ease;\n    will-change:transform;\n}\n\n/* Hover / focus rotates the icon. */\n#toplevel_page_sky-login-redirect:hover .wp-menu-image,\n#toplevel_page_sky-login-redirect .wp-menu-image:hover,\na.toplevel_page_sky-login-redirect:hover .wp-menu-image{\n    transform:rotate(180deg);\n}\n\n/* Respect reduced motion: no transition. */\n@media (prefers-reduced-motion: reduce){\n    #toplevel_page_sky-login-redirect .wp-menu-image{\n        transition:none;\n    }\n}\n\n/* Fallback when CSS masks aren't supported. */\n@supports not ((mask-image:url('')) or (-webkit-mask-image:url(''))){\n    #toplevel_page_sky-login-redirect .wp-menu-image{\n        background-color:transparent;\n        background-image:url('{$svg}');\n        background-repeat:no-repeat;\n        background-position:center;\n        background-size:var(--slr-icon-size);\n    }\n}" );
+        $plugin_screens = [
             'toplevel_page_sky-login-redirect',
             'login-redirect_page_sky-login-redirect-account',
             'login-redirect_page_sky-login-redirect-contact',
             'login-redirect_page_sky-login-redirect-pricing'
         ];
-        if ( in_array( $hook, $array ) ) {
+        if ( in_array( $hook, $plugin_screens, true ) ) {
             // Only on our plugin page
-            if ( $hook === $array[0] ) {
+            if ( $hook === $plugin_screens[0] ) {
                 wp_enqueue_style(
                     'utopique-elements',
                     plugins_url( 'lib/css/elements.css', __FILE__ ),
@@ -664,7 +502,7 @@ if ( function_exists( __NAMESPACE__ . '\\Sky_Login_Redirect_fs' ) ) {
                 wp_enqueue_script(
                     'slr-js',
                     plugins_url( 'lib/js/slr.js', __FILE__ ),
-                    ['jquery'],
+                    ['jquery', 'underscore', 'code-editor'],
                     SLR_VERSION,
                     true
                 );
@@ -672,6 +510,7 @@ if ( function_exists( __NAMESPACE__ . '\\Sky_Login_Redirect_fs' ) ) {
                     'upgrade_url'      => Sky_Login_Redirect_fs()->get_upgrade_url(),
                     'pro_feature'      => __( 'unlock with Pro version', 'sky-login-redirect' ),
                     'business_feature' => __( 'unlock with Business version', 'sky-login-redirect' ),
+                    'iconsBase'        => trailingslashit( plugins_url( 'lib/img/icons', __FILE__ ) ),
                 ) );
                 // Codemirror editor
                 $cm_css['codeEditor'] = wp_enqueue_code_editor( [
@@ -684,6 +523,25 @@ if ( function_exists( __NAMESPACE__ . '\\Sky_Login_Redirect_fs' ) ) {
                 wp_localize_script( 'jquery', 'cm_js', $cm_js );
                 wp_enqueue_script( 'wp-theme-plugin-editor' );
                 wp_enqueue_style( 'wp-codemirror' );
+                // Enqueue WordPress bundled Select2 (available since WP 4.2)
+                wp_enqueue_style( 'select2' );
+                wp_enqueue_script( 'select2' );
+                // Enqueue custom AJAX select script
+                wp_enqueue_script(
+                    'slr-ajax-select',
+                    plugins_url( 'assets/js/slr-ajax-select.js', __FILE__ ),
+                    ['jquery', 'select2'],
+                    SLR_VERSION,
+                    true
+                );
+                // Localize script with AJAX data
+                wp_localize_script( 'slr-ajax-select', 'slrAjax', [
+                    'nonce' => wp_create_nonce( 'slr_ajax_nonce' ),
+                    'i18n'  => [
+                        'selectPage' => __( 'Select a page...', 'sky-login-redirect' ),
+                        'selectUser' => __( 'Select users...', 'sky-login-redirect' ),
+                    ],
+                ] );
                 // remove WP emoji on our pages
                 remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
                 remove_action( 'admin_print_styles', 'print_emoji_styles' );

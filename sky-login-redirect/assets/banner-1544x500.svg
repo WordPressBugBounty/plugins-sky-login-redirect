@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1544 500" fill="none">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bgGradientHD" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accentGradientHD" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f093fb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f5576c;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1544" height="500" fill="url(#bgGradientHD)"/>
+
+  <!-- Decorative elements -->
+  <circle cx="1300" cy="100" r="160" fill="#ffffff" opacity="0.05"/>
+  <circle cx="1400" cy="360" r="120" fill="#ffffff" opacity="0.05"/>
+  <circle cx="240" cy="400" r="80" fill="#ffffff" opacity="0.08"/>
+  <circle cx="1200" cy="450" r="60" fill="#ffffff" opacity="0.06"/>
+  <circle cx="200" cy="80" r="50" fill="#ffffff" opacity="0.07"/>
+
+  <!-- Main redirect icon (larger, centered left) -->
+  <g transform="translate(120, 150)">
+    <circle cx="100" cy="100" r="110" fill="#ffffff" opacity="0.15"/>
+    <circle cx="100" cy="100" r="95" fill="#ffffff" opacity="0.1"/>
+    <path d="M154.36 96a5.632 5.632 0 0 1 5.64 5.672v25.632a5.632 5.632 0 0 1-5.6 5.672a5.632 5.632 0 0 1-5.6-5.672v-9C134.232 142.752 107.192 160 78.056 160c-35.28 0-64.848-21.768-77.672-55.32a5.696 5.696 0 0 1 3.2-7.336c2.88-1.128 6.128.32 7.248 3.24c11.2 29.296 36.704 48.08 67.224 48.08c26.968 0 52.16-17.456 63.896-41.232l-11.768.08a5.632 5.632 0 0 1-5.64-5.632a5.64 5.64 0 0 1 5.56-5.712L154.36 96ZM77.96 0c35.264 0 64.84 21.768 77.664 55.32a5.696 5.696 0 0 1-3.2 7.336a5.576 5.576 0 0 1-7.248-3.24c-11.2-29.296-36.704-48.08-67.224-48.08c-26.968 0-52.16 17.456-63.896 41.232l11.768-.08a5.632 5.632 0 0 1 5.64 5.632a5.64 5.64 0 0 1-5.56 5.712L5.64 64A5.632 5.632 0 0 1 0 58.328V32.696c0-3.136 2.504-5.672 5.6-5.672c3.088 0 5.6 2.536 5.6 5.672v9C25.768 17.248 52.808 0 77.96 0Z"
+          fill="#ffffff" opacity="0.95" filter="url(#glow)"/>
+  </g>
+
+  <!-- Plugin name -->
+  <text x="400" y="210" font-family="Arial, sans-serif" font-size="96" font-weight="700" fill="#ffffff">
+    Sky Login Redirect
+  </text>
+
+  <!-- Tagline -->
+  <text x="400" y="275" font-family="Arial, sans-serif" font-size="40" font-weight="400" fill="#ffffff" opacity="0.9">
+    Smart Login &amp; Logout Redirects for WordPress
+  </text>
+
+  <!-- Version badge -->
+  <g transform="translate(400, 295)">
+    <rect x="0" y="0" width="120" height="36" rx="18" fill="#ffffff" opacity="0.25"/>
+    <text x="60" y="24" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">
+      v4.1.0
+    </text>
+  </g>
+
+  <!-- Feature badges -->
+  <g transform="translate(400, 350)">
+    <!-- WooCommerce badge -->
+    <rect x="0" y="0" width="220" height="48" rx="24" fill="url(#accentGradientHD)"/>
+    <text x="110" y="32" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#ffffff" text-anchor="middle">
+      WooCommerce
+    </text>
+
+    <!-- Performance badge -->
+    <rect x="235" y="0" width="200" height="48" rx="24" fill="#ffffff" opacity="0.2"/>
+    <text x="335" y="32" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#ffffff" text-anchor="middle">
+      Performance
+    </text>
+
+    <!-- Security badge -->
+    <rect x="450" y="0" width="170" height="48" rx="24" fill="#ffffff" opacity="0.2"/>
+    <text x="535" y="32" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#ffffff" text-anchor="middle">
+      Security
+    </text>
+
+    <!-- AJAX badge -->
+    <rect x="635" y="0" width="120" height="48" rx="24" fill="#ffffff" opacity="0.2"/>
+    <text x="695" y="32" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#ffffff" text-anchor="middle">
+      AJAX
+    </text>
+  </g>
+
+  <!-- Bottom feature highlights -->
+  <g transform="translate(400, 430)">
+    <circle cx="5" cy="-5" r="4" fill="#ffffff" opacity="0.75"/>
+    <text x="15" y="0" font-family="Arial, sans-serif" font-size="18" font-weight="500" fill="#ffffff" opacity="0.75">
+      Cart/Checkout Preservation
+    </text>
+    <circle cx="285" cy="-5" r="4" fill="#ffffff" opacity="0.75"/>
+    <text x="295" y="0" font-family="Arial, sans-serif" font-size="18" font-weight="500" fill="#ffffff" opacity="0.75">
+      Loop Protection
+    </text>
+    <circle cx="515" cy="-5" r="4" fill="#ffffff" opacity="0.75"/>
+    <text x="525" y="0" font-family="Arial, sans-serif" font-size="18" font-weight="500" fill="#ffffff" opacity="0.75">
+      40-60% Faster
+    </text>
+  </g>
+</svg>

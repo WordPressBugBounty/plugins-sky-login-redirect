@@ -1,7 +1,8 @@
 <?php
 /**
- * Notices
- * PHP version 7
+ * Admin notices and promotional banners.
+ *
+ * Modern PHP 8.4+ implementation with proper state management.
  *
  * @category Notices
  * @package  Sky_Login_Redirect
@@ -10,121 +11,156 @@
  * @link     https://utopique.net
  */
 
+declare(strict_types=1);
+
 namespace SkyLoginRedirect\Notices;
 
-/**
- * Add plugin activation time
- *
- * @return null
- */
-function Slr_Activation_time()
-{
-    $get_activation_time = strtotime("now");
-    add_option('SLR_activation_time', $get_activation_time);
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
 }
-register_activation_hook(dirname(__DIR__) . '/sky-login-redirect.php', __NAMESPACE__ . '\\Slr_Activation_time');
+
+use function SkyLoginRedirect\Sky_Login_Redirect_fs;
 
 /**
- * Slr_Add_Notices_script
- *
- * Add JS script to record dismiss action
- *
- * @return file admin-notices.js
+ * Notice dismissal state enum.
  */
-function Slr_Add_Notices_script()
-{
-    wp_register_script(
-        'slr-notice-update',
-        plugins_url('lib/js/admin-notices.js', dirname(__DIR__) . '/sky-login-redirect.php'),
-        ['jquery'],
-        SLR_VERSION,
-        true
-    );
-    wp_localize_script(
-        'slr-notice-update',
-        'notice_params',
-        array(
-            'ajaxurl' => admin_url('admin-ajax.php'),
-            'nonce'   => wp_create_nonce('slr_notice'),
-        )
-    );
-    wp_enqueue_script('slr-notice-update');
+enum NoticeState: string {
+    case DISMISSED = 'dismissed';
+    case ACTIVE = 'active';
 }
-add_action('admin_enqueue_scripts', __NAMESPACE__ . '\\Slr_Add_Notices_script');
 
 /**
- * Record dismiss
- *
- * Action hook (wp_ajax_SLR_EOY_2020) must correspond to (wp_ajax_)
- * And also to the action name in the JS file (SLR_EOY_2020)
- *
- * @return null
+ * Admin notice manager class.
  */
-function Slr_Dismiss_notice()
-{
-    check_ajax_referer('slr_notice');
+final class NoticeManager {
+    private const OPTION_KEY = 'slr_promo_notice_dismissed';
+    private const NONCE_ACTION = 'slr_notice_dismiss';
+    private const AJAX_ACTION = 'slr_dismiss_notice';
 
-    if (! current_user_can('manage_options')) {
-        wp_send_json_error(['message' => 'forbidden'], 403);
-    }
-
-    update_option('SLR_EOY_2020', true);
-
-    wp_send_json_success();
-}
-add_action('wp_ajax_SLR_EOY_2020', __NAMESPACE__ . '\\Slr_Dismiss_notice');
-
-/**
- * Check if notice should be shown or not
- *
- * Wait at least 48 hours before displaying the notice
- *
- * @return null
- */
-function Slr_Check_Installation_time()
-{
-    $install_date = get_option('SLR_activation_time');
-    $past_date = strtotime('-2 days');
-    if ($past_date >= $install_date) {
-        // if no record set, display the notice
-        if (get_option('SLR_EOY_2020') != true) {
-            add_action('admin_notices', __NAMESPACE__ . '\\Slr_EOY_Admin_notice');
-        }
-    }
-}
-add_action('admin_init', __NAMESPACE__ . '\\Slr_Check_Installation_time');
-
-/**
- * Slr_EOY_Admin_notice
- *
- * @return void
- */
-function Slr_EOY_Admin_notice()
-{
-    $current_screen = get_current_screen();
-    $hook = $current_screen->id;
-    $array = [
+    private const PROMO_SCREENS = [
         'toplevel_page_sky-login-redirect',
         'login-redirect_page_sky-login-redirect-account',
         'login-redirect_page_sky-login-redirect-pricing',
         'plugins',
         'dashboard',
     ];
-    $SLR_fs = Sky_Login_Redirect_fs();
 
-    if (in_array($hook, $array)
-        && date("Ymd") < '20210101' // end of year sale
-        && ($SLR_fs->is_not_paying() || $SLR_fs->is_free_plan())
-    ) {
-        // class name is important as it's detected by the JS script: EOY-2020
-        echo sprintf(
-            '<div class="EOY-2020 notice notice-info is-dismissible"><p>'
-            . __('End of year sale: save %s on', 'sky-login-redirect')
-            . ' <a href="%s" target="_blank">'
-            . __('Sky Login Redirect Pro', 'sky-login-redirect')
-            . '</a>.</p></div>',
-            '20%',
-            esc_url('https://utopique.net/products/sky-login-redirect-premium/')
+    public function __construct(
+        private string $saleEndDate = '20260131',
+        private string $discount = '25%',
+        private string $couponCode = 'EOY2025'
+    ) {}
+
+    /**
+     * Initialize notice hooks.
+     */
+    public function init(): void {
+        add_action( 'admin_init', $this->checkAndDisplayNotice(...) );
+        add_action( 'admin_enqueue_scripts', $this->enqueueScripts(...) );
+        add_action( 'wp_ajax_' . self::AJAX_ACTION, $this->handleDismissal(...) );
+    }
+
+    /**
+     * Check if notice is dismissed.
+     */
+    private function isDismissed(): bool {
+        $value = get_option( self::OPTION_KEY, false );
+        return $value === NoticeState::DISMISSED->value || $value === '1' || $value === 1 || $value === true;
+    }
+
+    /**
+     * Check if sale is active.
+     */
+    private function isSaleActive(): bool {
+        return gmdate( 'Ymd' ) <= $this->saleEndDate;
+    }
+
+    /**
+     * Check if current screen is valid for notices.
+     */
+    private function isValidScreen(): bool {
+        $screen = get_current_screen();
+        return $screen && in_array( $screen->id, self::PROMO_SCREENS, true );
+    }
+
+    /**
+     * Check conditions and display notice if appropriate.
+     */
+    private function checkAndDisplayNotice(): void {
+        if ( $this->isDismissed() || ! $this->isSaleActive() ) {
+            return;
+        }
+
+        add_action( 'admin_notices', $this->renderNotice(...) );
+    }
+
+    /**
+     * Enqueue dismiss script.
+     */
+    private function enqueueScripts(): void {
+        if ( $this->isDismissed() || ! $this->isValidScreen() ) {
+            return;
+        }
+
+        wp_enqueue_script(
+            'slr-notice-dismiss',
+            plugins_url( 'lib/js/admin-notices.js', dirname( __DIR__ ) . '/sky-login-redirect.php' ),
+            [ 'jquery' ],
+            SLR_VERSION,
+            true
+        );
+
+        wp_localize_script( 'slr-notice-dismiss', 'slrNoticeParams', [
+            'ajaxurl' => admin_url( 'admin-ajax.php' ),
+            'nonce'   => wp_create_nonce( self::NONCE_ACTION ),
+            'action'  => self::AJAX_ACTION,
+        ] );
+    }
+
+    /**
+     * Handle AJAX dismissal request.
+     */
+    private function handleDismissal(): void {
+        check_ajax_referer( self::NONCE_ACTION, 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( [ 'message' => 'Forbidden' ], 403 );
+            return;
+        }
+
+        $updated = update_option( self::OPTION_KEY, NoticeState::DISMISSED->value, true );
+
+        if ( $updated ) {
+            wp_send_json_success( [ 'message' => 'Notice dismissed successfully' ] );
+        } else {
+            wp_send_json_error( [ 'message' => 'Failed to dismiss notice' ], 500 );
+        }
+    }
+
+    /**
+     * Render the promotional notice.
+     */
+    private function renderNotice(): void {
+        if ( ! $this->isValidScreen() ) {
+            return;
+        }
+
+        $upgrade_url = Sky_Login_Redirect_fs()->get_upgrade_url();
+        $upgrade_url = add_query_arg( 'coupon', $this->couponCode, $upgrade_url );
+
+        printf(
+            '<div class="slr-promo notice notice-info is-dismissible"><p>%s <a href="%s" target="_blank" rel="noopener">%s</a>.</p></div>',
+            sprintf(
+                /* translators: %s: discount percentage (e.g., "30%") */
+                esc_html__( 'New Year sale: save %s on', 'sky-login-redirect' ),
+                esc_html( $this->discount )
+            ),
+            esc_url( $upgrade_url ),
+            esc_html__( 'Sky Login Redirect Pro', 'sky-login-redirect' )
         );
     }
 }
+
+// Initialize notice manager.
+$notice_manager = new NoticeManager();
+$notice_manager->init();

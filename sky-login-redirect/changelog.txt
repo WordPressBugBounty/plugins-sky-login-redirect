@@ -1,8 +1,77 @@
 == Changelog ==
 
+= 4.1.5 - 2026-01-14 =
+*   Fix: Add default color values to login customizer fields (WordPress default colors)
+*   Fix: Update iframe sandbox to allow forms and scripts for WordPress Playground and wordpress.com compatibility
+*   Fix - Critical: Prevent enum redeclaration fatal error when both free and premium versions are active
+*   Fix: Remove deprecated load_plugin_textdomain() call
+*   Fix: Replace parse_url() with wp_parse_url() for better WordPress compatibility
+*   Fix: Remove debug error_log() code from production
+*   Fix: Add proper nonce verification and input sanitization for AJAX handlers
+*   Fix: Sanitize $_SERVER variables with wp_unslash()
+*   Fix: Use WordPress bundled Select2
+*   Fix: Add translators comment for placeholder in notice
+
+= 4.1.1 - 2026-01-11 =
+*   **BREAKING:** Minimum PHP version increased to 8.1 (previously 7.4)
+*   WooCommerce - add cart/checkout redirect preservation on login
+*   WooCommerce - add logout redirect handler with shop page fallback
+*   WooCommerce - prevent redirect loops on My Account endpoints (customer-logout, lost-password)
+*   Fix - sales notice dismissal now works correctly (script properly enqueued and localized)
+*   Improvement - enhanced loop detection for custom login pages and WooCommerce endpoints
+*   Code Quality - refactor AJAX handlers with modern PHP 8.1+ features (enums, readonly classes, strategy pattern)
+*   Code Quality - refactor WooCommerce integration with enum-based page handling and fluent CSS builder
+*   Code Quality - refactor admin notices with class-based architecture for better maintainability
+*   Security - add rate limiting to AJAX search endpoints (100 requests per minute per user)
+*   Security - add explicit output escaping to AJAX responses for defense in depth
+*   Developer - add debug logging for AJAX requests when WP_DEBUG is enabled
+
+= 4.0.0 - 2026-01-03 =
+*   Performance - optimize cookie setting to only update when URL changes (20-30% reduction in header overhead)
+*   Performance - add limits to get_posts() queries to prevent memory exhaustion on large sites (50-80% faster admin loads)
+*   Performance - implement dual-layer caching (object cache + transients) for database queries
+*   Performance - reduce redundant option updates during save operations
+*   Performance - replace regex with native string functions (strpos) for 10-15% faster redirects
+*   Performance - implement AJAX page/user selectors with Select2 for scalable admin interface
+*   Security - add redirect loop protection with transient tracking to prevent infinite loops
+*   Security - implement rate limiting on cookie operations (max 10 per minute per IP)
+*   Security - add security headers (X-Content-Type-Options, Referrer-Policy, Permissions-Policy)
+*   Improvement - refactor uninstall logic to use Freemius after_uninstall hook for proper tracking
+
+= 3.9.0 - 2025-12-30 =
+*   Improvement - major code optimization (~30% reduction across plugin files)
+*   Improvement - add type hints and return types throughout codebase
+*   Improvement - extract helper functions to reduce code duplication
+*   Improvement - refactor redirect logic with cleaner architecture
+*   Improvement - fix user ID parsing with proper regex validation
+*   Improvement - fix plan detection logic in options page
+*   Improvement - convert loose comparisons to strict (== to ===)
+*   Improvement - use WordPress constants (HOUR_IN_SECONDS, etc.)
+*   Improvement - minify inline CSS/JS output
+*   Improvement - add accessibility attributes to login preview iframe
+*   Improvement - consistent indentation and WordPress coding standards
+*   Improvement - remove dead/commented-out code
+*   Improvement - bump minimum requirements to WP 5.6 and PHP 7.4
+
+= 3.8.0 - 2025-11-26 =
+*   Improvement - convert jQuery code to vanilla JS
+*   Performance - improve code editor initialization
+*   Performance - improve tab handling with sprite-based icons
+*   Performance - improve DOM observation for CodeMirror initialization and complex tabs
+*   Improvement - remove Zen Settings
+*   Improvement - add object caching for login redirect settings to reduce DB queries
+*   Improvement - improve login redirect URL handling with proper sanitization and scheme detection
+*   Improvement - add proper escaping and i18n support to login modal form
+*   Improvement - use cookie-based referrer URL with proper sanitization in login modal form
+*   Improvement - improve login attempts tracking with safer IP validation and type casting
+*   Improvement - improve login form shortcode functionality
+*   Improvement - hide language switcher in login page
+*   Improvement - modernize login CSS
+
 = 3.7.10 - 2025-09-02 =
 *   Fix - Carbon Fields compatibility
 *   Improvement - modal login form now using vanilla JS
+*   Improvement - remove Zen Settings
 
 = 3.7.9 - 2025-09-02 =
 *   Update - CF, FS, Composer
