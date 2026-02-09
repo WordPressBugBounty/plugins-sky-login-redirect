@@ -232,7 +232,7 @@ final class RedirectManager {
         ?string $requested_redirect_to,
         $user
     ): ?string {
-        $referer = Sky_get_last_page_visited_cookie();
+        $referer = get_last_page_visited_cookie();
 
         // Redirect loop protection
         if ( $this->isRedirectLoop( $redirect_to, $user ) ) {

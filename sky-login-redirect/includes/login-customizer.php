@@ -33,16 +33,56 @@ final class LoginPageCustomizer {
      */
     private const REMEMBER_ME_SCRIPT = "<script>document.addEventListener('DOMContentLoaded',function(){var r=document.getElementById('rememberme');if(r)r.checked=true});</script>";
 
+    // CSS Selectors
+    private const SELECTOR_BODY = 'body.login';
+    private const SELECTOR_LOGIN = 'body.login #login';
+    private const SELECTOR_FORM = 'body.login #loginform';
+    private const SELECTOR_SUBMIT = 'body.login #wp-submit';
+    private const SELECTOR_SUBMIT_HOVER = 'body.login #wp-submit:hover';
+    private const SELECTOR_LABELS = 'body.login #loginform label';
+    private const SELECTOR_NAV = 'body.login #nav a';
+    private const SELECTOR_BACKTOBLOG = 'body.login #backtoblog a';
+    private const SELECTOR_PRIVACY = 'body.login .privacy-policy-page-link a';
+    private const SELECTOR_SUBMIT_WRAPPER = 'body.login #login form p.submit';
+
+    // Layout values
+    private const LAYOUT_MIN_HEIGHT = '100vh';
+    private const LAYOUT_PADDING = '4vh 16px';
+    private const LAYOUT_MAX_WIDTH = '380px';
+    private const LAYOUT_MARGIN_TOP = '8vh';
+
+    // Form styling
+    private const FORM_SHADOW = '0 8px 24px rgba(15,23,42,0.12)';
+    private const FORM_BORDER_RADIUS = '8px';
+    private const FORM_BORDER = '1px solid rgba(148,163,184,0.35)';
+    private const FORM_PADDING = '24px 24px 28px';
+    private const FORM_BACKDROP = 'blur(6px)';
+
+    // Mobile responsive
+    private const MOBILE_BREAKPOINT = '480px';
+    private const MOBILE_MARGIN_TOP = '4vh';
+    private const MOBILE_PADDING = '20px 18px 24px';
+    private const MOBILE_SHADOW = '0 4px 16px rgba(15,23,42,0.16)';
+
+    // Logo styling
+    private const LOGO_MARGIN = '0 auto 24px';
+    private const LOGO_TEXT_ALIGN = 'center';
+    private const LOGO_MAX_WIDTH = '320px';
+    private const LOGO_TEXT_INDENT = '-9999px';
+
     /**
-     * Build CSS property string (legacy helper for inline usage).
+     * Cached CSS output to avoid regenerating on multiple calls.
      */
-    private function css( string $prop, mixed $value, string $unit = '', bool $is_int = false ): string {
-        if ( ! $value ) {
-            return '';
-        }
-        $val = $is_int ? (int) $value : sanitize_text_field( (string) $value );
-        return "{$prop}:{$val}{$unit};";
-    }
+    private ?string $cachedCSS = null;
+
+    /**
+     * Cached logo data to avoid duplicate image processing.
+     */
+    private array $logoDataCache = [];
+
+    public function __construct(
+        private CSSBuilder $css = new CSSBuilder()
+    ) {}
 
     /**
      * Filter custom login URL.
@@ -102,8 +142,19 @@ final class LoginPageCustomizer {
 
     /**
      * Get logo URL and height from attachment or URL.
+     *
+     * Caches results to avoid duplicate image processing calls.
+     *
+     * @param string|int $logo Attachment ID or URL string.
+     * @return array{url: string, height: int} Logo data with URL and height in pixels.
      */
     private function getLogoData( string|int $logo ): array {
+    $cache_key = is_numeric( $logo ) ? "id_{$logo}" : md5( (string) $logo );
+
+    if ( isset( $this->logoDataCache[ $cache_key ] ) ) {
+        return $this->logoDataCache[ $cache_key ];
+    }
+
     $url    = (string) $logo;
     $height = 80;
 
@@ -128,116 +179,329 @@ final class LoginPageCustomizer {
         }
     }
 
-    return [ 'url' => $url, 'height' => $height ];
+    $this->logoDataCache[ $cache_key ] = [ 'url' => $url, 'height' => $height ];
+    return $this->logoDataCache[ $cache_key ];
 }
 
     /**
      * Output login page customizer CSS.
+     *
+     * Composes CSS from all builder methods and outputs as inline style tag.
+     * Uses array composition pattern for clean separation of concerns.
+     * Caches output to avoid regenerating CSS on multiple calls within same request.
+     *
+     * @return void
      */
     public function customizerCSS(): void {
-    $style = '';
+        if ( $this->cachedCSS === null ) {
+            $styles = [
+                $this->buildHideElementsStyles(),
+                $this->buildLogoStyles(),
+                $this->buildBodyStyles(),
+                $this->buildFormStyles(),
+                $this->buildLoginContainerStyles(),
+                $this->buildMobileStyles(),
+                $this->buildColorStyles(),
+                $this->buildButtonStyles(),
+                $this->buildButtonHoverStyles(),
+            ];
 
-    // Hide elements.
-    if ( carbonade( 'slr_hide_backtoblog' ) === 'yes' ) {
-        $style .= 'p#backtoblog a{display:none}';
-    }
-    if ( carbonade( 'slr_hide_privacy_policy' ) === 'yes' ) {
-        $style .= '.login .privacy-policy-page-link{display:none}';
+            $this->cachedCSS = implode( '', array_filter( $styles ) );
+        }
+
+        if ( $this->cachedCSS ) {
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Intentional inline CSS from admin options.
+            echo "<style>{$this->cachedCSS}</style>";
+        }
     }
 
-    // Custom logo.
-    $logo = carbonade( 'slr_custom_logo' );
-    if ( $logo ) {
+    /**
+     * Build CSS to hide optional login page elements.
+     *
+     * Generates display:none rules for:
+     * - Back to blog link
+     * - Privacy policy link
+     *
+     * @return string CSS rules for hiding elements, empty if no elements hidden.
+     */
+    private function buildHideElementsStyles(): string {
+        $styles = [];
+
+        if ( carbonade( 'slr_hide_backtoblog' ) === 'yes' ) {
+            $this->css->reset()->add( 'display', 'none' );
+            $styles[] = 'p#backtoblog a{' . $this->css->build() . '}';
+        }
+        if ( carbonade( 'slr_hide_privacy_policy' ) === 'yes' ) {
+            $this->css->reset()->add( 'display', 'none' );
+            $styles[] = '.login .privacy-policy-page-link{' . $this->css->build() . '}';
+        }
+
+        return implode( '', $styles );
+    }
+
+    /**
+     * Build custom logo styles for login page.
+     *
+     * Generates CSS for custom logo including:
+     * - Logo container centering and spacing
+     * - Logo image with background-image property
+     * - Responsive height based on image dimensions
+     * - Text hiding for accessibility
+     *
+     * @return string CSS rules for logo styling, empty if no logo set.
+     */
+    private function buildLogoStyles(): string {
+        $logo = carbonade( 'slr_custom_logo' );
+        if ( ! $logo ) {
+            return '';
+        }
+
         $data   = $this->getLogoData( $logo );
         $url    = esc_url( $data['url'] );
         $height = $data['height'];
 
-        $style .= ".login h1{margin:0 auto 24px;text-align:center}"
-            . ".login h1 a{background-image:url('{$url}')!important;background-size:contain;"
-            . "background-position:center;background-repeat:no-repeat;color:#444;font-size:20px;"
-            . "font-weight:400;line-height:1.3;margin:0 auto;padding:0;text-decoration:none;"
-            . "text-indent:-9999px;outline:0;overflow:hidden;display:block;width:100%;"
-            . "max-width:320px;height:{$height}px}";
+        // Logo container
+        $this->css->reset()
+            ->add( 'margin', self::LOGO_MARGIN )
+            ->add( 'text-align', self::LOGO_TEXT_ALIGN );
+        $h1_styles = $this->css->build();
+
+        // Logo link with image
+        $this->css->reset()
+            ->add( 'background-image', "url('{$url}')" )
+            ->add( 'background-size', 'contain' )
+            ->add( 'background-position', 'center' )
+            ->add( 'background-repeat', 'no-repeat' )
+            ->add( 'color', '#444' )
+            ->add( 'font-size', '20px' )
+            ->add( 'font-weight', '400' )
+            ->add( 'line-height', '1.3' )
+            ->add( 'margin', '0 auto' )
+            ->add( 'padding', '0' )
+            ->add( 'text-decoration', 'none' )
+            ->add( 'text-indent', self::LOGO_TEXT_INDENT )
+            ->add( 'outline', '0' )
+            ->add( 'overflow', 'hidden' )
+            ->add( 'display', 'block' )
+            ->add( 'width', '100%' )
+            ->add( 'max-width', self::LOGO_MAX_WIDTH )
+            ->add( 'height', "{$height}px" );
+        $link_styles = $this->css->build();
+
+        return ".login h1{{$h1_styles}}.login h1 a{{$link_styles}!important}";
     }
 
-    // Page background.
-    $page_bg = carbonade( 'slr_page_background_color' );
-    if ( $page_bg ) {
-        $style .= 'body.login{background:' . sanitize_text_field( $page_bg ) . '}';
+    /**
+     * Build body.login container styles.
+     *
+     * Generates layout styles for the login page body including:
+     * - Full viewport height
+     * - Responsive padding
+     * - Optional background color/image
+     *
+     * @return string CSS rule for body.login selector, empty if no properties set.
+     */
+    private function buildBodyStyles(): string {
+        $this->css->reset()
+            ->add( 'min-height', self::LAYOUT_MIN_HEIGHT )
+            ->add( 'padding', self::LAYOUT_PADDING )
+            ->add( 'box-sizing', 'border-box' );
+
+        if ( $page_bg = carbonade( 'slr_page_background_color' ) ) {
+            $this->css->add( 'background', $page_bg );
+        }
+
+        if ( $page_bg_img = carbonade( 'slr_page_background_image' ) ) {
+            $this->css->add( 'background-image', "url('" . esc_url( $page_bg_img ) . "')" )
+                ->add( 'background-repeat', 'no-repeat' )
+                ->add( 'background-position', 'center' )
+                ->add( 'background-size', 'auto' );
+        }
+
+        $props = $this->css->build();
+        return $props ? self::SELECTOR_BODY . "{{$props}}" : '';
     }
 
-    $page_bg_img = carbonade( 'slr_page_background_image' );
-    if ( $page_bg_img ) {
-        $style .= "body.login{background-image:url('" . esc_url( $page_bg_img ) . "');"
-            . "background-repeat:no-repeat;background-position:center;background-size:cover}";
+    /**
+     * Build login form styles.
+     *
+     * Generates modern form styling including:
+     * - Elevated shadow for depth
+     * - Rounded corners
+     * - Semi-transparent border
+     * - Backdrop blur effect
+     * - Optional background color/image
+     *
+     * @return string CSS rule for #loginform selector, empty if no properties set.
+     */
+    private function buildFormStyles(): string {
+        $this->css->reset()
+            ->add( 'box-shadow', self::FORM_SHADOW )
+            ->add( 'border-radius', self::FORM_BORDER_RADIUS )
+            ->add( 'border', self::FORM_BORDER )
+            ->add( 'padding', self::FORM_PADDING )
+            ->add( 'backdrop-filter', self::FORM_BACKDROP )
+            ->add( 'box-sizing', 'border-box' );
+
+        if ( $form_bg = carbonade( 'slr_form_background_color' ) ) {
+            $this->css->add( 'background', $form_bg );
+        }
+
+        if ( $form_bg_img = carbonade( 'slr_form_background_image' ) ) {
+            $this->css->add( 'background-image', "url('" . esc_url( $form_bg_img ) . "')" )
+                ->add( 'background-repeat', 'no-repeat' )
+                ->add( 'background-position', 'center' );
+        }
+
+        $props = $this->css->build();
+        return $props ? self::SELECTOR_FORM . "{{$props}}" : '';
     }
 
-    // Form background.
-    $form_bg = carbonade( 'slr_form_background_color' );
-    if ( $form_bg ) {
-        $style .= 'body.login #loginform{background:' . sanitize_text_field( $form_bg ) . '}';
+    /**
+     * Build #login container styles.
+     *
+     * Generates centered container layout with:
+     * - Full width with max-width constraint
+     * - Vertical spacing from top
+     * - Horizontal centering
+     *
+     * @return string CSS rule for #login container.
+     */
+    private function buildLoginContainerStyles(): string {
+        $this->css->reset()
+            ->add( 'width', '100%' )
+            ->add( 'max-width', self::LAYOUT_MAX_WIDTH )
+            ->add( 'margin', self::LAYOUT_MARGIN_TOP . ' auto 0' )
+            ->add( 'padding', '0' )
+            ->add( 'box-sizing', 'border-box' );
+
+        return self::SELECTOR_LOGIN . '{' . $this->css->build() . '}';
     }
 
-    $form_bg_img = carbonade( 'slr_form_background_image' );
-    if ( $form_bg_img ) {
-        $style .= "body.login #loginform{background-image:url('" . esc_url( $form_bg_img ) . "');"
-            . "background-repeat:no-repeat;background-position:center}";
+    /**
+     * Build mobile responsive styles.
+     *
+     * Generates media query for mobile devices with:
+     * - Reduced top margin for smaller screens
+     * - Adjusted padding for touch targets
+     * - Lighter shadow for mobile context
+     *
+     * @return string CSS media query for mobile breakpoint.
+     */
+    private function buildMobileStyles(): string {
+        // Login container mobile styles
+        $this->css->reset()->add( 'margin-top', self::MOBILE_MARGIN_TOP );
+        $login_mobile = self::SELECTOR_LOGIN . '{' . $this->css->build() . '}';
+
+        // Form mobile styles
+        $this->css->reset()
+            ->add( 'padding', self::MOBILE_PADDING )
+            ->add( 'box-shadow', self::MOBILE_SHADOW );
+        $form_mobile = self::SELECTOR_FORM . '{' . $this->css->build() . '}';
+
+        return '@media(max-width:' . self::MOBILE_BREAKPOINT . '){' . $login_mobile . $form_mobile . '}';
     }
 
-    // Modern layout.
-    $style .= 'body.login{display:flex;align-items:center;justify-content:center;min-height:100vh;'
-        . 'padding:4vh 16px;box-sizing:border-box}'
-        . 'body.login #login{width:100%;max-width:380px;padding:0;box-sizing:border-box}'
-        . 'body.login form#loginform{box-shadow:0 8px 24px rgba(15,23,42,0.12);border-radius:8px;'
-        . 'border:1px solid rgba(148,163,184,0.35);padding:24px 24px 28px;backdrop-filter:blur(6px);box-sizing:border-box}'
-        . '@media(max-width:480px){body.login{align-items:flex-start;padding-top:8vh}'
-        . 'body.login form#loginform{padding:20px 18px 24px;box-shadow:0 4px 16px rgba(15,23,42,0.16)}}';
+    /**
+     * Build custom color styles for form elements.
+     *
+     * Generates color overrides for:
+     * - Form labels
+     * - Navigation links
+     * - Back to blog link
+     * - Privacy policy link
+     *
+     * @return string CSS rules for custom colors, empty if no colors set.
+     */
+    private function buildColorStyles(): string {
+        $styles = [];
 
-    // Colors.
-    $style .= $this->css( 'color', carbonade( 'slr_form_labels_color' ) ) ? "body.login #loginform label{" . $this->css( 'color', carbonade( 'slr_form_labels_color' ) ) . "}" : '';
-    $style .= $this->css( 'color', carbonade( 'slr_form_nav_color' ) ) ? "body.login #nav a{" . $this->css( 'color', carbonade( 'slr_form_nav_color' ) ) . "}" : '';
-    $style .= $this->css( 'color', carbonade( 'slr_form_backtoblog_color' ) ) ? "body.login #backtoblog a{" . $this->css( 'color', carbonade( 'slr_form_backtoblog_color' ) ) . "}" : '';
-    $style .= $this->css( 'color', carbonade( 'slr_form_privacy_color' ) ) ? "body.login .privacy-policy-page-link a{" . $this->css( 'color', carbonade( 'slr_form_privacy_color' ) ) . "}" : '';
+        if ( $color = carbonade( 'slr_form_labels_color' ) ) {
+            $this->css->reset()->add( 'color', $color );
+            $styles[] = self::SELECTOR_LABELS . "{" . $this->css->build() . "}";
+        }
 
-    // Submit button.
-    $btn = $this->css( 'background', carbonade( 'slr_form_submit_background_color' ) )
-         . $this->css( 'color', carbonade( 'slr_form_submit_text_color' ) )
-         . $this->css( 'border-color', carbonade( 'slr_form_submit_border_color' ) )
-         . $this->css( 'border-width', carbonade( 'slr_form_submit_border_width' ), 'px', true )
-         . ( carbonade( 'slr_form_submit_border_width' ) ? 'border-style:solid;' : '' )
-         . $this->css( 'border-radius', carbonade( 'slr_form_submit_radius' ), 'px', true );
+        if ( $color = carbonade( 'slr_form_nav_color' ) ) {
+            $this->css->reset()->add( 'color', $color );
+            $styles[] = self::SELECTOR_NAV . "{" . $this->css->build() . "}";
+        }
 
-    // Button alignment.
-    $align = carbonade( 'slr_form_submit_align' );
-    if ( $align && $align !== 'default' ) {
-        $justify = $align === 'center' ? 'center' : ( $align === 'end' ? 'flex-end' : 'flex-start' );
-        $style  .= "body.login #login form p.submit{display:flex;justify-content:{$justify};gap:8px}";
+        if ( $color = carbonade( 'slr_form_backtoblog_color' ) ) {
+            $this->css->reset()->add( 'color', $color );
+            $styles[] = self::SELECTOR_BACKTOBLOG . "{" . $this->css->build() . "}";
+        }
+
+        if ( $color = carbonade( 'slr_form_privacy_color' ) ) {
+            $this->css->reset()->add( 'color', $color );
+            $styles[] = self::SELECTOR_PRIVACY . "{" . $this->css->build() . "}";
+        }
+
+        return implode( '', $styles );
     }
 
-    // Button size.
-    $size = carbonade( 'slr_form_submit_size' );
-    if ( $size === 'custom' ) {
-        $btn .= $this->css( 'width', carbonade( 'slr_form_submit_size_width' ), 'px', true )
-              . $this->css( 'height', carbonade( 'slr_form_submit_size_height' ), 'px', true );
-    } elseif ( $size === 'full-width' ) {
-        $btn .= 'width:100%;height:100%;';
+    /**
+     * Build submit button styles.
+     *
+     * Generates comprehensive button styling including:
+     * - Background and text colors
+     * - Border styling (color, width, radius)
+     * - Size options (default, custom, full-width)
+     * - Alignment options (left, center, right)
+     *
+     * @return string CSS rules for submit button, empty if no properties set.
+     */
+    private function buildButtonStyles(): string {
+        $border_width = carbonade( 'slr_form_submit_border_width' );
+
+        $this->css->reset()
+            ->add( 'background', carbonade( 'slr_form_submit_background_color' ) )
+            ->add( 'color', carbonade( 'slr_form_submit_text_color' ) )
+            ->add( 'border-color', carbonade( 'slr_form_submit_border_color' ) )
+            ->add( 'border-width', $border_width, 'px', true )
+            ->add( 'border-radius', carbonade( 'slr_form_submit_radius' ), 'px', true );
+
+        if ( $border_width ) {
+            $this->css->add( 'border-style', 'solid' );
+        }
+
+        // Button size
+        $size = carbonade( 'slr_form_submit_size' );
+        if ( $size === 'custom' ) {
+            $this->css->add( 'width', carbonade( 'slr_form_submit_size_width' ), 'px', true )
+                ->add( 'height', carbonade( 'slr_form_submit_size_height' ), 'px', true );
+        } elseif ( $size === 'full-width' ) {
+            $this->css->add( 'width', '100%' )->add( 'height', '100%' );
+        }
+
+        $props = $this->css->build();
+        $button_css = $props ? self::SELECTOR_SUBMIT . "{{$props}}" : '';
+
+        // Button alignment
+        $align = carbonade( 'slr_form_submit_align' );
+        if ( $align && $align !== 'default' ) {
+            $justify = $align === 'center' ? 'center' : ( $align === 'end' ? 'flex-end' : 'flex-start' );
+            $button_css .= self::SELECTOR_SUBMIT_WRAPPER . "{display:flex;justify-content:{$justify};gap:8px}";
+        }
+
+        return $button_css;
     }
 
-    if ( $btn ) {
-        $style .= "body.login #wp-submit{{$btn}}";
-    }
+    /**
+     * Build submit button hover styles.
+     *
+     * Generates hover state styling for:
+     * - Background color transition
+     * - Text color transition
+     *
+     * @return string CSS rule for button hover state, empty if no colors set.
+     */
+    private function buildButtonHoverStyles(): string {
+        $this->css->reset()
+            ->add( 'background', carbonade( 'slr_form_submit_background_color_hover' ) )
+            ->add( 'color', carbonade( 'slr_form_submit_text_color_hover' ) );
 
-    // Button hover.
-    $hover = $this->css( 'background', carbonade( 'slr_form_submit_background_color_hover' ) )
-           . $this->css( 'color', carbonade( 'slr_form_submit_text_color_hover' ) );
-    if ( $hover ) {
-        $style .= "body.login #wp-submit:hover{{$hover}}";
-    }
-
-    if ( $style ) {
-        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Intentional inline CSS from admin options.
-        echo "<style>{$style}</style>";
-    }
+        $props = $this->css->build();
+        return $props ? self::SELECTOR_SUBMIT_HOVER . "{{$props}}" : '';
     }
 
     /**

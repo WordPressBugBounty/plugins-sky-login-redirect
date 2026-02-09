@@ -34,8 +34,10 @@ enum NoticeState: string {
  */
 final class NoticeManager {
     private const OPTION_KEY = 'slr_promo_notice_dismissed';
+    private const INSTALL_TIME_KEY = 'slr_install_time';
     private const NONCE_ACTION = 'slr_notice_dismiss';
     private const AJAX_ACTION = 'slr_dismiss_notice';
+    private const DELAY_DAYS = 2;
 
     private const PROMO_SCREENS = [
         'toplevel_page_sky-login-redirect',
@@ -55,9 +57,33 @@ final class NoticeManager {
      * Initialize notice hooks.
      */
     public function init(): void {
+        $this->recordInstallTime();
         add_action( 'admin_init', $this->checkAndDisplayNotice(...) );
         add_action( 'admin_enqueue_scripts', $this->enqueueScripts(...) );
         add_action( 'wp_ajax_' . self::AJAX_ACTION, $this->handleDismissal(...) );
+    }
+
+    /**
+     * Record installation time if not already set.
+     */
+    private function recordInstallTime(): void {
+        if ( ! get_option( self::INSTALL_TIME_KEY ) ) {
+            update_option( self::INSTALL_TIME_KEY, time(), true );
+        }
+    }
+
+    /**
+     * Check if the delay period has passed since installation.
+     */
+    private function isDelayPeriodPassed(): bool {
+        $install_time = get_option( self::INSTALL_TIME_KEY );
+
+        if ( ! $install_time ) {
+            return false;
+        }
+
+        $delay_seconds = self::DELAY_DAYS * DAY_IN_SECONDS;
+        return ( time() - (int) $install_time ) >= $delay_seconds;
     }
 
     /**
@@ -87,7 +113,7 @@ final class NoticeManager {
      * Check conditions and display notice if appropriate.
      */
     private function checkAndDisplayNotice(): void {
-        if ( $this->isDismissed() || ! $this->isSaleActive() ) {
+        if ( $this->isDismissed() || ! $this->isSaleActive() || ! $this->isDelayPeriodPassed() ) {
             return;
         }
 
@@ -96,9 +122,12 @@ final class NoticeManager {
 
     /**
      * Enqueue dismiss script.
+     *
+     * Only loads when notice will actually be displayed.
      */
     private function enqueueScripts(): void {
-        if ( $this->isDismissed() || ! $this->isValidScreen() ) {
+        // Check all conditions - only load if notice will be shown
+        if ( $this->isDismissed() || ! $this->isSaleActive() || ! $this->isDelayPeriodPassed() || ! $this->isValidScreen() ) {
             return;
         }
 
@@ -110,11 +139,15 @@ final class NoticeManager {
             true
         );
 
-        wp_localize_script( 'slr-notice-dismiss', 'slrNoticeParams', [
-            'ajaxurl' => admin_url( 'admin-ajax.php' ),
-            'nonce'   => wp_create_nonce( self::NONCE_ACTION ),
-            'action'  => self::AJAX_ACTION,
-        ] );
+        wp_localize_script(
+            'slr-notice-dismiss',
+            'slrNotice',
+            [
+                'ajax_url' => admin_url( 'admin-ajax.php' ),
+                'nonce'    => wp_create_nonce( self::NONCE_ACTION ),
+                'action'   => self::AJAX_ACTION,
+            ]
+        );
     }
 
     /**

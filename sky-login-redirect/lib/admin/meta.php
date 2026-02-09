@@ -49,7 +49,7 @@ function get_plugin_basename(): string {
  * @param array $links Existing links.
  * @return array Modified links.
  */
-function Slr_Settings_link( array $links ): array {
+function add_settings_link( array $links ): array {
     array_unshift(
         $links,
         sprintf(
@@ -60,7 +60,7 @@ function Slr_Settings_link( array $links ): array {
     );
     return $links;
 }
-add_filter( 'plugin_action_links_' . get_plugin_basename(), __NAMESPACE__ . '\\Slr_Settings_link' );
+add_filter( 'plugin_action_links_' . get_plugin_basename(), __NAMESPACE__ . '\\add_settings_link' );
 
 /**
  * Add row meta links to plugins page.
@@ -69,7 +69,7 @@ add_filter( 'plugin_action_links_' . get_plugin_basename(), __NAMESPACE__ . '\\S
  * @param string $file  Plugin file.
  * @return array Modified links.
  */
-function Slr_Row_meta( array $links, string $file ): array {
+function add_row_meta( array $links, string $file ): array {
     if ( $file !== get_plugin_basename() ) {
         return $links;
     }
@@ -97,7 +97,7 @@ function Slr_Row_meta( array $links, string $file ): array {
         ),
     ] );
 }
-add_filter( 'plugin_row_meta', __NAMESPACE__ . '\\Slr_Row_meta', 10, 2 );
+add_filter( 'plugin_row_meta', __NAMESPACE__ . '\\add_row_meta', 10, 2 );
 
 /**
  * Show custom credits in admin footer.
@@ -105,7 +105,7 @@ add_filter( 'plugin_row_meta', __NAMESPACE__ . '\\Slr_Row_meta', 10, 2 );
  * @param string $footer_text Default footer text.
  * @return string Modified footer text.
  */
-function Slr_Admin_credits( string $footer_text ): string {
+function modify_admin_footer( string $footer_text ): string {
     $screen = get_current_screen();
     if ( ! $screen || ! in_array( $screen->id, ADMIN_SCREENS, true ) ) {
         return $footer_text;
@@ -145,4 +145,4 @@ function Slr_Admin_credits( string $footer_text ): string {
 
     return $text;
 }
-add_filter( 'admin_footer_text', __NAMESPACE__ . '\\Slr_Admin_credits' );
+add_filter( 'admin_footer_text', __NAMESPACE__ . '\\modify_admin_footer' );

@@ -1,8 +1,8 @@
 <?php return array(
     'root' => array(
         'name' => 'skyminds/sky-login-redirect',
-        'pretty_version' => '4.0.0',
-        'version' => '4.0.0.0',
+        'pretty_version' => '4.1.5',
+        'version' => '4.1.5.0',
         'reference' => null,
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
@@ -61,8 +61,8 @@
             ),
         ),
         'skyminds/sky-login-redirect' => array(
-            'pretty_version' => '4.0.0',
-            'version' => '4.0.0.0',
+            'pretty_version' => '4.1.5',
+            'version' => '4.1.5.0',
             'reference' => null,
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
@@ -70,9 +70,9 @@
             'dev_requirement' => false,
         ),
         'wp-cli/wp-config-transformer' => array(
-            'pretty_version' => 'v1.4.3',
-            'version' => '1.4.3.0',
-            'reference' => '5ade4e70349a1d5cd07efc33880ceb5eebb9e9fa',
+            'pretty_version' => 'v1.4.4',
+            'version' => '1.4.4.0',
+            'reference' => 'b0fda07aac51317404f5e56dc8953ea899bc7bce',
             'type' => 'library',
             'install_path' => __DIR__ . '/../wp-cli/wp-config-transformer',
             'aliases' => array(),

@@ -1679,7 +1679,7 @@ add_filter(
  *
  * @return array
  */
-function slr_count_nav_menu_items($key)
+function count_nav_menu_items($key)
 {
     // Get menu object
     $my_menu = wp_get_nav_menu_object($key);
@@ -1720,7 +1720,7 @@ function display_content_after_fields()
  *
  * @return mixed
  */
-function Slr_Upsell_features()
+function render_upsell_features()
 {
     /* platinum users : bail early */
     if (SLR_FS()->is_plan('platinum')) {
@@ -1802,11 +1802,11 @@ function Slr_Upsell_features()
 }
 add_action(
     'carbon_fields_container_sky_login_redirect_after_sidebar',
-    __NAMESPACE__ . '\\Slr_Upsell_features'
+    __NAMESPACE__ . '\\render_upsell_features'
 );
 /*
 add_action( 'carbon_fields_register_fields',  __NAMESPACE__ . '\\slr_gutenberg_block');
-function slr_gutenberg_block(){
+function register_gutenberg_block(){
     Block::make( __( 'My Shiny Gutenberg Block' ) )
         ->add_fields( array(
     Field::make( 'text', 'heading', __( 'Block Heading' ) ),

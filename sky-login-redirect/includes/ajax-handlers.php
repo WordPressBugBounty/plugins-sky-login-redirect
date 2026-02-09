@@ -248,18 +248,18 @@ final class AjaxSearchHandler {
 /**
  * AJAX endpoint for page search.
  */
-function slr_ajax_search_pages(): void {
+function ajax_search_pages(): void {
     AjaxSearchHandler::forPages()->handle();
 }
-add_action( 'wp_ajax_slr_search_pages', __NAMESPACE__ . '\\slr_ajax_search_pages' );
+add_action( 'wp_ajax_slr_search_pages', __NAMESPACE__ . '\\ajax_search_pages' );
 
 /**
  * AJAX endpoint for user search.
  */
-function slr_ajax_search_users(): void {
+function ajax_search_users(): void {
     AjaxSearchHandler::forUsers()->handle();
 }
-add_action( 'wp_ajax_slr_search_users', __NAMESPACE__ . '\\slr_ajax_search_users' );
+add_action( 'wp_ajax_slr_search_users', __NAMESPACE__ . '\\ajax_search_users' );
 
 /**
  * Filter Carbon Fields HTML to add AJAX select classes
@@ -268,7 +268,7 @@ add_action( 'wp_ajax_slr_search_users', __NAMESPACE__ . '\\slr_ajax_search_users
  * @param object $field The field object.
  * @return string Modified HTML.
  */
-function slr_carbon_fields_ajax_select_filter( $html, $field ): string {
+function carbon_fields_ajax_select_filter( $html, $field ): string {
     $field_name = method_exists( $field, 'get_base_name' ) ? $field->get_base_name() : '';
 
     // Page selectors
@@ -301,4 +301,4 @@ function slr_carbon_fields_ajax_select_filter( $html, $field ): string {
 
     return $html;
 }
-add_filter( 'carbon_fields_field_html', __NAMESPACE__ . '\\slr_carbon_fields_ajax_select_filter', 10, 2 );
+add_filter( 'carbon_fields_field_html', __NAMESPACE__ . '\\carbon_fields_ajax_select_filter', 10, 2 );
