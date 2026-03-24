@@ -20,18 +20,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use function SkyLoginRedirect\Sky_Login_Redirect_fs;
+use const SkyLoginRedirect\PLUGIN_SCREENS;
 
 /** Allowed HTML for links in footer. */
 const LINK_ALLOWED_HTML = [
     'a'      => [ 'href' => [], 'target' => [], 'rel' => [] ],
     'strong' => [],
-];
-
-/** Plugin admin screens. */
-const ADMIN_SCREENS = [
-    'toplevel_page_sky-login-redirect',
-    'login-redirect_page_sky-login-redirect-account',
-    'login-redirect_page_sky-login-redirect-contact',
 ];
 
 /**
@@ -107,7 +101,7 @@ add_filter( 'plugin_row_meta', __NAMESPACE__ . '\\add_row_meta', 10, 2 );
  */
 function modify_admin_footer( string $footer_text ): string {
     $screen = get_current_screen();
-    if ( ! $screen || ! in_array( $screen->id, ADMIN_SCREENS, true ) ) {
+    if ( ! $screen || ! in_array( $screen->id, PLUGIN_SCREENS, true ) ) {
         return $footer_text;
     }
 

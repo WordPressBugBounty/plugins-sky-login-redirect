@@ -26,6 +26,13 @@ final class RedirectManager {
     private const REDIRECT_LOOP_TIMEOUT = 30;
 
     /**
+     * Cached WooCommerce My Account page ID.
+     *
+     * @var int|null
+     */
+    private ?int $wc_myaccount_id = null;
+
+    /**
      * Process redirect based on rules and context.
      *
      * @param string|null $redirect_to           Default redirect URL.
@@ -44,8 +51,13 @@ final class RedirectManager {
             return $explicit_redirect;
         }
 
-        // Get redirect rules from options
-        $rules = carbon_get_theme_option( 'slr_xlogin_logout' );
+        // Get redirect rules from options (cached for object-cache / VIP compat).
+        $cache_key = 'slr_redirect_rules';
+        $rules     = wp_cache_get( $cache_key, 'slr' );
+        if ( false === $rules ) {
+            $rules = carbon_get_theme_option( 'slr_xlogin_logout' );
+            wp_cache_set( $cache_key, $rules ?: [], 'slr', HOUR_IN_SECONDS );
+        }
 
         // No rules configured - redirect to homepage
         if ( empty( $rules ) ) {
@@ -78,7 +90,7 @@ final class RedirectManager {
      * @return string|null Validated redirect URL or null.
      */
     private function getExplicitRedirect(): ?string {
-        $requested_raw = filter_input( INPUT_GET, 'redirect_to', FILTER_UNSAFE_RAW );
+        $requested_raw = filter_input( INPUT_GET, 'redirect_to', FILTER_DEFAULT );
 
         if ( ! $requested_raw ) {
             return null;
@@ -216,7 +228,8 @@ final class RedirectManager {
      * @return string|null Custom URL or null.
      */
     private function getCustomUrl( array $rule, string $action ): ?string {
-        return $rule["slr_x{$action}_url"] ?? null;
+        $url = $rule["slr_x{$action}_url"] ?? null;
+        return $url ? esc_url_raw( $url ) : null;
     }
 
     /**
@@ -292,9 +305,7 @@ final class RedirectManager {
      * @return bool True if looping detected.
      */
     private function isRedirectLoop( ?string $redirect_to, $user ): bool {
-        $user_id = is_object( $user ) && isset( $user->ID ) ? $user->ID : 0;
-        $redirect_key = 'slr_redirect_' . md5( $redirect_to . $user_id . current_filter() );
-        $attempts = (int) get_transient( $redirect_key );
+        $attempts = (int) wp_cache_get( $this->getRedirectKey( $redirect_to, $user ), 'slr_loop' );
 
         return $attempts > self::REDIRECT_LOOP_THRESHOLD;
     }
@@ -307,11 +318,22 @@ final class RedirectManager {
      * @return void
      */
     private function trackRedirectAttempt( ?string $redirect_to, $user ): void {
-        $user_id = is_object( $user ) && isset( $user->ID ) ? $user->ID : 0;
-        $redirect_key = 'slr_redirect_' . md5( $redirect_to . $user_id . current_filter() );
-        $attempts = (int) get_transient( $redirect_key );
+        $key = $this->getRedirectKey( $redirect_to, $user );
+        $attempts = (int) wp_cache_get( $key, 'slr_loop' );
 
-        set_transient( $redirect_key, $attempts + 1, self::REDIRECT_LOOP_TIMEOUT );
+        wp_cache_set( $key, $attempts + 1, 'slr_loop', self::REDIRECT_LOOP_TIMEOUT );
+    }
+
+    /**
+     * Build cache key for redirect loop detection.
+     *
+     * @param string|null $redirect_to Redirect URL.
+     * @param WP_User|null $user Current user.
+     * @return string Cache key.
+     */
+    private function getRedirectKey( ?string $redirect_to, $user ): string {
+        $user_id = is_object( $user ) && isset( $user->ID ) ? $user->ID : 0;
+        return 'slr_redirect_' . md5( $redirect_to . $user_id . current_filter() );
     }
 
     /**
@@ -336,9 +358,17 @@ final class RedirectManager {
             return false;
         }
 
-        $my_account_id = wc_get_page_id( 'myaccount' );
+        $my_account_id = $this->getWooCommerceMyAccountId();
 
-        if ( url_to_postid( (string) $redirect_to ) !== $my_account_id ) {
+        // Cache url_to_postid() result — expensive uncached DB query (VIP / Cache Product Objects compat).
+        $cache_key = 'slr_u2p_' . md5( (string) $redirect_to );
+        $post_id   = wp_cache_get( $cache_key, 'slr' );
+        if ( false === $post_id ) {
+            $post_id = url_to_postid( (string) $redirect_to );
+            wp_cache_set( $cache_key, $post_id, 'slr', HOUR_IN_SECONDS );
+        }
+
+        if ( (int) $post_id !== $my_account_id ) {
             return false;
         }
 
@@ -363,7 +393,21 @@ final class RedirectManager {
             return null;
         }
 
-        return get_permalink( wc_get_page_id( 'myaccount' ) );
+        return get_permalink( $this->getWooCommerceMyAccountId() );
+    }
+
+    /**
+     * Get cached WooCommerce My Account page ID.
+     *
+     * @return int My Account page ID.
+     */
+    private function getWooCommerceMyAccountId(): int {
+        if ( null === $this->wc_myaccount_id ) {
+            $this->wc_myaccount_id = function_exists( 'wc_get_page_id' )
+                ? wc_get_page_id( 'myaccount' )
+                : 0;
+        }
+        return $this->wc_myaccount_id;
     }
 
     /**

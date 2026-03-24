@@ -1,5 +1,37 @@
 == Changelog ==
 
+= 4.1.8 - 2026-03-24 =
+*   Security - add wp_strip_all_tags() defense-in-depth to all inline CSS outputs (login customizer, WooCommerce customizer, modal customizer, custom CSS blocks, pro-code CSS)
+*   Security - remove Select2 library and custom AJAX search system entirely — Carbon Fields handles selects natively
+*   Performance - remove update_option() from read path in get_cached_options() (VIP compatibility)
+*   Performance - carbonade() now reads from object cache / transient two-tier cache instead of direct get_option() DB query
+*   Performance - modal login form no longer renders HTML or generates nonces for logged-in users
+*   Performance - modal AJAX login script only enqueues for logged-out users via reliable template_redirect check
+*   Performance - flush all cache layers (object cache + transient) on Carbon Fields settings save with correct priority ordering
+*   Compatibility - patch Carbon Fields Pimple container for PHP 8.5: replace deprecated SplObjectStorage::attach()/detach() with offsetSet()/offsetUnset()
+*   Refactor - split modal ModalLoginManager::initAjaxLogin() into registerAjaxHandler() (init) and enqueueLoginScripts() (template_redirect) for proper separation of concerns
+
+= 4.1.7 - 2026-02-10 =
+*   Security - sanitize AJAX login inputs (username/password) before wp_signon()
+*   Security - replace error suppression operator (@) with libxml_use_internal_errors() in Avada menu integration
+*   Security - sanitize $_SERVER superglobals in SSL detection
+*   Security - sanitize $_COOKIE iteration keys in logout cookie clearing
+*   Performance - cache carbon_get_theme_option() redirect and restrict rules in object cache
+*   Performance - cache url_to_postid() results in object cache (VIP / Cache Product Objects compat)
+*   Performance - cache attachment_url_to_postid() in object cache for login logo
+*   Performance - cache wc_get_page_id() via static helper function
+*   Performance - replace all transient-based rate limiting with object cache (cookie, AJAX, redirect loop)
+*   Performance - add cache invalidation on Carbon Fields settings save
+*   Compatibility - declare WooCommerce product_instance_caching (Cache Product Objects) compatibility
+*   Compatibility - declare WooCommerce cart_checkout_blocks compatibility
+*   Compatibility - replace deprecated FILTER_UNSAFE_RAW with FILTER_DEFAULT for PHP 8.4+
+*   Compatibility - replace deprecated mb_convert_encoding() with mb_encode_numericentity() for PHP 8.2+
+*   WPCS - fix wp_register_script/style URL parameter from false to empty string
+*   WPCS - add text domain, prefix, and minimum version configuration to phpcs.xml.dist
+*   WPCS - add NoSilencedErrors and DirectDatabaseQuery sniffs
+*   Fix - Avada menu integration: resolve fatal error from calling private methods as standalone functions
+*   Fix - login customizer: store logo data in cache on all return paths to prevent duplicate lookups
+
 = 4.1.6 - 2026-02-09 =
 *   Code Quality - refactor function naming: remove all Sky_, Slr_, slr_ prefixes throughout plugin
 *   Code Quality - leverage PHP namespaces for uniqueness instead of redundant function prefixes

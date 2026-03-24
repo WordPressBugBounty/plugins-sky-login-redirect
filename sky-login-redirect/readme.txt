@@ -5,7 +5,7 @@ Tags: login redirect, logout redirect, custom login, woocommerce login, login cu
 Requires at least: 5.6
 Tested up to: 6.9
 Requires PHP: 8.1
-Stable tag: 4.1.6
+Stable tag: 4.1.8
 License: GPLv3 or later
 
 Control where users land after login/logout. Redirect by role, user, or previous page. Includes a powerful login customizer and WooCommerce support.
@@ -49,7 +49,7 @@ Control where users land after login/logout. Redirect by role, user, or previous
 
 **Performance & Security**
 * Built with modern PHP 8.1+ architecture
-* AJAX-powered admin interface (Select2)
+* AJAX-powered admin interface
 * Rate limiting on AJAX endpoints
 * Dual-layer caching for speed
 * 40-60% faster than previous versions
@@ -174,39 +174,20 @@ Free support is available through the [WordPress.org support forum](https://word
 
 == Changelog ==
 
-= 4.1.6 - 2026-02-09 =
-*   Code Quality - refactor function naming: remove all Sky_, Slr_, slr_ prefixes throughout plugin
-*   Code Quality - leverage PHP namespaces for uniqueness instead of redundant function prefixes
-*   Code Quality - rename is_ssl() to check_ssl() to avoid WordPress core function conflict
-*   Code Quality - optimize login customizer CSS: use CSSBuilder to group selectors and eliminate duplicate declarations (20-30% size reduction)
-*   Code Quality - standardize CSSBuilder API: remove duplicate class, unified on add() method throughout codebase
-*   Code Quality - refactor login customizer: add dependency injection, remove legacy css() helper, break down into focused builder methods matching WooCommerce pattern
-*   Code Quality - achieve 100% maintainability: comprehensive PHPDoc, extract magic values to constants, refactor logo method to use CSSBuilder, add type hints
-*   Performance - optimize login customizer: add CSS output caching, logo data caching, reduce duplicate option calls (96% performance score)
-*   Performance - optimize backend loading: admin notice script only loads when notice is actually displayed
-*   Performance - optimize Carbon Fields loading: dequeue assets on non-plugin pages, saves ~320 KB on all other admin pages
-*   Improvement - cleaner, more descriptive function names for better code readability and maintainability
-*   Improvement - promotional notices now appear 2 days after plugin activation for better user experience
-*   Fix - login customizer: simplify CSS layout by removing flexbox and using margin-based centering that works with WordPress defaults
-
-= 4.1.5 - 2026-01-14 =
-*   Fix: Add default color values to login customizer fields (WordPress default colors)
-*   Fix: Update iframe sandbox to allow forms and scripts for WordPress Playground and wordpress.com compatibility
-*   Fix - Critical: Prevent enum redeclaration fatal error when both free and premium versions are active
-*   Fix: Remove deprecated load_plugin_textdomain() call
-*   Fix: Replace parse_url() with wp_parse_url() for better WordPress compatibility
-*   Fix: Remove debug error_log() code from production
-*   Fix: Add proper nonce verification and input sanitization for AJAX handlers
-*   Fix: Sanitize $_SERVER variables with wp_unslash()
-*   Fix: Use WordPress bundled Select2
-*   Fix: Add translators comment for placeholder in notice
+= 4.1.8 - 2026-03-24 =
+*   Security - add wp_strip_all_tags() defense-in-depth to all inline CSS outputs (login customizer, WooCommerce customizer, modal customizer, custom CSS blocks, code CSS)
+*   Security - remove Select2 library and custom AJAX search system entirely — Carbon Fields handles selects natively
+*   Performance - remove update_option() from read path in get_cached_options() (VIP compatibility)
+*   Performance - carbonade() now reads from object cache / transient two-tier cache instead of direct get_option() DB query
+*   Performance - modal login form no longer renders HTML or generates nonces for logged-in users
+*   Performance - modal AJAX login script only enqueues for logged-out users via reliable template_redirect check
+*   Performance - flush all cache layers (object cache + transient) on Carbon Fields settings save with correct priority ordering
+*   Compatibility - patch Carbon Fields Pimple container for PHP 8.5: replace deprecated SplObjectStorage::attach()/detach() with offsetSet()/offsetUnset()
+*   Refactor - split modal ModalLoginManager::initAjaxLogin() into registerAjaxHandler() (init) and enqueueLoginScripts() (template_redirect) for proper separation of concerns
 
 Older versions changes can be found in [the changelog](https://utopique.net/products/sky-login-redirect-premium/#changelog "Sky Login Redirect changelog")
 
 == Upgrade Notice ==
 
-= 4.1.6 =
-**Quality & Performance Update!** Enterprise-grade code refactoring with 100% maintainability, 96% performance optimization, 84% backend overhead reduction. Improved Carbon Fields loading and admin performance. Safe update - no breaking changes.
-
-= 4.1.5 =
-**Major Update!** Modern PHP 8.1+ architecture, enhanced WooCommerce integration, improved security & performance. Requires PHP 8.1+. Backup before updating!
+= 4.1.8 =
+**Security, Performance & VIP Readiness Update!** Defense-in-depth XSS hardening on all inline CSS outputs. Removed Select2 (Carbon Fields handles it natively). Eliminated DB writes on read paths for VIP compatibility. Modal login optimized for logged-in users. PHP 8.5 forward compatibility for Carbon Fields. WPCS compliance improvements. Safe update - no breaking changes.

@@ -650,7 +650,19 @@ function options_woocommerce_tab_theme_fields()
         ->set_required(true);
 
     // logout
-    // skip for now
+    $fields[] = Field::make('checkbox', 'slr_wc_logout_redirect', __('Redirect WooCommerce customers after they logout', 'sky-login-redirect'))
+        ->set_classes('slider-checkbox starter')
+        ->set_option_value('yes');
+
+    $fields[] = Field::make('text', 'slr_wc_logout_redirect_url', __('Redirect to:', 'sky-login-redirect'))
+        ->set_classes('indent show-field')
+        ->set_conditional_logic(
+            [ [ 'field' => 'slr_wc_logout_redirect', 'value' => true ] ]
+        )
+        ->set_attribute('placeholder', 'https://')
+        ->set_attribute('type', 'url')
+        ->set_required(true)
+        ->set_default_value($wc_shop);
 
     // WooCommerce customizer
     $fields[] = Field::make('html', 'slr_woocommerce_customizer')
