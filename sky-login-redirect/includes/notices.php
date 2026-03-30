@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use function SkyLoginRedirect\Sky_Login_Redirect_fs;
+use function SkyLoginRedirect\sky_login_redirect_fs;
 
 /**
  * Notice dismissal state enum.
@@ -39,13 +39,13 @@ final class NoticeManager {
 	private const AJAX_ACTION      = 'slr_dismiss_notice';
 	private const DELAY_DAYS       = 2;
 
-	private const PROMO_SCREENS = array(
+	private const PROMO_SCREENS = [
 		'toplevel_page_sky-login-redirect',
 		'login-redirect_page_sky-login-redirect-account',
 		'login-redirect_page_sky-login-redirect-pricing',
 		'plugins',
 		'dashboard',
-	);
+	];
 
 	public function __construct(
 		private string $saleEndDate = '20260131',
@@ -149,8 +149,8 @@ final class NoticeManager {
 
 		wp_enqueue_script(
 			'slr-notice-dismiss',
-			plugins_url( 'lib/js/admin-notices.js', dirname( __DIR__ ) . '/sky-login-redirect.php' ),
-			array(),
+			plugins_url( '/assets/js/admin-notices.js', dirname( __DIR__ ) . '/sky-login-redirect.php' ),
+			[],
 			SLR_VERSION,
 			true
 		);
@@ -158,11 +158,11 @@ final class NoticeManager {
 		wp_localize_script(
 			'slr-notice-dismiss',
 			'slrNotice',
-			array(
+			[
 				'ajax_url' => admin_url( 'admin-ajax.php' ),
 				'nonce'    => wp_create_nonce( self::NONCE_ACTION ),
 				'action'   => self::AJAX_ACTION,
-			)
+			]
 		);
 	}
 
@@ -175,16 +175,16 @@ final class NoticeManager {
 		check_ajax_referer( self::NONCE_ACTION, 'nonce' );
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( array( 'message' => 'Forbidden' ), 403 );
+			wp_send_json_error( [ 'message' => 'Forbidden' ], 403 );
 			return;
 		}
 
 		$updated = update_option( self::OPTION_KEY, NoticeState::DISMISSED->value, true );
 
 		if ( $updated ) {
-			wp_send_json_success( array( 'message' => 'Notice dismissed successfully' ) );
+			wp_send_json_success( [ 'message' => 'Notice dismissed successfully' ] );
 		} else {
-			wp_send_json_error( array( 'message' => 'Failed to dismiss notice' ), 500 );
+			wp_send_json_error( [ 'message' => 'Failed to dismiss notice' ], 500 );
 		}
 	}
 
@@ -198,7 +198,7 @@ final class NoticeManager {
 			return;
 		}
 
-		$upgrade_url = Sky_Login_Redirect_fs()->get_upgrade_url();
+		$upgrade_url = sky_login_redirect_fs()->get_upgrade_url();
 		$upgrade_url = add_query_arg( 'coupon', $this->couponCode, $upgrade_url );
 
 		printf(

@@ -36,7 +36,6 @@
             <property name="indent" value="\t"/>
         </properties>
     </rule>
-    <rule ref="Generic.WhiteSpace.DisallowTabIndent" severity="0"/>
 
 	<!-- Allow short syntax arrays. -->
 	<rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
@@ -51,9 +50,11 @@
         <!-- Exclude the WordPress array declaration rules. -->
         <exclude name="WordPress.Arrays.ArrayDeclarationSpacing"/>
 		<!-- Exclude check for short syntax arrays. -->
-		 <exclude name="Universal.Arrays.DisallowShortArraySyntax"/>
-         <!-- Disable inline comment terminal punctuation rule -->
-         <exclude name="Squiz.Commenting.InlineComment"/>
+		<exclude name="Universal.Arrays.DisallowShortArraySyntax"/>
+		<!-- Disable inline comment terminal punctuation rule -->
+		<exclude name="Squiz.Commenting.InlineComment"/>
+		<!-- Allow tab indentation (WordPress enforces spaces by default). -->
+		<exclude name="Generic.WhiteSpace.DisallowTabIndent"/>
     </rule>
 
 	<!-- Minimum supported PHP version. -->

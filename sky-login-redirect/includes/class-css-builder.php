@@ -31,11 +31,11 @@ final class CSSBuilder {
      * @return self For method chaining.
      */
     public function add( string $property, mixed $value, string $unit = '', bool $is_int = false ): self {
-        if ( ! $value ) {
+        if ( '' === $value || false === $value || null === $value ) {
             return $this;
         }
 
-        $val = $is_int ? (int) $value : sanitize_text_field( (string) $value );
+        $val           = $is_int ? (int) $value : sanitize_text_field( (string) $value );
         $this->rules[] = "{$property}:{$val}{$unit};";
 
         return $this;
@@ -53,7 +53,7 @@ final class CSSBuilder {
      */
     public function addWithDefault( string $property, mixed $value, string $default, string $unit = '', bool $is_int = false ): self {
         if ( $value ) {
-            $val = $is_int ? (int) $value : sanitize_text_field( (string) $value );
+            $val           = $is_int ? (int) $value : sanitize_text_field( (string) $value );
             $this->rules[] = "{$property}:{$val}{$unit};";
         } else {
             $this->rules[] = "{$property}:{$default};";

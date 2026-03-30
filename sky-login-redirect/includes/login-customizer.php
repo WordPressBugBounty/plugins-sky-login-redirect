@@ -80,7 +80,7 @@ final class LoginPageCustomizer {
 	 *
 	 * @var array
 	 */
-	private array $logoDataCache = array();
+	private array $logoDataCache = [];
 
 	public function __construct(
 		private CSSBuilder $css = new CSSBuilder()
@@ -177,10 +177,10 @@ final class LoginPageCustomizer {
 		if ( is_numeric( $logo ) ) {
 			$src = wp_get_attachment_image_src( (int) $logo, 'full' );
 			if ( $src ) {
-				$this->logoDataCache[ $cache_key ] = array(
+				$this->logoDataCache[ $cache_key ] = [
 					'url'    => $src[0],
 					'height' => (int) ( $src[2] ?? 80 ),
-				);
+				];
 				return $this->logoDataCache[ $cache_key ];
 			}
 		} else {
@@ -199,20 +199,20 @@ final class LoginPageCustomizer {
 				if ( $id ) {
 					$src = wp_get_attachment_image_src( $id, 'full' );
 					if ( $src ) {
-						$this->logoDataCache[ $cache_key ] = array(
+						$this->logoDataCache[ $cache_key ] = [
 							'url'    => $src[0],
 							'height' => (int) ( $src[2] ?? 80 ),
-						);
+						];
 						return $this->logoDataCache[ $cache_key ];
 					}
 				}
 			}
 		}
 
-		$this->logoDataCache[ $cache_key ] = array(
+		$this->logoDataCache[ $cache_key ] = [
 			'url'    => $url,
 			'height' => $height,
-		);
+		];
 		return $this->logoDataCache[ $cache_key ];
 	}
 
@@ -227,7 +227,7 @@ final class LoginPageCustomizer {
 	 */
 	public function customizerCSS(): void {
 		if ( $this->cachedCSS === null ) {
-			$styles = array(
+			$styles = [
 				$this->buildHideElementsStyles(),
 				$this->buildLogoStyles(),
 				$this->buildBodyStyles(),
@@ -237,7 +237,7 @@ final class LoginPageCustomizer {
 				$this->buildColorStyles(),
 				$this->buildButtonStyles(),
 				$this->buildButtonHoverStyles(),
-			);
+			];
 
 			$this->cachedCSS = implode( '', array_filter( $styles ) );
 		}
@@ -258,7 +258,7 @@ final class LoginPageCustomizer {
 	 * @return string CSS rules for hiding elements, empty if no elements hidden.
 	 */
 	private function buildHideElementsStyles(): string {
-		$styles = array();
+		$styles = [];
 
 		if ( 'yes' === carbonade( 'slr_hide_backtoblog' ) ) {
 			$this->css->reset()->add( 'display', 'none' );
@@ -451,7 +451,7 @@ final class LoginPageCustomizer {
 	 * @return string CSS rules for custom colors, empty if no colors set.
 	 */
 	private function buildColorStyles(): string {
-		$styles = array();
+		$styles = [];
 
 		$color = carbonade( 'slr_form_labels_color' );
 		if ( $color ) {
@@ -558,19 +558,6 @@ final class LoginPageCustomizer {
 	}
 
 	/**
-	 * Hide "Remember Me" checkbox (EDD).
-	 *
-	 * @param string $html EDD login form HTML.
-	 * @return string Modified HTML with hidden checkbox.
-	 */
-	public function eddHideRememberMe( string $html ): string {
-		if ( 'yes' === carbonade( 'slr_hide_remember_me' ) ) {
-			return $html . '<style>p.edd-login-remember{display:none}</style>';
-		}
-		return $html;
-	}
-
-	/**
 	 * Check "Remember Me" checkbox by default (WP/WC).
 	 *
 	 * @return void
@@ -583,34 +570,54 @@ final class LoginPageCustomizer {
 	}
 
 	/**
-	 * Check "Remember Me" checkbox by default (EDD).
+	 * Modify EDD login form markup.
 	 *
 	 * @param string $html EDD login form HTML.
-	 * @return string Modified HTML with checked checkbox.
+	 * @return string
 	 */
-	public function eddCheckRememberMe( string $html ): string {
-		if ( 'yes' === carbonade( 'slr_check_remember_me' ) ) {
-			return $html . self::REMEMBER_ME_SCRIPT;
+	public function customizeEddLoginForm( string $html ): string {
+		if ( 'yes' === carbonade( 'slr_hide_remember_me' ) ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Static CSS string, no dynamic values.
+			$html .= '<style>p.edd-login-remember{display:none}</style>';
 		}
+
+		if ( 'yes' === carbonade( 'slr_check_remember_me' ) ) {
+			$html .= self::REMEMBER_ME_SCRIPT;
+		}
+
 		return $html;
+	}
+	
+	/**
+	 * Control whether the login language dropdown should be displayed.
+	 *
+	 * @param bool $display Whether to display the language dropdown.
+	 * @return bool
+	 */
+	public function maybeDisplayLanguageDropdown( bool $display ): bool {
+		if ( 'yes' === carbonade( 'slr_hide_language_switcher' ) ) {
+			return false;
+		}
+
+		return $display;
 	}
 }
 
 // Initialize login page customizer.
 $login_customizer = new LoginPageCustomizer();
+
 add_filter( 'login_url', $login_customizer->customLoginPage( ... ), 10, 3 );
 add_filter( 'login_headerurl', $login_customizer->loginLogoUrl( ... ) );
 add_filter( 'login_headertext', $login_customizer->loginLogoTitle( ... ) );
+
 add_action( 'admin_enqueue_scripts', $login_customizer->loginPreview( ... ), 20 );
-add_filter( 'login_head', $login_customizer->customizerCSS( ... ), 50 );
-add_filter( 'login_head', $login_customizer->hideRememberMe( ... ), 50 );
+
+add_action( 'login_head', $login_customizer->customizerCSS( ... ), 50 );
+add_action( 'login_head', $login_customizer->hideRememberMe( ... ), 50 );
+
 add_action( 'woocommerce_login_form_start', $login_customizer->hideRememberMe( ... ), 10 );
-add_filter( 'edd_login_form', $login_customizer->eddHideRememberMe( ... ) );
 add_action( 'login_footer', $login_customizer->checkRememberMe( ... ), 10 );
 add_action( 'woocommerce_login_form_end', $login_customizer->checkRememberMe( ... ), 10 );
-add_filter( 'edd_login_form', $login_customizer->eddCheckRememberMe( ... ) );
+add_filter( 'edd_login_form', $login_customizer->customizeEddLoginForm( ... ) );
 
-// Hide language switcher.
-if ( 'yes' === carbonade( 'slr_hide_language_switcher' ) ) {
-	add_filter( 'login_display_language_dropdown', '__return_false' );
-}
+add_filter(	'login_display_language_dropdown',$login_customizer->maybeDisplayLanguageDropdown( ... ) );

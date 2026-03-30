@@ -48,7 +48,7 @@ final class CookieManager {
 		}
 
 		$this->incrementRateLimit();
-		$this->setCookie( $current_url );
+		$this->set_cookie( $current_url );
 	}
 
 	/**
@@ -130,14 +130,14 @@ final class CookieManager {
 	 * @param string $url URL to store in the cookie.
 	 * @return void
 	 */
-	private function setCookie( string $url ): void {
-		$options = array(
+	private function set_cookie( string $url ): void {
+		$options = [
 			'expires'  => time() + HOUR_IN_SECONDS,
 			'path'     => '/',
 			'secure'   => is_ssl(),
 			'httponly' => true,
 			'samesite' => 'Lax',
-		);
+		];
 
 		if ( defined( 'COOKIE_DOMAIN' ) && COOKIE_DOMAIN ) {
 			$options['domain'] = COOKIE_DOMAIN;
