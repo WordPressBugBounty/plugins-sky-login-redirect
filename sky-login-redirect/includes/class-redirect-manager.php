@@ -17,6 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use WP_User;
+use function SkyLoginRedirect\carbonade_pipe;
 
 /**
  * Manages redirect logic for login, logout, and registration actions.
@@ -51,15 +52,13 @@ final class RedirectManager {
 			return $explicit_redirect;
 		}
 
-		// Get redirect rules from options (cached for object-cache / VIP compat).
-		// carbonade() is used instead of carbon_get_theme_option() so that this
-		// path never requires CF to be loaded — redirects fire on the login page
-		// (front-end) where CF does not boot.
+		// carbonade_pipe() reassembles CF complex field rows without CF being booted —
+		// safe on wp-login.php where carbon_get_theme_option() is unavailable.
 		$cache_key = 'slr_redirect_rules';
 		$rules     = wp_cache_get( $cache_key, 'slr' );
 		if ( false === $rules ) {
-			$rules = carbonade( 'slr_xlogin_logout' );
-			wp_cache_set( $cache_key, $rules ?: [], 'slr', HOUR_IN_SECONDS );
+			$rules = carbonade_pipe( 'slr_xlogin_logout' );
+			wp_cache_set( $cache_key, $rules, 'slr', HOUR_IN_SECONDS );
 		}
 
 		// No rules configured - redirect to homepage
@@ -136,8 +135,17 @@ final class RedirectManager {
 		$target_users = $rule['slr_xuser'] ?? [];
 
 		foreach ( $target_users as $usr ) {
-			// Extract user ID from format "Display Name (ID=123)"
-			if ( preg_match( '/\(ID=(\d+)\)/', $usr, $matches ) ) {
+			// New format: Carbon Fields association field returns array with 'id' key
+			if ( is_array( $usr ) && isset( $usr['id'] ) ) {
+				$user_id = (int) $usr['id'];
+				if ( $user_id === $user->ID ) {
+					return true;
+				}
+				continue;
+			}
+
+			// Legacy format: "Display Name (ID=123)" - for backward compatibility during migration
+			if ( is_string( $usr ) && preg_match( '/\(ID=(\d+)\)/', $usr, $matches ) ) {
 				$user_id = (int) $matches[1];
 				if ( $user_id === $user->ID ) {
 					return true;
@@ -218,9 +226,24 @@ final class RedirectManager {
 	 * @return string|null Page permalink or null.
 	 */
 	private function getPageUrl( array $rule, string $action ): ?string {
-		$page_id = $rule[ "slr_x{$action}_page" ] ?? 0;
+		$page_data = $rule[ "slr_x{$action}_page" ] ?? null;
 
-		return $page_id ? get_permalink( $page_id ) : null;
+		// Handle new association field format (array of items)
+		if ( is_array( $page_data ) && ! empty( $page_data ) ) {
+			$first_item = $page_data[0];
+			if ( is_array( $first_item ) && isset( $first_item['id'] ) ) {
+				$page_id = (int) $first_item['id'];
+				return $page_id ? get_permalink( $page_id ) : null;
+			}
+		}
+
+		// Legacy format: direct page ID (for backward compatibility during migration)
+		if ( is_numeric( $page_data ) ) {
+			$page_id = (int) $page_data;
+			return $page_id ? get_permalink( $page_id ) : null;
+		}
+
+		return null;
 	}
 
 	/**

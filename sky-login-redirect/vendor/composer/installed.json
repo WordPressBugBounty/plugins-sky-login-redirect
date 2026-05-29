@@ -396,58 +396,6 @@
                 "source": "https://github.com/htmlburger/carbon-fields"
             },
             "install-path": "../htmlburger/carbon-fields"
-        },
-        {
-            "name": "wp-cli/wp-config-transformer",
-            "version": "v1.4.5",
-            "version_normalized": "1.4.5.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/wp-cli/wp-config-transformer.git",
-                "reference": "8f5e66c717a7371dfb6559086880bee528aee858"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/wp-cli/wp-config-transformer/zipball/8f5e66c717a7371dfb6559086880bee528aee858",
-                "reference": "8f5e66c717a7371dfb6559086880bee528aee858",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.2.24"
-            },
-            "require-dev": {
-                "wp-cli/wp-cli-tests": "^4.0 || ^5.0"
-            },
-            "time": "2026-03-20T07:28:10+00:00",
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-main": "1.x-dev"
-                }
-            },
-            "installation-source": "dist",
-            "autoload": {
-                "files": [
-                    "src/WPConfigTransformer.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Frankie Jarrett",
-                    "email": "fjarrett@gmail.com"
-                }
-            ],
-            "description": "Programmatically edit a wp-config.php file.",
-            "homepage": "https://github.com/wp-cli/wp-config-transformer",
-            "support": {
-                "issues": "https://github.com/wp-cli/wp-config-transformer/issues",
-                "source": "https://github.com/wp-cli/wp-config-transformer/tree/v1.4.5"
-            },
-            "install-path": "../wp-cli/wp-config-transformer"
         }
     ],
     "dev": false,

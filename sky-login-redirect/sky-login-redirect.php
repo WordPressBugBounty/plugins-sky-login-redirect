@@ -3,8 +3,8 @@
 /**
  * Plugin Name: Sky Login Redirect
  * Plugin URI: https://utopique.net/products/sky-login-redirect-premium/
- * Description: Redirects users to the page they were prior to logging in or out. Features an awesome login customizer.
- * Version: 4.1.9
+ * Description: Advanced login/logout redirects with user/role rules, content restriction, login customizer, and WooCommerce integration.
+ * Version: 4.2.0
  * Author: Utopique
  * Author URI: https://utopique.net/
  * Developer: Utopique
@@ -14,7 +14,7 @@
  * Domain Path: /languages
  * License: GPLv3 or later
  * Requires at least: 5.6
- * Tested up to: 6.9
+ * Tested up to: 7.0
  * Requires PHP: 8.1
  * WC requires at least: 3.3
  * WC tested up to: 11
@@ -34,7 +34,7 @@ if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 // Current version.
-define( 'SLR_VERSION', '4.1.9' );
+define( 'SLR_VERSION', '4.2.0' );
 // Plugin root path.
 define( 'SLR_ROOT', trailingslashit( plugin_dir_path( __FILE__ ) ) );
 // Composer autoloader — must be loaded unconditionally so that:
@@ -205,8 +205,9 @@ if ( function_exists( __NAMESPACE__ . '\\sky_login_redirect_fs' ) ) {
 
         // Load cookie manager
         require_once SLR_ROOT . 'includes/class-cookie-manager.php';
-        $cookie_manager = new CookieManager();
-        add_action( 'template_redirect', $cookie_manager->setLastVisitedPage( ... ) );
+        add_action( 'template_redirect', [CookieManager::getInstance(), 'setLastVisitedPage'] );
+        // Load PERF-005 migration for Select2 to association fields
+        require_once SLR_ROOT . 'includes/migration-perf005.php';
         // Load security header manager
         require_once SLR_ROOT . 'includes/class-security-header-manager.php';
         $security_manager = new SecurityHeaderManager();
@@ -310,11 +311,7 @@ if ( function_exists( __NAMESPACE__ . '\\sky_login_redirect_fs' ) ) {
          * @return string The referer URL if it exists, otherwise an empty string.
          */
         function get_last_page_visited_cookie() : string {
-            static $manager;
-            if ( null === $manager ) {
-                $manager = new CookieManager();
-            }
-            $url = $manager->getLastVisitedUrl();
+            $url = CookieManager::getLastVisitedUrlStatic();
             if ( $url ) {
                 return $url;
             }
@@ -495,21 +492,118 @@ if ( function_exists( __NAMESPACE__ . '\\sky_login_redirect_fs' ) ) {
 
         add_action( 'carbon_fields_theme_options_container_saved', __NAMESPACE__ . '\\flush_slr_object_cache', 5 );
         /**
-         * Getter : retrieve cached options from transient
+         * Internal shared option-cache loader.
          *
-         * @param mixed $key     The key to retrieve.
-         * @param bool  $default False by default.
+         * Calls get_cached_options() once per request and memoises the result so
+         * both carbonade() and carbonade_pipe() share the same array without a
+         * second DB / transient / object-cache round-trip.
          *
-         * @return mixed the value for a given key
+         * @return array Flat map of every _slr_* wp_option row.
          */
-        function carbonade(  string $key, $default = false  ) {
+        function slr_options_cache() : array {
             static $cache;
             if ( null === $cache ) {
                 $cache = get_cached_options();
             }
+            return $cache;
+        }
+
+        /**
+         * Getter for scalar Carbon Fields theme options.
+         *
+         * Works for simple fields (text, select, checkbox, …) that Carbon Fields
+         * stores as a single wp_option row.  For complex (repeater) fields use
+         * carbonade_pipe() instead.
+         *
+         * @param string $key     Option key without leading underscore.
+         * @param mixed  $default Returned when the key is not found.
+         * @return mixed Raw option value.
+         */
+        function carbonade(  string $key, $default = false  ) {
             $k = '_' . $key;
             // Return raw value - escaping should be done at output time, not retrieval
+            $cache = slr_options_cache();
             return ( array_key_exists( $k, $cache ) ? $cache[$k] : $default );
+        }
+
+        /**
+         * Reconstruct a Carbon Fields complex (repeater) field from flat rows.
+         *
+         * Carbon Fields stores complex fields as individual wp_option rows with a
+         * pipe-separated hierarchy:
+         *   _{field}|{sub_field}|{group_index}|{item_index}|{property}
+         *
+         * This function reassembles those rows into the same nested array that
+         * carbon_get_theme_option() would return, without requiring CF to be
+         * booted — safe to call on wp-login.php and any frontend context.
+         *
+         * Sub-field type detection rules:
+         *   - property === '_empty'           → empty array  (empty multiselect/assoc)
+         *   - item has > 1 property or 'id'   → array of objects  (association field)
+         *   - multiple items, only 'value'    → flat string array  (multiselect)
+         *   - single item, only 'value'       → scalar string  (select / text / …)
+         *
+         * @param string $key     Complex field name without leading underscore.
+         * @param array  $default Returned when no matching rows are found.
+         * @return array Reconstructed array of group entries.
+         */
+        function carbonade_pipe(  string $key, array $default = []  ) : array {
+            $cache = slr_options_cache();
+            $prefix = '_' . $key . '|';
+            $prefix_len = strlen( $prefix );
+            $raw = [];
+            // [ group_idx => [ sub_field => [ item_idx => [ prop => val ] ] ] ]
+            foreach ( $cache as $option_name => $value ) {
+                if ( strncmp( $option_name, $prefix, $prefix_len ) !== 0 ) {
+                    continue;
+                }
+                $parts = explode( '|', substr( $option_name, $prefix_len ), 4 );
+                if ( count( $parts ) !== 4 ) {
+                    continue;
+                }
+                [
+                    $sub_field,
+                    $group_str,
+                    $item_str,
+                    $property
+                ] = $parts;
+                if ( '' === $sub_field ) {
+                    continue;
+                    // group-type marker row (e.g. |||0|value = _)
+                }
+                $raw[(int) $group_str][$sub_field][(int) $item_str][$property] = $value;
+            }
+            if ( empty( $raw ) ) {
+                return $default;
+            }
+            ksort( $raw );
+            $groups = [];
+            foreach ( $raw as $sub_fields ) {
+                $entry = [];
+                foreach ( $sub_fields as $sub_field => $items ) {
+                    ksort( $items );
+                    $first = reset( $items );
+                    // Empty-array marker (empty multiselect / association)
+                    if ( isset( $first['_empty'] ) ) {
+                        $entry[$sub_field] = [];
+                        continue;
+                    }
+                    // Association field: item carries more than just 'value'
+                    if ( count( $first ) > 1 || isset( $first['id'] ) ) {
+                        $entry[$sub_field] = array_values( $items );
+                        continue;
+                    }
+                    // Multiselect: several items each with only 'value'
+                    if ( count( $items ) > 1 ) {
+                        $entry[$sub_field] = array_column( array_values( $items ), 'value' );
+                        continue;
+                    }
+                    // Scalar: single item with only 'value' (select, text, textarea, …)
+                    $entry[$sub_field] = $first['value'] ?? '';
+                }
+                $groups[] = $entry;
+            }
+            return $groups;
         }
 
         /**

@@ -13,7 +13,6 @@
     "require": {
         "composer/installers": "^1.12",
         "freemius/wordpress-sdk": "^2.13",
-        "wp-cli/wp-config-transformer": "^1.4",
         "collizo4sky/persist-admin-notices-dismissal": "^1.4",
         "htmlburger/carbon-fields": "^3.6"
     },

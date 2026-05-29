@@ -67,14 +67,5 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
-        'wp-cli/wp-config-transformer' => array(
-            'pretty_version' => 'v1.4.5',
-            'version' => '1.4.5.0',
-            'reference' => '8f5e66c717a7371dfb6559086880bee528aee858',
-            'type' => 'library',
-            'install_path' => __DIR__ . '/../wp-cli/wp-config-transformer',
-            'aliases' => array(),
-            'dev_requirement' => false,
-        ),
     ),
 );

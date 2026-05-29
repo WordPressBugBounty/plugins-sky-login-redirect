@@ -19,11 +19,8 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-use Carbon_Fields\Carbon_Fields;
 use Carbon_Fields\Container;
-use Carbon_Fields\Block;
 use Carbon_Fields\Field;
-use Carbon_Fields\Field\Complex_Field;
 
 /**
  * Import the sky_login_redirect_fs() function as defined in the plugin
@@ -200,21 +197,19 @@ function options_login_logout_tab_theme_fields() {
 				)
 				->set_options( $categories ),
 
-				// USER multiselect
+				// USER association field (replaces multiselect)
 				Field::make(
-					'multiselect',
+					'association',
 					'slr_xuser',
 					__( 'User(s):', 'sky-login-redirect' )
-				)->add_options(
-					function () {
-						$usr = [];
-						// Limit to 1000 users to prevent memory exhaustion on large sites
-						$users = get_users( [ 'number' => 1000 ] );
-						foreach ( $users as $user ) {
-							$usr[ $user->display_name . ' (ID=' . $user->ID . ')' ] = $user->display_name;
-						}
-						return $usr;
-					}
+				)->set_types(
+					[
+						[
+							'type' => 'user',
+						],
+					]
+				)->set_help_text(
+					__( 'Search and select users. Start typing to filter.', 'sky-login-redirect' )
 				)
 				->set_conditional_logic(
 					[ [ 'field' => 'slr_xselect_redirect', 'value' => 'user' ] ]
@@ -266,28 +261,21 @@ function options_login_logout_tab_theme_fields() {
 						]
 					),
 
-				// select page for the login redirect
-				Field::make( 'select', 'slr_xlogin_page', __( 'Page:', 'sky-login-redirect' ) )
-					->add_options(
-						function () {
-							$usr = [];
-							// Optimize query: limit results and only fetch necessary fields
-							$posts = get_posts(
-                                [
-									'post_type'      => 'page',
-									'posts_per_page' => 500,
-									'orderby'        => 'title',
-									'order'          => 'ASC',
-									'post_status'    => 'publish',
-                                ]
-                            );
-							foreach ( $posts as $post ) {
-								$usr[ $post->ID ] = $post->post_title;
-							}
-							return $usr;
-						}
+				// select page for the login redirect (association field)
+				Field::make( 'association', 'slr_xlogin_page', __( 'Page:', 'sky-login-redirect' ) )
+					->set_types(
+						[
+							[
+								'type'      => 'post',
+								'post_type' => 'page',
+							],
+						]
+					)
+					->set_help_text(
+						__( 'Search and select a page. Start typing to filter.', 'sky-login-redirect' )
 					)
 					->set_classes( 'indent' )
+					->set_max( 1 )
 					->set_conditional_logic(
 						[
 							[
@@ -350,50 +338,43 @@ function options_login_logout_tab_theme_fields() {
 							]
 						),
 
-                // select page for the logout redirect
-                Field::make(
-                    'select',
-                    'slr_xlogout_page',
-                    __(
-                        'Page:',
-                        'sky-login-redirect'
-                    )
-                )
-                    ->add_options(
-                        function () {
-                            $usr = [];
-                            // Optimize query: limit results and only fetch necessary fields
-                            $posts = get_posts(
-                                [
-									'post_type'      => 'page',
-									'posts_per_page' => 500,
-									'orderby'        => 'title',
-									'order'          => 'ASC',
-									'post_status'    => 'publish',
-								]
-                            );
-                            foreach ( $posts as $post ) {
-                                $usr[ $post->ID ] = $post->post_title;
-                            }
-                            return $usr;
-                        }
-                    )
-                ->set_classes( 'indent' )
-                ->set_conditional_logic(
-                    [
+				// select page for the logout redirect (association field)
+				Field::make(
+					'association',
+					'slr_xlogout_page',
+					__(
+						'Page:',
+						'sky-login-redirect'
+					)
+				)
+					->set_types(
 						[
-							'field' => 'slr_xselect_logout', 'value' => 'page',
-						],
-					]
-                ),
+							[
+								'type'      => 'post',
+								'post_type' => 'page',
+							],
+						]
+					)
+					->set_help_text(
+						__( 'Search and select a page. Start typing to filter.', 'sky-login-redirect' )
+					)
+					->set_classes( 'indent' )
+					->set_max( 1 )
+					->set_conditional_logic(
+						[
+							[
+								'field' => 'slr_xselect_logout', 'value' => 'page',
+							],
+						]
+					),
 
-                // USER meta : logout
-                /*
-                Field::make( 'text', 'slr_xlogout_meta_key', __( 'User meta key:', 'sky-login-redirect' ) )
-                    ->set_help_text( __( 'The user meta key.', 'sky-login-redirect' ) )
-                    ->set_attribute( 'placeholder', 'User meta key' )
-                    ->set_classes( 'indent' )
-                    ->set_conditional_logic( [ [ 'field' => 'slr_xselect_logout', 'value' => 'meta' ] ] ),
+            // USER meta : logout
+            /*
+            Field::make( 'text', 'slr_xlogout_meta_key', __( 'User meta key:', 'sky-login-redirect' ) )
+                ->set_help_text( __( 'The user meta key.', 'sky-login-redirect' ) )
+                ->set_attribute( 'placeholder', 'User meta key' )
+                ->set_classes( 'indent' )
+                ->set_conditional_logic( [ [ 'field' => 'slr_xselect_logout', 'value' => 'meta' ] ] ),
 
                 Field::make( 'text', 'slr_xlogout_meta_value', __( 'User meta value:', 'sky-login-redirect' ) )
                     ->set_help_text( __( 'The user meta value.', 'sky-login-redirect' ) )
@@ -405,7 +386,7 @@ function options_login_logout_tab_theme_fields() {
 			]
         )
                                 ->set_layout( 'tabbed-vertical' )
-                                ->set_header_template( '<% if(slr_xselect_redirect) { %> <%- $_index %>. [<%- slr_xselect_redirect %>] <%- slr_xrole %><%- slr_xuser %><% } %>' );
+                                ->set_header_template( '<% if(slr_xselect_redirect) { %> <%- $_index %>. [<%- slr_xselect_redirect %>]<% if(slr_xselect_redirect === "user" && slr_xuser && slr_xuser.length) { %> <%- slr_xuser[0].title %><% if(slr_xuser.length > 1) { %> +<%- slr_xuser.length - 1 %> more<% } %><% } %><% if(slr_xselect_redirect === "role" && slr_xrole && slr_xrole.length) { %> <%- (typeof slr_xrole[0] === "object" ? slr_xrole[0].title : slr_xrole[0]) %><% if(slr_xrole.length > 1) { %> +<%- slr_xrole.length - 1 %> more<% } %><% } %><% } %>' );
 
     return $fields;
 }
@@ -1130,44 +1111,40 @@ function options_restrict_tab_theme_fields() {
 
                     // rule name?
 
-                    // restrict content multiselect
-                    Field::make( 'multiselect', 'slr_xcpt_restrict', __( 'Content to restrict:', 'sky-login-redirect' ) )
-                        ->add_options(
-                            function () {
-                                $usr = [];
-                                // Optimize query: limit results to prevent memory issues
-                                $posts = get_posts(
-                                    [
-										'post_type'      => [ 'post', 'page' ],
-										'posts_per_page' => 500,
-										'orderby'        => 'title',
-										'order'          => 'ASC',
-										'post_status'    => 'publish',
-									]
-                                );
-                                foreach ( $posts as $post ) {
-                                    $usr[ $post->post_title . ' (ID=' . $post->ID . ')' ] = $post->post_title;
-                                }
-                                return $usr;
-                            }
-                        ),
+                    // restrict content association field (replaces multiselect)
+                    Field::make( 'association', 'slr_xcpt_restrict', __( 'Content to restrict:', 'sky-login-redirect' ) )
+                        ->set_types(
+							[
+								[
+									'type'      => 'post',
+									'post_type' => 'post',
+								],
+								[
+									'type'      => 'post',
+									'post_type' => 'page',
+								],
+							]
+						)
+						->set_help_text(
+							__( 'Search and select posts/pages. Start typing to filter.', 'sky-login-redirect' )
+						),
 
                     // restrict for $categories
                     Field::make( 'select', 'slr_xselect_restrict', __( 'Restrict for:', 'sky-login-redirect' ) )
                         ->set_options( $categories ),
 
-                    // USER multiselect
-                    Field::make( 'multiselect', 'slr_xuser_restrict', __( 'User(s):', 'sky-login-redirect' ) )
-                        ->add_options(
-                            function () {
-                                $usr   = [];
-                                $users = get_users();
-                                foreach ( $users as $user ) {
-                                    $usr[ $user->display_name . ' (ID=' . $user->ID . ')' ] = $user->display_name;
-                                }
-                                return $usr;
-                            }
-                        )
+                    // USER association field for restriction (replaces multiselect)
+                    Field::make( 'association', 'slr_xuser_restrict', __( 'User(s):', 'sky-login-redirect' ) )
+                        ->set_types(
+							[
+								[
+									'type' => 'user',
+								],
+							]
+						)
+						->set_help_text(
+							__( 'Search and select users. Start typing to filter.', 'sky-login-redirect' )
+						)
                         ->set_conditional_logic(
                             [ [ 'field' => 'slr_xselect_restrict', 'value' => 'user' ] ]
                         ),
@@ -1220,7 +1197,7 @@ function options_restrict_tab_theme_fields() {
 				]
             )
                                         ->set_layout( 'tabbed-vertical' )
-                                        ->set_header_template( '<% if(slr_xselect_restrict) { %> <%- $_index %>. [<%- slr_xselect_restrict %>] <%- slr_xrole_restrict %><%- slr_xuser_restrict %><%- slr_xcpt_restrict %><% } %>' );
+                                        ->set_header_template( '<% if(slr_xselect_restrict) { %> <%- $_index %>. [<%- slr_xselect_restrict %>]<% if(slr_xcpt_restrict && slr_xcpt_restrict.length) { %> <%- slr_xcpt_restrict[0].title %><% if(slr_xcpt_restrict.length > 1) { %> +<%- slr_xcpt_restrict.length - 1 %> more<% } %> →<% } %><% if(slr_xselect_restrict === "user" && slr_xuser_restrict && slr_xuser_restrict.length) { %> <%- slr_xuser_restrict[0].title %><% if(slr_xuser_restrict.length > 1) { %> +<%- slr_xuser_restrict.length - 1 %> more<% } %><% } %><% if(slr_xselect_restrict === "role" && slr_xrole_restrict && slr_xrole_restrict.length) { %> <%- (typeof slr_xrole_restrict[0] === "object" ? slr_xrole_restrict[0].title : slr_xrole_restrict[0]) %><% if(slr_xrole_restrict.length > 1) { %> +<%- slr_xrole_restrict.length - 1 %> more<% } %><% } %><% } %>' );
 
         /*
         foreach ( $post_types  as $post_type ) {

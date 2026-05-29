@@ -172,8 +172,12 @@ img.security {
     display: none;
 }
 
-@media (max-width: 768px) {
+/* association field: no edit icon */
+.cf-association__option-action.cf-association__option-action--edit.dashicons.dashicons-edit {
+  display: none;
+}
 
+@media (max-width: 768px) {
     .carbon-theme-options #post-body.columns-2 #postbox-container-1.fixed,
     .carbon-network #post-body.columns-2 #postbox-container-1.fixed {
     position: static !important;

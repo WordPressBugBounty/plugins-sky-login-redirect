@@ -21,6 +21,74 @@ use function SkyLoginRedirect\is_login_page;
  * Cookie manager for last page visited tracking.
  */
 final class CookieManager {
+
+	/**
+	 * Singleton instance.
+	 */
+	private static ?self $instance = null;
+
+	/**
+	 * Get the singleton instance.
+	 *
+	 * @return self The CookieManager instance.
+	 */
+	public static function getInstance(): self {
+		if (null === self::$instance) {
+			self::$instance = new self();
+		}
+
+		return self::$instance;
+	}
+
+	/**
+	 * Private constructor to enforce singleton pattern.
+	 */
+	private function __construct() {}
+
+	/**
+	 * Get the real client IP address, checking for proxy/CDN headers.
+	 * 
+	 * This static method checks multiple headers in order of reliability:
+	 * 1. HTTP_CF_CONNECTING_IP (Cloudflare)
+	 * 2. HTTP_X_FORWARDED_FOR (standard proxy header)
+	 * 3. REMOTE_ADDR (direct connection)
+	 * 
+	 * The order can be filtered via the 'slr_rate_limit_ip' filter for custom environments.
+	 * 
+	 * @return string The client IP address, or empty string if not found.
+	 */
+	public static function getClientIp(): string {
+		// Allow filtering of IP detection order for custom environments
+		$ip_headers = apply_filters('slr_rate_limit_ip', [
+			'HTTP_CF_CONNECTING_IP', // Cloudflare
+			'HTTP_X_FORWARDED_FOR',  // Standard proxy header
+			'REMOTE_ADDR',           // Direct connection
+		]);
+
+		foreach ($ip_headers as $header) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- We sanitize below
+			$ip = $_SERVER[$header] ?? '';
+			if (empty($ip)) {
+				continue;
+			}
+
+			// X-Forwarded-For can contain multiple IPs (client, proxy1, proxy2)
+			// We want the first one (the original client)
+			if ($header === 'HTTP_X_FORWARDED_FOR') {
+				$ips = explode(',', $ip);
+				$ip = trim($ips[0]);
+			}
+
+			// Validate IP
+			$ip = filter_var(trim($ip), FILTER_VALIDATE_IP);
+			if ($ip !== false) {
+				return $ip;
+			}
+		}
+
+		return '';
+	}
+
 	private const COOKIE_NAME             = 'last_page_visited';
 	private const RATE_LIMIT_PREFIX       = 'slr_cookie_rate_';
 	private const MAX_ATTEMPTS_PER_MINUTE = 10;
@@ -54,7 +122,7 @@ final class CookieManager {
 	/**
 	 * Get the last visited page URL from cookie.
 	 *
-	 * @return string Sanitized URL or empty string.
+	 * @return string The sanitized URL from the cookie, or empty string if not set.
 	 */
 	public function getLastVisitedUrl(): string {
 		$raw_cookie = filter_input( INPUT_COOKIE, self::COOKIE_NAME, FILTER_DEFAULT );
@@ -64,6 +132,16 @@ final class CookieManager {
 
 		$cookie = wp_unslash( (string) $raw_cookie );
 		return esc_url_raw( $cookie );
+	}
+
+	/**
+	 * Static method to get the last visited page URL.
+	 * Uses the singleton instance for consistency.
+	 *
+	 * @return string The sanitized URL from the cookie, or empty string if not set.
+	 */
+	public static function getLastVisitedUrlStatic(): string {
+		return self::getInstance()->getLastVisitedUrl();
 	}
 
 	/**
@@ -118,9 +196,7 @@ final class CookieManager {
 	 * @return string MD5-hashed key based on client IP.
 	 */
 	private function getRateLimitKey(): string {
-		$ip_address = isset( $_SERVER['REMOTE_ADDR'] )
-			? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) )
-			: '';
+		$ip_address = self::getClientIp();
 		return self::RATE_LIMIT_PREFIX . md5( $ip_address );
 	}
 

@@ -1,5 +1,29 @@
 == Changelog ==
 
+= 4.2.0 - 2026-05-29 =
+*   New - IPs are now correctly detected, when behind a proxy.
+*   New - Migrate 5 fields to CF association with lazy-loaded paginated search.
+*   Fix - Two separate CookieManager instances were created.
+*   Fix - Restrict rule header template now displays the selected content-to-restrict title at a glance
+*   Fix - Rule header template: defensive typeof check for slr_xrole[0] against future association field format changes
+*   New - carbonade_pipe(): reconstructs CF complex (repeater) fields from flat pipe-delimited wp_option rows without Carbon Fields being booted — safe on wp-login.php and any frontend context
+*   Internal - slr_options_cache() shared cache loader: carbonade() and carbonade_pipe() share a single get_cached_options() call per request
+
+= 4.1.9 - 2026-03-30 =
+*   Performance - Carbon Fields no longer loads on frontend, saving ~5-15 ms PHP time and ~1-2 MB memory per public page load
+*   Performance - Freemius SDK no longer initialises on frontend — all plan checks are strictly admin-only
+*   Performance - Premium widget rewritten as plain WP_Widget, removing CF boot requirement on every widgets_init call
+*   Performance - Removed redundant get_cached_options() hook on save — cache repopulates lazily
+*   Bug Fix - Cookies were not cleared on logout due to sanitize_key() stripping uppercase from cookie names
+*   Bug Fix - CSS value 0 was silently ignored in the login customizer (border-radius: 0, border-width: 0, etc.)
+*   Security - Open redirect hardening: custom redirect URLs now validated with wp_validate_redirect() in addition to esc_url_raw()
+*   Resilience - Server-side redirect_to hidden field injection for compatibility with security plugins (WPS Limit Login, etc.)
+*   Resilience - login_redirect and logout_redirect filter priorities raised to PHP_INT_MAX
+*   Resilience - Cookie-based fallback in redirect logic when redirect_to is stripped by security plugins
+*   Internal - Login customizer hook moved from carbon_fields_register_fields to after_setup_theme
+*   Internal - carbonade() replaces carbon_get_theme_option() in RedirectManager for frontend compatibility
+*   Internal - Freemius helper renamed to snake_case, uninstall hook and premium loader gated to is_admin()
+
 = 4.1.8 - 2026-03-24 =
 *   Security - add wp_strip_all_tags() defense-in-depth to all inline CSS outputs (login customizer, WooCommerce customizer, modal customizer, custom CSS blocks, pro-code CSS)
 *   Security - remove Select2 library and custom AJAX search system entirely — Carbon Fields handles selects natively

@@ -3,9 +3,9 @@ Contributors: skyminds
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DNSC3NVBWR66L
 Tags: login redirect, logout redirect, custom login, woocommerce login, login customizer, user redirect, role redirect, login page, redirect users, membership
 Requires at least: 5.6
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 4.1.9
+Stable tag: 4.2.0
 License: GPLv3 or later
 
 Control where users land after login/logout. Redirect by role, user, or previous page. Includes a powerful login customizer and WooCommerce support.
@@ -174,35 +174,21 @@ Free support is available through the [WordPress.org support forum](https://word
 
 == Changelog ==
 
-= 4.1.9 - 2026-03-30 =
-*   Performance - Carbon Fields no longer loads on frontend, saving ~5-15 ms PHP time and ~1-2 MB memory per public page load
-*   Performance - Freemius SDK no longer initialises on frontend — all plan checks are strictly admin-only
-*   Performance - Premium widget rewritten as plain WP_Widget, removing CF boot requirement on every widgets_init call
-*   Performance - Removed redundant get_cached_options() hook on save — cache repopulates lazily
-*   Bug Fix - Cookies were not cleared on logout due to sanitize_key() stripping uppercase from cookie names
-*   Bug Fix - CSS value 0 was silently ignored in the login customizer (border-radius: 0, border-width: 0, etc.)
-*   Security - Open redirect hardening: custom redirect URLs now validated with wp_validate_redirect() in addition to esc_url_raw()
-*   Resilience - Server-side redirect_to hidden field injection for compatibility with security plugins (WPS Limit Login, etc.)
-*   Resilience - login_redirect and logout_redirect filter priorities raised to PHP_INT_MAX
-*   Resilience - Cookie-based fallback in redirect logic when redirect_to is stripped by security plugins
-*   Internal - Login customizer hook moved from carbon_fields_register_fields to after_setup_theme
-*   Internal - carbonade() replaces carbon_get_theme_option() in RedirectManager for frontend compatibility
-*   Internal - Freemius helper renamed to snake_case, uninstall hook and premium loader gated to is_admin()
-
-= 4.1.8 - 2026-03-24 =
-*   Security - add wp_strip_all_tags() defense-in-depth to all inline CSS outputs (login customizer, WooCommerce customizer, modal customizer, custom CSS blocks, code CSS)
-*   Security - remove Select2 library and custom AJAX search system entirely — Carbon Fields handles selects natively
-*   Performance - remove update_option() from read path in get_cached_options() (VIP compatibility)
-*   Performance - carbonade() now reads from object cache / transient two-tier cache instead of direct get_option() DB query
-*   Performance - modal login form no longer renders HTML or generates nonces for logged-in users
-*   Performance - modal AJAX login script only enqueues for logged-out users via reliable template_redirect check
-*   Performance - flush all cache layers (object cache + transient) on Carbon Fields settings save with correct priority ordering
-*   Compatibility - patch Carbon Fields Pimple container for PHP 8.5: replace deprecated SplObjectStorage::attach()/detach() with offsetSet()/offsetUnset()
-*   Refactor - split modal ModalLoginManager::initAjaxLogin() into registerAjaxHandler() (init) and enqueueLoginScripts() (template_redirect) for proper separation of concerns
+= 4.2.0 - 2026-05-29 =
+*   New - IPs are now correctly detected, when behind a proxy.
+*   New - Migrate 5 fields to CF association with lazy-loaded paginated search.
+*   Fix - Two separate CookieManager instances were created.
+*   Fix - Restrict rule header template now displays the selected content-to-restrict title at a glance
+*   Fix - Rule header template: defensive typeof check for slr_xrole[0] against future association field format changes
+*   New - carbonade_pipe(): reconstructs CF complex (repeater) fields from flat pipe-delimited wp_option rows without Carbon Fields being booted — safe on wp-login.php and any frontend context
+*   Internal - slr_options_cache() shared cache loader: carbonade() and carbonade_pipe() share a single get_cached_options() call per request
 
 Older versions changes can be found in [the changelog](https://utopique.net/products/sky-login-redirect-premium/#changelog "Sky Login Redirect changelog")
 
 == Upgrade Notice ==
+
+= 4.2.0 =
+**Content Restriction & Redirect Fix!** Fixed a critical bug where content restriction rules and redirect rules were silently not applied due to how Carbon Fields stores complex fields. Also fixes the "Content to restrict" field showing 0 results. Upgrade recommended for all users of the Restrict Content feature.
 
 = 4.1.9 =
 **Major Performance & Resilience Update!** Carbon Fields and Freemius SDK no longer load on frontend pages — saves ~5-15 ms and ~1-2 MB memory per page load. Fixed cookie clearing on logout and CSS zero-value handling. Open redirect hardening on custom URL rules. Improved compatibility with security plugins (WPS Limit Login).
