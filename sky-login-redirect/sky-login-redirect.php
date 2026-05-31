@@ -4,7 +4,7 @@
  * Plugin Name: Sky Login Redirect
  * Plugin URI: https://utopique.net/products/sky-login-redirect-premium/
  * Description: Advanced login/logout redirects with user/role rules, content restriction, login customizer, and WooCommerce integration.
- * Version: 4.2.0
+ * Version: 4.2.1
  * Author: Utopique
  * Author URI: https://utopique.net/
  * Developer: Utopique
@@ -34,7 +34,7 @@ if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 // Current version.
-define( 'SLR_VERSION', '4.2.0' );
+define( 'SLR_VERSION', '4.2.1' );
 // Plugin root path.
 define( 'SLR_ROOT', trailingslashit( plugin_dir_path( __FILE__ ) ) );
 // Composer autoloader — must be loaded unconditionally so that:
@@ -87,6 +87,11 @@ if ( function_exists( __NAMESPACE__ . '\\sky_login_redirect_fs' ) ) {
         if ( is_admin() ) {
             // Init Freemius.
             sky_login_redirect_fs();
+            // Ensure the plugin icon resolves to the committed local asset
+            // regardless of the Freemius SDK assets folder copy.
+            sky_login_redirect_fs()->add_filter( 'plugin_icon', function () {
+                return __DIR__ . '/assets/img/sky-login-redirect.png';
+            } );
             // Signal that SDK was initiated.
             do_action( 'sky_login_redirect_fs_loaded' );
         }

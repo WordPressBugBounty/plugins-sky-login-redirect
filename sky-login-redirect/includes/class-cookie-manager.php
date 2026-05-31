@@ -48,21 +48,23 @@ final class CookieManager {
 	/**
 	 * Get the real client IP address, checking for proxy/CDN headers.
 	 * 
-	 * This static method checks multiple headers in order of reliability:
-	 * 1. HTTP_CF_CONNECTING_IP (Cloudflare)
-	 * 2. HTTP_X_FORWARDED_FOR (standard proxy header)
-	 * 3. REMOTE_ADDR (direct connection)
-	 * 
-	 * The order can be filtered via the 'slr_rate_limit_ip' filter for custom environments.
-	 * 
+	 * By default ONLY REMOTE_ADDR is trusted, because proxy headers like
+	 * X-Forwarded-For and CF-Connecting-IP are attacker-controllable on any
+	 * site that is not actually behind the corresponding proxy/CDN. Trusting
+	 * them by default would let an attacker rotate the rate-limit key per
+	 * request and bypass brute-force protection.
+	 *
+	 * Sites genuinely behind Cloudflare or another reverse proxy can opt in
+	 * via the 'slr_rate_limit_ip' filter, e.g.:
+	 *   add_filter( 'slr_rate_limit_ip', fn() => [ 'HTTP_CF_CONNECTING_IP', 'REMOTE_ADDR' ] );
+	 *
 	 * @return string The client IP address, or empty string if not found.
 	 */
 	public static function getClientIp(): string {
-		// Allow filtering of IP detection order for custom environments
+		// Secure default: only the real connection IP. Proxy/CDN headers are
+		// opt-in via the filter for environments that can trust them.
 		$ip_headers = apply_filters('slr_rate_limit_ip', [
-			'HTTP_CF_CONNECTING_IP', // Cloudflare
-			'HTTP_X_FORWARDED_FOR',  // Standard proxy header
-			'REMOTE_ADDR',           // Direct connection
+			'REMOTE_ADDR', // Direct connection (trusted)
 		]);
 
 		foreach ($ip_headers as $header) {

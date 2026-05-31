@@ -5,7 +5,7 @@ Tags: login redirect, logout redirect, custom login, woocommerce login, login cu
 Requires at least: 5.6
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 4.2.0
+Stable tag: 4.2.1
 License: GPLv3 or later
 
 Control where users land after login/logout. Redirect by role, user, or previous page. Includes a powerful login customizer and WooCommerce support.
@@ -174,6 +174,15 @@ Free support is available through the [WordPress.org support forum](https://word
 
 == Changelog ==
 
+= 4.2.1 - 2026-05-31 =
+*   Security - Modal login brute-force protection now uses a transient instead of the non-persistent object cache, so the rate limiter works on sites without Redis/Memcached.
+*   Security - Client IP detection now trusts only REMOTE_ADDR by default; spoofable proxy headers (X-Forwarded-For, CF-Connecting-IP) are opt-in via the slr_rate_limit_ip filter, closing a rate-limit bypass.
+*   Fix - Fatal error on the modal login form caused by a missing get_current_url() import.
+*   Fix - WooCommerce registration redirect no longer discards the default destination when the custom redirect is disabled.
+*   Fix - Possible TypeError when building a nav-menu login/logout link with no saved link type.
+*   Internal - Removed redundant wp_set_current_user()/wp_set_auth_cookie() after wp_signon() in AJAX login.
+*   Internal - PERF-005 migration: removed a duplicate option read and guarded upgrader array keys.
+
 = 4.2.0 - 2026-05-29 =
 *   New - IPs are now correctly detected, when behind a proxy.
 *   New - Migrate 5 fields to CF association with lazy-loaded paginated search.
@@ -187,8 +196,8 @@ Older versions changes can be found in [the changelog](https://utopique.net/prod
 
 == Upgrade Notice ==
 
+= 4.2.1 =
+**Security & stability fix.** Restores modal login brute-force protection (the rate limiter was inactive on sites without a persistent object cache) and hardens client-IP detection against header spoofing. Also fixes a fatal error on the modal login form and a WooCommerce registration redirect regression. Recommended for all users. NOTE: if your site is behind Cloudflare or a reverse proxy, add the slr_rate_limit_ip filter to keep trusting forwarded IP headers (see changelog/docs).
+
 = 4.2.0 =
 **Content Restriction & Redirect Fix!** Fixed a critical bug where content restriction rules and redirect rules were silently not applied due to how Carbon Fields stores complex fields. Also fixes the "Content to restrict" field showing 0 results. Upgrade recommended for all users of the Restrict Content feature.
-
-= 4.1.9 =
-**Major Performance & Resilience Update!** Carbon Fields and Freemius SDK no longer load on frontend pages — saves ~5-15 ms and ~1-2 MB memory per page load. Fixed cookie clearing on logout and CSS zero-value handling. Open redirect hardening on custom URL rules. Improved compatibility with security plugins (WPS Limit Login).

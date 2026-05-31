@@ -85,13 +85,7 @@ final class AssociationFieldMigrator
      */
     private function migrateRedirectRules(): void
     {
-        // Get the container data
-        $container_id = carbon_get_theme_option('slr_xlogin_logout');
-        if (empty($container_id)) {
-            return;
-        }
-
-        // Get all rules
+        // Get all redirect rules
         $rules = carbon_get_theme_option('slr_xlogin_logout');
         if (empty($rules) || !is_array($rules)) {
             return;
@@ -416,7 +410,7 @@ add_action('admin_init', __NAMESPACE__ . '\\run_perf005_migration', 100); // Run
 function run_perf005_migration_on_upgrade($upgrader_object, $options): void
 {
     // Check if this is our plugin being updated
-    if ($options['action'] === 'update' && $options['type'] === 'plugin') {
+    if (($options['action'] ?? '') === 'update' && ($options['type'] ?? '') === 'plugin') {
         // Check if our plugin is in the list of updated plugins
         $plugins = $options['plugins'] ?? [];
         if (in_array('sky-login-redirect/sky-login-redirect.php', (array) $plugins, true)) {

@@ -169,6 +169,7 @@ final class RedirectManager {
 		}
 
 		$target_roles = $rule['slr_xrole'] ?? [];
+		$target_roles = is_array( $target_roles ) ? $target_roles : [ $target_roles ];
 		$user_role    = $user->roles[0] ?? '';
 
 		return in_array( $user_role, $target_roles, true );
