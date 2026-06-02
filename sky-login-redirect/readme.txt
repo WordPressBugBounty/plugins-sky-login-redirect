@@ -5,7 +5,7 @@ Tags: login redirect, logout redirect, custom login, woocommerce login, login cu
 Requires at least: 5.6
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 4.2.1
+Stable tag: 4.2.2
 License: GPLv3 or later
 
 Control where users land after login/logout. Redirect by role, user, or previous page. Includes a powerful login customizer and WooCommerce support.
@@ -174,6 +174,11 @@ Free support is available through the [WordPress.org support forum](https://word
 
 == Changelog ==
 
+= 4.2.2 - 2026-06-02 =
+*   Fix - Users not covered by any redirect rule (including administrators) were forced to the homepage on login/logout. The plugin now preserves the default WordPress destination (e.g. the dashboard) when no rule matches the user, so a rule scoped to specific roles only affects those roles.
+*   Fix - Role-based content restriction restricted every page the role viewed instead of only the pages selected in the rule. It now respects the chosen "Content to restrict" list, consistent with user- and logged-out-based rules.
+*   Improvement - Both redirect rules and content restriction rules now match against all of a user's roles instead of only the primary role, so multi-role users are handled correctly.
+
 = 4.2.1 - 2026-05-31 =
 *   Security - Modal login brute-force protection now uses a transient instead of the non-persistent object cache, so the rate limiter works on sites without Redis/Memcached.
 *   Security - Client IP detection now trusts only REMOTE_ADDR by default; spoofable proxy headers (X-Forwarded-For, CF-Connecting-IP) are opt-in via the slr_rate_limit_ip filter, closing a rate-limit bypass.
@@ -195,6 +200,9 @@ Free support is available through the [WordPress.org support forum](https://word
 Older versions changes can be found in [the changelog](https://utopique.net/products/sky-login-redirect-premium/#changelog "Sky Login Redirect changelog")
 
 == Upgrade Notice ==
+
+= 4.2.2 =
+**Important redirect fix.** Resolves a bug where users not matched by a redirect rule (including administrators) were sent to the homepage instead of their normal destination. Role rules now apply only to the selected roles and correctly handle multi-role users. Recommended for everyone using role- or user-specific rules.
 
 = 4.2.1 =
 **Security & stability fix.** Restores modal login brute-force protection (the rate limiter was inactive on sites without a persistent object cache) and hardens client-IP detection against header spoofing. Also fixes a fatal error on the modal login form and a WooCommerce registration redirect regression. Recommended for all users. NOTE: if your site is behind Cloudflare or a reverse proxy, add the slr_rate_limit_ip filter to keep trusting forwarded IP headers (see changelog/docs).

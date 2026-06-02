@@ -61,9 +61,11 @@ final class RedirectManager {
 			wp_cache_set( $cache_key, $rules, 'slr', HOUR_IN_SECONDS );
 		}
 
-		// No rules configured - redirect to homepage
+		// No rules configured - leave the default redirect untouched so users
+		// not covered by any rule (e.g. administrators) land where WordPress and
+		// other plugins intended (the dashboard, a requested page, etc.).
 		if ( empty( $rules ) ) {
-			return esc_url_raw( home_url( '/' ) );
+			return $this->defaultRedirect( $redirect_to );
 		}
 
 		// Find and apply matching rule
@@ -82,7 +84,27 @@ final class RedirectManager {
 			}
 		}
 
-		// Fallback to homepage
+		// No rule matched this user - preserve the default redirect computed by
+		// WordPress/other plugins (e.g. wp-admin for administrators) rather than
+		// forcing every uncovered user to the homepage.
+		return $this->defaultRedirect( $redirect_to );
+	}
+
+	/**
+	 * Default redirect to use when the plugin has no matching rule.
+	 *
+	 * Honors the incoming redirect target so users outside the configured rules
+	 * keep WordPress' default behaviour. Falls back to the homepage only when no
+	 * destination was provided.
+	 *
+	 * @param string|null $redirect_to Default redirect URL from the filter.
+	 * @return string Validated redirect URL.
+	 */
+	private function defaultRedirect( ?string $redirect_to ): string {
+		if ( ! empty( $redirect_to ) ) {
+			return wp_validate_redirect( $redirect_to, home_url( '/' ) );
+		}
+
 		return esc_url_raw( home_url( '/' ) );
 	}
 
@@ -170,9 +192,10 @@ final class RedirectManager {
 
 		$target_roles = $rule['slr_xrole'] ?? [];
 		$target_roles = is_array( $target_roles ) ? $target_roles : [ $target_roles ];
-		$user_role    = $user->roles[0] ?? '';
 
-		return in_array( $user_role, $target_roles, true );
+		// Match against every role the user holds, not just the primary one,
+		// so multi-role users are handled correctly.
+		return (bool) array_intersect( $user->roles, $target_roles );
 	}
 
 	/**

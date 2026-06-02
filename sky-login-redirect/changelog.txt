@@ -1,5 +1,10 @@
 == Changelog ==
 
+= 4.2.2 - 2026-06-02 =
+*   Fix - Users not covered by any redirect rule (including administrators) were forced to the homepage on login/logout. The plugin now preserves the default WordPress destination (e.g. the dashboard) when no rule matches the user, so a rule scoped to specific roles only affects those roles.
+*   Fix - Role-based content restriction restricted every page the role viewed instead of only the pages selected in the rule. It now respects the chosen "Content to restrict" list, consistent with user- and logged-out-based rules.
+*   Improvement - Both redirect rules and content restriction rules now match against all of a user's roles instead of only the primary role, so multi-role users are handled correctly.
+
 = 4.2.1 - 2026-05-31 =
 *   Security - Modal login brute-force protection now uses a transient instead of the non-persistent object cache, so the rate limiter works on sites without Redis/Memcached.
 *   Security - Client IP detection now trusts only REMOTE_ADDR by default; spoofable proxy headers (X-Forwarded-For, CF-Connecting-IP) are opt-in via the slr_rate_limit_ip filter, closing a rate-limit bypass.

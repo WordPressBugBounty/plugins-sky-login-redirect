@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c8ee1fc010c4e429b884ba7095b1f73e",
+    "content-hash": "800ccb48899319cee5a0a13b15fe2410",
     "packages": [
         {
             "name": "collizo4sky/persist-admin-notices-dismissal",
