@@ -1,5 +1,9 @@
 == Changelog ==
 
+= 4.2.3 - 2026-06-02 =
+*   Fix - Fatal error (TypeError) on login when another plugin's `login_redirect`/`logout_redirect` filter callback returned a non-string value (e.g. `true`). The redirect arguments are now normalised to a string or null before being passed to the strictly-typed RedirectManager, so the plugin no longer crashes wp-login.php.
+*   Hardening - The WooCommerce and EDD redirect handlers and the custom login URL filter now defensively normalise any non-string value passed by third-party plugins (including arrays/objects), preventing the same class of error across all redirect filters.
+
 = 4.2.2 - 2026-06-02 =
 *   Fix - Users not covered by any redirect rule (including administrators) were forced to the homepage on login/logout. The plugin now preserves the default WordPress destination (e.g. the dashboard) when no rule matches the user, so a rule scoped to specific roles only affects those roles.
 *   Fix - Role-based content restriction restricted every page the role viewed instead of only the pages selected in the rule. It now respects the chosen "Content to restrict" list, consistent with user- and logged-out-based rules.

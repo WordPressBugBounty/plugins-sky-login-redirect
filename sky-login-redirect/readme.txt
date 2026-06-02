@@ -5,7 +5,7 @@ Tags: login redirect, logout redirect, custom login, woocommerce login, login cu
 Requires at least: 5.6
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 4.2.2
+Stable tag: 4.2.3
 License: GPLv3 or later
 
 Control where users land after login/logout. Redirect by role, user, or previous page. Includes a powerful login customizer and WooCommerce support.
@@ -174,6 +174,10 @@ Free support is available through the [WordPress.org support forum](https://word
 
 == Changelog ==
 
+= 4.2.3 - 2026-06-02 =
+*   Fix - Fatal error (TypeError) on login when another plugin's `login_redirect`/`logout_redirect` filter callback returned a non-string value (e.g. `true`). The redirect arguments are now normalised to a string or null before being passed to the strictly-typed RedirectManager, so the plugin no longer crashes wp-login.php.
+*   Hardening - The WooCommerce and EDD redirect handlers and the custom login URL filter now defensively normalise any non-string value passed by third-party plugins (including arrays/objects), preventing the same class of error across all redirect filters.
+
 = 4.2.2 - 2026-06-02 =
 *   Fix - Users not covered by any redirect rule (including administrators) were forced to the homepage on login/logout. The plugin now preserves the default WordPress destination (e.g. the dashboard) when no rule matches the user, so a rule scoped to specific roles only affects those roles.
 *   Fix - Role-based content restriction restricted every page the role viewed instead of only the pages selected in the rule. It now respects the chosen "Content to restrict" list, consistent with user- and logged-out-based rules.
@@ -200,6 +204,9 @@ Free support is available through the [WordPress.org support forum](https://word
 Older versions changes can be found in [the changelog](https://utopique.net/products/sky-login-redirect-premium/#changelog "Sky Login Redirect changelog")
 
 == Upgrade Notice ==
+
+= 4.2.3 =
+**Fatal error fix.** Prevents a crash on wp-login.php when another plugin returns a non-string value through the `login_redirect`/`logout_redirect` filter. Recommended for everyone, especially sites running other login/redirect plugins.
 
 = 4.2.2 =
 **Important redirect fix.** Resolves a bug where users not matched by a redirect rule (including administrators) were sent to the homepage instead of their normal destination. Role rules now apply only to the selected roles and correctly handle multi-role users. Recommended for everyone using role- or user-specific rules.

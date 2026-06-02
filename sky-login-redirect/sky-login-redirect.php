@@ -4,7 +4,7 @@
  * Plugin Name: Sky Login Redirect
  * Plugin URI: https://utopique.net/products/sky-login-redirect-premium/
  * Description: Advanced login/logout redirects with user/role rules, content restriction, login customizer, and WooCommerce integration.
- * Version: 4.2.2
+ * Version: 4.2.3
  * Author: Utopique
  * Author URI: https://utopique.net/
  * Developer: Utopique
@@ -34,7 +34,7 @@ if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 // Current version.
-define( 'SLR_VERSION', '4.2.2' );
+define( 'SLR_VERSION', '4.2.3' );
 // Plugin root path.
 define( 'SLR_ROOT', trailingslashit( plugin_dir_path( __FILE__ ) ) );
 // Composer autoloader — must be loaded unconditionally so that:
@@ -358,6 +358,11 @@ if ( function_exists( __NAMESPACE__ . '\\sky_login_redirect_fs' ) ) {
             if ( null === $redirect_manager ) {
                 $redirect_manager = new RedirectManager();
             }
+            // WordPress and third-party plugins sometimes pass bool/int as
+            // $redirect_to via the login_redirect filter — normalise before
+            // passing to the strictly-typed RedirectManager.
+            $redirect_to = ( is_string( $redirect_to ) ? $redirect_to : null );
+            $requested_redirect_to = ( is_string( $requested_redirect_to ) ? $requested_redirect_to : null );
             return $redirect_manager->processRedirect( $redirect_to, $requested_redirect_to, $user );
         }
 

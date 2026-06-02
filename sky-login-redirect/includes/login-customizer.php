@@ -89,12 +89,16 @@ final class LoginPageCustomizer {
 	/**
 	 * Filter custom login URL.
 	 *
-	 * @param string $url          Default login URL.
-	 * @param string $redirect     Redirect destination.
-	 * @param bool   $force_reauth Whether to force reauthentication.
+	 * @param mixed $url          Default login URL (may be polluted by other plugins).
+	 * @param mixed $redirect     Redirect destination (may be polluted by other plugins).
+	 * @param mixed $force_reauth Whether to force reauthentication.
 	 * @return string Modified login URL.
 	 */
-	public function customLoginPage( string $url, string $redirect, bool $force_reauth ): string {
+	public function customLoginPage( mixed $url, mixed $redirect = '', mixed $force_reauth = false ): string {
+		$url          = is_scalar( $url ) ? (string) $url : '';
+		$redirect     = is_scalar( $redirect ) ? (string) $redirect : '';
+		$force_reauth = (bool) $force_reauth;
+
 		if ( is_admin() ) {
 			return $url;
 		}

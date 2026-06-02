@@ -36,4 +36,20 @@ trait RedirectHelpers {
 	private function isValidUrl( ?string $url ): bool {
 		return $url && filter_var( $url, FILTER_VALIDATE_URL ) !== false;
 	}
+
+	/**
+	 * Normalise a filter-supplied redirect value to a string.
+	 *
+	 * WordPress filters such as woocommerce_login_redirect normally pass a
+	 * string, but a lower-priority callback from another plugin can return any
+	 * type (bool, int, array, object). Scalars are cast; non-scalars (array,
+	 * object, null) collapse to an empty string so downstream string operations
+	 * never throw a TypeError.
+	 *
+	 * @param mixed $value Raw value from the filter chain.
+	 * @return string Safe string representation.
+	 */
+	private function toRedirectString( mixed $value ): string {
+		return is_scalar( $value ) ? (string) $value : '';
+	}
 }
