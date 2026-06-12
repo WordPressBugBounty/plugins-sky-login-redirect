@@ -1,5 +1,9 @@
 == Changelog ==
 
+= 4.2.4 - 2026-06-12 =
+*   New - Generic login error messages (Starter): optionally replace WordPress's username-revealing login, lost-password and email-login errors with a single neutral message, so attackers can't tell whether a username or email address exists on your site (account enumeration). Enable it under Login Redirect → Tweaks → Admin tweaks. Harmless notices like "empty password" are left intact; the message is customizable via the slr_generic_login_error_message filter.
+*   New - Cloudflare Turnstile anti-spam protection (Platinum): adds a free, privacy-friendly, no-puzzle CAPTCHA to the login, registration and lost-password forms to stop spam bots and brute-force attempts. Configure under Tweaks → Spam protection (enable + paste your Cloudflare site and secret keys). Verification is restricted to interactive wp-login.php submissions, so XML-RPC, the REST API, application passwords and the AJAX modal login are never affected. New slr_turnstile_fail_open filter controls behaviour if Cloudflare is unreachable (defaults to fail-closed).
+
 = 4.2.3 - 2026-06-02 =
 *   Fix - Fatal error (TypeError) on login when another plugin's `login_redirect`/`logout_redirect` filter callback returned a non-string value (e.g. `true`). The redirect arguments are now normalised to a string or null before being passed to the strictly-typed RedirectManager, so the plugin no longer crashes wp-login.php.
 *   Hardening - The WooCommerce and EDD redirect handlers and the custom login URL filter now defensively normalise any non-string value passed by third-party plugins (including arrays/objects), preventing the same class of error across all redirect filters.

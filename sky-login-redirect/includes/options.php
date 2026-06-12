@@ -442,6 +442,11 @@ function options_tweaks_tab_theme_fields() {
         ->set_classes( 'slider-checkbox starter' )
         ->set_option_value( 'yes' );
 
+    $fields[] = Field::make( 'checkbox', 'slr_generic_login_errors', __( 'Use generic login error messages', 'sky-login-redirect' ) )
+        ->set_classes( 'slider-checkbox starter' )
+        ->set_help_text( __( 'Hide whether a username or email address exists by replacing username-revealing login, lost-password and email-login errors with a single neutral message. Helps prevent account enumeration by attackers.', 'sky-login-redirect' ) )
+        ->set_option_value( 'yes' );
+
     $fields[] = Field::make( 'checkbox', 'slr_change_user_session', __( 'Change user\'s session timeout', 'sky-login-redirect' ) )
         ->set_classes( 'slider-checkbox starter' );
 
@@ -462,6 +467,43 @@ function options_tweaks_tab_theme_fields() {
             ]
         )
         ->set_conditional_logic( [ [ 'field' => 'slr_change_user_session', 'value' => true ] ] );
+
+    $fields[] = Field::make( 'html', 'spam_protection' )
+        ->set_html( sprintf( '<h2>%s</h2>', __( 'Spam protection', 'sky-login-redirect' ) ) );
+
+    $fields[] = Field::make( 'checkbox', 'slr_turnstile_enable', __( 'Enable Cloudflare Turnstile', 'sky-login-redirect' ) )
+        ->set_classes( 'slider-checkbox platinum' )
+        ->set_help_text( __( 'Add a free, privacy-friendly, no-puzzle CAPTCHA to the login, registration and lost-password forms to stop spam bots.', 'sky-login-redirect' ) )
+        ->set_option_value( 'yes' );
+
+    $fields[] = Field::make( 'text', 'slr_turnstile_site_key', __( 'Site key', 'sky-login-redirect' ) )
+        ->set_classes( 'indent platinum' )
+        ->set_conditional_logic( [ [ 'field' => 'slr_turnstile_enable', 'value' => true ] ] )
+        ->set_attribute( 'placeholder', '0x4AAAA...' )
+        ->set_help_text(
+            sprintf(
+                /* translators: %s: URL to the Cloudflare Turnstile dashboard. */
+                __( 'Create a free widget in your <a href="%s" target="_blank" rel="noopener">Cloudflare Turnstile dashboard</a>, then paste the site and secret keys here.', 'sky-login-redirect' ),
+                'https://dash.cloudflare.com/?to=/:account/turnstile'
+            )
+        );
+
+    $fields[] = Field::make( 'text', 'slr_turnstile_secret_key', __( 'Secret key', 'sky-login-redirect' ) )
+        ->set_classes( 'indent platinum' )
+        ->set_conditional_logic( [ [ 'field' => 'slr_turnstile_enable', 'value' => true ] ] )
+        ->set_attribute( 'type', 'password' )
+        ->set_attribute( 'placeholder', '0x4AAAA...' );
+
+    $fields[] = Field::make( 'select', 'slr_turnstile_theme', __( 'Widget theme', 'sky-login-redirect' ) )
+        ->set_classes( 'indent platinum' )
+        ->set_conditional_logic( [ [ 'field' => 'slr_turnstile_enable', 'value' => true ] ] )
+        ->add_options(
+            [
+                'auto'  => __( 'Auto', 'sky-login-redirect' ),
+                'light' => __( 'Light', 'sky-login-redirect' ),
+                'dark'  => __( 'Dark', 'sky-login-redirect' ),
+            ]
+        );
 
     $fields[] = Field::make( 'html', 'login_design' )
         ->set_html( sprintf( '<h2>%s</h2>', __( 'Custom login page code', 'sky-login-redirect' ) ) );
@@ -1668,32 +1710,6 @@ function count_nav_menu_items( $key ) {
     $array   = array_fill( 0, $counter, $counter );
     return $array;
 }
-
-/**
- * Affiche la valeur d'un champ sous la metabox d'onglets
- *
- * @return void
- */
-function display_content_after_fields() {
-    printf(
-        '<hr><div>
-		<h4>%1$s</h4>
-		%2$s
-		</div>',
-        esc_html__( 'Valeur du champ "Champ WYSIWYG"', 'sky-login-redirect' ),
-        wp_kses_post( (string) \carbon_get_theme_option( 'champ_riche' ) )
-    );
-
-    printf(
-        '<br><hr><div>
-		<h4>%1$s</h4>
-		%2$s
-		</div>',
-        esc_html__( 'Valeur du champ "Champs menu déroulant"', 'sky-login-redirect' ),
-        esc_html( (string) \carbon_get_theme_option( 'champ_select' ) )
-    );
-}
-//add_action( 'carbon_fields_container_options_du_plugin_after_fields', __NAMESPACE__ . '\\display_content_after_fields' );
 
 /**
  * Upsell features

@@ -1,11 +1,11 @@
 === Sky Login Redirect ===
-Contributors: skyminds
+Contributors: skyminds, freemius
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DNSC3NVBWR66L
 Tags: login redirect, logout redirect, custom login, woocommerce login, login customizer, user redirect, role redirect, login page, redirect users, membership
 Requires at least: 5.6
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 4.2.3
+Stable tag: 4.2.4
 License: GPLv3 or later
 
 Control where users land after login/logout. Redirect by role, user, or previous page. Includes a powerful login customizer and WooCommerce support.
@@ -174,6 +174,10 @@ Free support is available through the [WordPress.org support forum](https://word
 
 == Changelog ==
 
+= 4.2.4 - 2026-06-12 =
+*   New - Generic login error messages (Starter): optionally replace WordPress's username-revealing login, lost-password and email-login errors with a single neutral message, so attackers can't tell whether a username or email address exists on your site (account enumeration). Enable it under Login Redirect → Tweaks → Admin tweaks. Harmless notices like "empty password" are left intact; the message is customizable via the slr_generic_login_error_message filter.
+*   New - Cloudflare Turnstile anti-spam protection (Platinum). Adds a free, privacy-friendly, no-puzzle CAPTCHA to the WordPress login, registration and lost-password forms to stop spam bots and brute-force attempts. Enable it and paste your site/secret keys under Login Redirect → Tweaks → Spam protection. Programmatic logins (XML-RPC, REST, application passwords) are never affected.
+
 = 4.2.3 - 2026-06-02 =
 *   Fix - Fatal error (TypeError) on login when another plugin's `login_redirect`/`logout_redirect` filter callback returned a non-string value (e.g. `true`). The redirect arguments are now normalised to a string or null before being passed to the strictly-typed RedirectManager, so the plugin no longer crashes wp-login.php.
 *   Hardening - The WooCommerce and EDD redirect handlers and the custom login URL filter now defensively normalise any non-string value passed by third-party plugins (including arrays/objects), preventing the same class of error across all redirect filters.
@@ -204,6 +208,9 @@ Free support is available through the [WordPress.org support forum](https://word
 Older versions changes can be found in [the changelog](https://utopique.net/products/sky-login-redirect-premium/#changelog "Sky Login Redirect changelog")
 
 == Upgrade Notice ==
+
+= 4.2.4 =
+**New security feature.** Optional generic login error messages (Starter) hide whether a username or email address exists on your site, helping prevent account enumeration. Cloudflare Turnstile anti-spam protection for the login, registration and lost-password forms (Platinum). Configure it under Login Redirect → Tweaks → Spam protection.
 
 = 4.2.3 =
 **Fatal error fix.** Prevents a crash on wp-login.php when another plugin returns a non-string value through the `login_redirect`/`logout_redirect` filter. Recommended for everyone, especially sites running other login/redirect plugins.
