@@ -5,7 +5,7 @@ Tags: login redirect, logout redirect, custom login, woocommerce login, login cu
 Requires at least: 5.6
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 4.2.4
+Stable tag: 4.2.5
 License: GPLv3 or later
 
 Control where users land after login/logout. Redirect by role, user, or previous page. Includes a powerful login customizer and WooCommerce support.
@@ -174,6 +174,12 @@ Free support is available through the [WordPress.org support forum](https://word
 
 == Changelog ==
 
+= 4.2.5 - 2026-06-14 =
+*   Fix - Fatal errors when WooCommerce is deactivated while the menu-link shortcode is still in use: `add_lost_password_link()` now checks for `wc_get_page_id()` before accessing the My Account page, and `wc_page_id_cached()` returns early when WooCommerce is inactive.
+*   UI - Settings tabs are now displayed vertically for a cleaner, easier-to-navigate layout.
+*   UI - Save Changes button moved to the title bar; Carbon Fields sidebar hidden to reduce visual clutter.
+*   UI - Admin menu icon now inlined as SVG in `admin_head`, removing a small async fetch on every admin page load.
+
 = 4.2.4 - 2026-06-12 =
 *   New - Generic login error messages (Starter): optionally replace WordPress's username-revealing login, lost-password and email-login errors with a single neutral message, so attackers can't tell whether a username or email address exists on your site (account enumeration). Enable it under Login Redirect → Tweaks → Admin tweaks. Harmless notices like "empty password" are left intact; the message is customizable via the slr_generic_login_error_message filter.
 *   New - Cloudflare Turnstile anti-spam protection (Platinum). Adds a free, privacy-friendly, no-puzzle CAPTCHA to the WordPress login, registration and lost-password forms to stop spam bots and brute-force attempts. Enable it and paste your site/secret keys under Login Redirect → Tweaks → Spam protection. Programmatic logins (XML-RPC, REST, application passwords) are never affected.
@@ -208,6 +214,9 @@ Free support is available through the [WordPress.org support forum](https://word
 Older versions changes can be found in [the changelog](https://utopique.net/products/sky-login-redirect-premium/#changelog "Sky Login Redirect changelog")
 
 == Upgrade Notice ==
+
+= 4.2.5 =
+**Maintenance & UI release.** Fixes a fatal error when WooCommerce is deactivated while the plugin's menu-link shortcode is still in use. Includes a refreshed admin UI with vertical settings tabs and Save Changes in the title bar.
 
 = 4.2.4 =
 **New security feature.** Optional generic login error messages (Starter) hide whether a username or email address exists on your site, helping prevent account enumeration. Cloudflare Turnstile anti-spam protection for the login, registration and lost-password forms (Platinum). Configure it under Login Redirect → Tweaks → Spam protection.

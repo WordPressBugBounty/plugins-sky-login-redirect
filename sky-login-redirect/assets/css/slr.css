@@ -12,12 +12,6 @@ div.radio {
     background-color: lightgreen !important;
 }
 
-/* help inline */
-em.cf-field__help {
-    display: block ruby;
-    margin-top: 1px;
-}
-
 /* hide elements that should be hidden: conditional logic */
 .content-login [hidden] {
     display: none !important;
@@ -143,9 +137,84 @@ img.security {
     display: none;
 }
 
+/* hide sidebar postbox (Save Changes moved to title bar) */
+.carbon-theme-options #postbox-container-1 {
+    display: none !important;
+}
+
+.carbon-theme-options #post-body-content {
+    width: 100% !important;
+    margin-right: 0 !important;
+    float: none !important;
+}
+
+/* page title + save button bar */
+.slr-title-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.slr-title-bar h1,
+.slr-title-bar h2 {
+    margin: 0;
+}
+
 /* tab space after SVG icons */
 .cf-container__tabs-list .cf-container__tabs-item button {
     padding-left: 8px !important;
+}
+
+/* vertical tabs layout */
+.cf-container--tabbed-vertical {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0;
+}
+
+.cf-container__tabs--tabbed-vertical {
+    flex-shrink: 0;
+    width: 180px;
+    border-right: 1px solid #ddd;
+    margin-right: 16px;
+}
+
+.cf-container__tabs--tabbed-vertical .cf-container__tabs-list {
+    display: flex;
+    flex-direction: column;
+    border-bottom: none;
+}
+
+.cf-container__tabs--tabbed-vertical .cf-container__tabs-item {
+    width: 100%;
+}
+
+.cf-container__tabs--tabbed-vertical .cf-container__tabs-item button {
+    width: 100%;
+    text-align: left !important;
+    padding: 8px 12px !important;
+    border-left: 3px solid transparent;
+}
+
+.cf-container__tabs--tabbed-vertical .cf-container__tabs-item--current button {
+    border-left: 3px solid #007cba;
+    background-color: #f0f6fc;
+}
+
+.cf-container--tabbed-vertical .cf-container__fields {
+    flex: 1;
+    min-width: 0;
+}
+/* Matt : vertical tabs container */
+#carbon_fields_container_sky_login_redirect li.cf-container__tabs-item {
+  padding: 1rem 0 1rem 1rem;
+  box-shadow: 1px 1px 1px #ccc;
+}
+
+.cf-container__tabs.cf-container__tabs--tabbed-vertical {
+  width: 200px;
 }
 
 /* promo */

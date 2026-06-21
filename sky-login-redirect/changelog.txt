@@ -1,5 +1,11 @@
 == Changelog ==
 
+= 4.2.5 - 2026-06-14 =
+*   Fix - Fatal errors when WooCommerce is deactivated while the menu-link shortcode is still in use: add_lost_password_link() now checks for wc_get_page_id() before accessing the My Account page, and wc_page_id_cached() returns early when WooCommerce is inactive.
+*   UI - Settings tabs are now displayed vertically for a cleaner, easier-to-navigate layout.
+*   UI - Save Changes button moved to the title bar; Carbon Fields sidebar hidden to reduce visual clutter.
+*   UI - Admin menu icon now inlined as SVG in admin_head, removing a small async fetch on every admin page load.
+
 = 4.2.4 - 2026-06-12 =
 *   New - Generic login error messages (Starter): optionally replace WordPress's username-revealing login, lost-password and email-login errors with a single neutral message, so attackers can't tell whether a username or email address exists on your site (account enumeration). Enable it under Login Redirect → Tweaks → Admin tweaks. Harmless notices like "empty password" are left intact; the message is customizable via the slr_generic_login_error_message filter.
 *   New - Cloudflare Turnstile anti-spam protection (Platinum): adds a free, privacy-friendly, no-puzzle CAPTCHA to the login, registration and lost-password forms to stop spam bots and brute-force attempts. Configure under Tweaks → Spam protection (enable + paste your Cloudflare site and secret keys). Verification is restricted to interactive wp-login.php submissions, so XML-RPC, the REST API, application passwords and the AJAX modal login are never affected. New slr_turnstile_fail_open filter controls behaviour if Cloudflare is unreachable (defaults to fail-closed).

@@ -4,7 +4,7 @@
  * Plugin Name: Sky Login Redirect
  * Plugin URI: https://utopique.net/products/sky-login-redirect-premium/
  * Description: Advanced login/logout redirects with user/role rules, content restriction, login customizer, and WooCommerce integration.
- * Version: 4.2.4
+ * Version: 4.2.5
  * Author: Utopique
  * Author URI: https://utopique.net/
  * Developer: Utopique
@@ -34,7 +34,7 @@ if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 // Current version.
-define( 'SLR_VERSION', '4.2.4' );
+define( 'SLR_VERSION', '4.2.5' );
 // Plugin root path.
 define( 'SLR_ROOT', trailingslashit( plugin_dir_path( __FILE__ ) ) );
 // Composer autoloader — must be loaded unconditionally so that:
@@ -656,6 +656,16 @@ if ( function_exists( __NAMESPACE__ . '\\sky_login_redirect_fs' ) ) {
             if ( in_array( $hook, PLUGIN_SCREENS, true ) ) {
                 // Only on our main plugin page
                 if ( $hook === PLUGIN_SCREENS[0] ) {
+                    add_action( 'admin_head', function () {
+                        $sprite = SLR_ROOT . 'assets/icons/icons-sprite.svg';
+                        if ( is_readable( $sprite ) ) {
+                            echo '<div aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">';
+                            // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+                            echo file_get_contents( $sprite );
+                            // phpcs:ignore
+                            echo '</div>';
+                        }
+                    } );
                     wp_enqueue_style(
                         'utopique-elements',
                         plugins_url( 'assets/css/elements.css', __FILE__ ),
@@ -681,7 +691,6 @@ if ( function_exists( __NAMESPACE__ . '\\sky_login_redirect_fs' ) ) {
                         'upgrade_url'      => sky_login_redirect_fs()->get_upgrade_url(),
                         'pro_feature'      => __( 'unlock with Pro version', 'sky-login-redirect' ),
                         'business_feature' => __( 'unlock with Business version', 'sky-login-redirect' ),
-                        'iconsBase'        => trailingslashit( plugins_url( 'assets/icons', __FILE__ ) ),
                     ] );
                     // Codemirror editor
                     $cm_css['codeEditor'] = wp_enqueue_code_editor( [

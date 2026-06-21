@@ -89,6 +89,9 @@ function options_initialize_admin_page() {
     }
     $theme_options->set_classes( $plan );
 
+    // On définit la disposition des onglets (vertical = onglets à gauche).
+    $theme_options->set_layout( 'tabbed-vertical' );
+
     // For each tab, load its fields via the corresponding filter.
     foreach ( $tabs as $tab_slug => $tab_title ) {
         $theme_options->add_tab(
@@ -1094,7 +1097,7 @@ function options_plugins_tab_theme_fields() {
             . esc_url( plugins_url( 'banners/block-bad-queries.jpg', __DIR__ ) )
             . '" class="alignleft security" /></a><a href="https://wordpress.org/plugins/block-bad-queries/" rel="noopener" target="_blank">Block Bad Queries (BBQ)</a> is a simple, super-fast plugin that protects your site against malicious URL requests. BBQ checks all incoming traffic and quietly blocks bad requests containing nasty stuff like eval, base64, and excessively-long request-strings. This is a simple yet solid solution for sites that are unable to use a strong .htaccess firewall. <span class="plugin-installed ' . $class_bbq . '">'
             . $bbq_installed . '</span></div>
-			<div class="security-block"><a href="https://ithemes.pxf.io/c/2217288/708564/9639" rel="noopener" target="_blank"><img src="' . esc_url( plugins_url( 'banners/ithemes-security-pro.png', __DIR__ ) ) . '" class="alignleft security" /></a><a href="https://ithemes.pxf.io/c/2217288/708564/9639" rel="noopener" target="_blank">iThemes Security Pro</a> improves your WordPress login security with strong password enforcement, bad users lockout, 2FA identification, password management and expiration, magic login links, and trusted devices. It does not just take care about login security, it is an all-around security Swiss Army knife that can keep the baddies at bay. Strongly recommended for WordPress. <span class="plugin-installed ' . $class_ithemes . '">' . $itsec_installed . '</span></div>
+			<div class="security-block"><a href="https://ithemes.pxf.io/c/2217288/708564/9639" rel="noopener" target="_blank"><img src="' . esc_url( plugins_url( 'banners/ithemes-security-pro.png', __DIR__ ) ) . '" class="alignleft security" /></a><a href="https://ithemes.pxf.io/c/2217288/708564/9639" rel="noopener" target="_blank">iThemes Security Pro</a> improves your WordPress login security with strong password enforcement, bad users lockout, 2FA identification, password management and expiration, magic login links, and trusted devices. It does not just take care about login security, it is an all-around security Swiss Army knife that can keep the baddies at bay. <span class="plugin-installed ' . $class_ithemes . '">' . $itsec_installed . '</span></div>
 			</div>'
         );
 

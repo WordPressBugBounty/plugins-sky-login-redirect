@@ -6,27 +6,6 @@ document.addEventListener("DOMContentLoaded", function () {
   var pro_feature = typeof SLR !== 'undefined' ? SLR.pro_feature : undefined;
   var business_feature = typeof SLR !== 'undefined' ? SLR.business_feature : undefined;
 
-  // Resolve icons base URL from localized data or derive from this script URL
-  function getIconsBase() {
-    if (window.SLR && SLR.iconsBase) return SLR.iconsBase;
-    try {
-      const scripts = document.getElementsByTagName('script');
-      for (let i = scripts.length - 1; i >= 0; i--) {
-        const s = scripts[i];
-        const src = s && s.getAttribute('src');
-        if (src && src.indexOf('/assets/js/slr.js') !== -1) {
-          return src.replace('/assets/js/slr.js', '/assets/icons/');
-        }
-      }
-    } catch (e) { /* noop */ }
-    return null;
-  }
-
-  // Sprite loader: fetch and inject icons-sprite.svg once per page
-  let spriteInjected = false;
-  let spriteRequestInFlight = false;
-  const XLINK_NS = 'http://www.w3.org/1999/xlink';
-
   // Simple debounce helper to coalesce rapid DOM changes
   function debounce(fn, wait) {
     let t;
@@ -37,70 +16,21 @@ document.addEventListener("DOMContentLoaded", function () {
     };
   }
 
-  function getSpriteUrl() {
-    const base = getIconsBase();
-    if (!base) return null;
-    return base + 'icons-sprite.svg';
-  }
-
-  function ensureSpriteLoaded(callback) {
-    if (spriteInjected) {
-      if (typeof callback === 'function') callback();
-      return;
-    }
-    if (spriteRequestInFlight) {
-      // Retry a bit later
-      setTimeout(function(){ ensureSpriteLoaded(callback); }, 100);
-      return;
-    }
-    const url = getSpriteUrl();
-    if (!url) return;
-    spriteRequestInFlight = true;
-    fetch(url, { credentials: 'same-origin' })
-      .then(function (res) { return res.text(); })
-      .then(function (svgText) {
-        const tmp = document.createElement('div');
-        tmp.innerHTML = svgText;
-        const svg = tmp.querySelector('svg');
-        if (!svg) throw new Error('Sprite SVG missing');
-        // Hide and inject at document start
-        svg.setAttribute('aria-hidden', 'true');
-        svg.style.position = 'absolute';
-        svg.style.width = '0';
-        svg.style.height = '0';
-        svg.style.overflow = 'hidden';
-        document.body.insertBefore(svg, document.body.firstChild);
-        spriteInjected = true;
-        spriteRequestInFlight = false;
-        if (typeof callback === 'function') callback();
-      })
-      .catch(function () {
-        spriteRequestInFlight = false;
-      });
-  }
-
-  // Helper: prepend an inline SVG icon referencing a <symbol>
+  // Prepend an inline SVG icon referencing a sprite <symbol> already in the page
   function insertSymbolIcon(li, symbolId) {
     if (!li || !symbolId) return;
     if (li.querySelector('svg.slr-icon')) return; // idempotent
-    ensureSpriteLoaded(function () {
-      try {
-        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.setAttribute('class', 'slr-icon');
-        svg.setAttribute('width', '1.625em');
-        svg.setAttribute('height', '1.625em');
-        svg.style.verticalAlign = 'middle';
-
-        const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-        // Modern attribute
-        use.setAttribute('href', '#' + symbolId);
-        // Legacy attribute for broader support
-        use.setAttributeNS(XLINK_NS, 'xlink:href', '#' + symbolId);
-
-        svg.appendChild(use);
-        li.insertAdjacentElement('afterbegin', svg);
-      } catch (e) { /* noop */ }
-    });
+    try {
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('class', 'slr-icon');
+      svg.setAttribute('width', '1.625em');
+      svg.setAttribute('height', '1.625em');
+      svg.style.verticalAlign = 'middle';
+      const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+      use.setAttribute('href', '#' + symbolId);
+      svg.appendChild(use);
+      li.insertAdjacentElement('afterbegin', svg);
+    } catch (e) { /* noop */ }
   }
 
   // Prepend SVG icons to tabs and set IDs
@@ -208,6 +138,34 @@ document.addEventListener("DOMContentLoaded", function () {
     const updateTabsDebounced = debounce(updateComplexTabsUI, 50);
     new MutationObserver(function () { updateTabsDebounced(); })
       .observe(cfContainer, { childList: true, subtree: true });
+  }
+
+  // Hoist "Save Changes" button next to the page title
+  const slrContainer = document.getElementById('carbon_fields_container_sky_login_redirect');
+  if (slrContainer) {
+    const slrForm = slrContainer.closest('form');
+    const slrWrap = slrForm ? slrForm.parentElement : null;
+    const slrHeading = slrWrap
+      ? Array.from(slrWrap.querySelectorAll('h1, h2')).find(function (el) {
+          return !el.closest('form') && !el.closest('.cf-container');
+        })
+      : null;
+
+    if (slrForm && slrHeading) {
+      if (!slrForm.id) slrForm.id = 'slr-options-form';
+
+      const titleBtn = document.createElement('button');
+      titleBtn.type = 'submit';
+      titleBtn.setAttribute('form', slrForm.id);
+      titleBtn.className = 'button button-primary';
+      titleBtn.textContent = 'Save Changes';
+
+      const titleBar = document.createElement('div');
+      titleBar.className = 'slr-title-bar';
+      slrHeading.parentNode.insertBefore(titleBar, slrHeading);
+      titleBar.appendChild(slrHeading);
+      titleBar.appendChild(titleBtn);
+    }
   }
 
   // Move and show iframe
