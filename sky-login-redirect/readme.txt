@@ -1,11 +1,11 @@
 === Sky Login Redirect ===
-Contributors: skyminds, freemius
+Contributors: skyminds
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DNSC3NVBWR66L
 Tags: login redirect, logout redirect, custom login, woocommerce login, login customizer, user redirect, role redirect, login page, redirect users, membership
 Requires at least: 5.6
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 4.2.5
+Stable tag: 4.2.6
 License: GPLv3 or later
 
 Control where users land after login/logout. Redirect by role, user, or previous page. Includes a powerful login customizer and WooCommerce support.
@@ -174,61 +174,31 @@ Free support is available through the [WordPress.org support forum](https://word
 
 == Changelog ==
 
+= 4.2.6 - 2026-07-23 =
+*   Fix - WooCommerce login bypassed all per-user/role redirect rules. WooCommerce fires `woocommerce_login_redirect` instead of WordPress's `login_redirect`, so the rule engine never ran for WC logins. `getCurrentAction()` now maps WC and EDD filter names to the correct action types; `handleLogin()` now delegates to the rule engine before falling through to WC-specific defaults.
+*   Fix - "Previous page" redirect was ignored on WooCommerce and custom login pages. `slr-login-injector.js` was only enqueued on `wp-login.php`. It now also loads on all frontend pages for logged-out users (self-exits on pages without a login form), covering My Account, custom `/login/` pages, and any page embedding a WC login form shortcode.
+*   Fix - Custom login page used as the redirect target on login, creating a loop. `isRefererLoginPage()` now also recognises the WooCommerce My Account URL and the plugin's configured custom login page as login page referers, preventing `wp_get_referer()` from returning the login page itself as "previous page".
+*   Fix - A redirect rule with no action configured for the current event (e.g. login-only rule triggering on logout) silently sent users to wp-admin. `getRedirectUrlForRule()` now returns `null` for unconfigured actions, allowing the next rule or the WordPress default to apply.
+*   Fix - Potential TypeError in PHP strict mode when a page assigned to a rule was deleted. `get_permalink()` returns `false` for missing posts, which violated the `?string` return type of `getPageUrl()`. Both code paths now coerce `false` to `null`.
+*   Fix - EDD logins now use per-user and per-role rules; modal and embedded login forms preserve the true previous page.
+*   Fix - Custom login URLs preserve nested paths and WordPress Remember Me duration is unchanged when custom timeout is disabled.
+*   Hardening - Prior-page scripts load only when needed and store a short-lived same-origin URL with sensitive parameters removed.
+*   Fix - Modal throttling counts failures only; empty option caches no longer trigger repeated database reads.
+*   Fix - WooCommerce logout rules now use the supported hook and EDD previous-page redirects support shortcode and block login forms.
+*   Privacy - Prior-page storage excludes query strings and fragments.
+*   Development - Added automated redirect, tracking, session, and release-packaging regression tests.
+*   Packaging - Release archives now contain production dependencies only and exclude nested system metadata.
+*   Fix - Removed a malformed token from generated login-logo CSS.
+
 = 4.2.5 - 2026-06-14 =
 *   Fix - Fatal errors when WooCommerce is deactivated while the menu-link shortcode is still in use: `add_lost_password_link()` now checks for `wc_get_page_id()` before accessing the My Account page, and `wc_page_id_cached()` returns early when WooCommerce is inactive.
 *   UI - Settings tabs are now displayed vertically for a cleaner, easier-to-navigate layout.
 *   UI - Save Changes button moved to the title bar; Carbon Fields sidebar hidden to reduce visual clutter.
 *   UI - Admin menu icon now inlined as SVG in `admin_head`, removing a small async fetch on every admin page load.
 
-= 4.2.4 - 2026-06-12 =
-*   New - Generic login error messages (Starter): optionally replace WordPress's username-revealing login, lost-password and email-login errors with a single neutral message, so attackers can't tell whether a username or email address exists on your site (account enumeration). Enable it under Login Redirect → Tweaks → Admin tweaks. Harmless notices like "empty password" are left intact; the message is customizable via the slr_generic_login_error_message filter.
-*   New - Cloudflare Turnstile anti-spam protection (Platinum). Adds a free, privacy-friendly, no-puzzle CAPTCHA to the WordPress login, registration and lost-password forms to stop spam bots and brute-force attempts. Enable it and paste your site/secret keys under Login Redirect → Tweaks → Spam protection. Programmatic logins (XML-RPC, REST, application passwords) are never affected.
-
-= 4.2.3 - 2026-06-02 =
-*   Fix - Fatal error (TypeError) on login when another plugin's `login_redirect`/`logout_redirect` filter callback returned a non-string value (e.g. `true`). The redirect arguments are now normalised to a string or null before being passed to the strictly-typed RedirectManager, so the plugin no longer crashes wp-login.php.
-*   Hardening - The WooCommerce and EDD redirect handlers and the custom login URL filter now defensively normalise any non-string value passed by third-party plugins (including arrays/objects), preventing the same class of error across all redirect filters.
-
-= 4.2.2 - 2026-06-02 =
-*   Fix - Users not covered by any redirect rule (including administrators) were forced to the homepage on login/logout. The plugin now preserves the default WordPress destination (e.g. the dashboard) when no rule matches the user, so a rule scoped to specific roles only affects those roles.
-*   Fix - Role-based content restriction restricted every page the role viewed instead of only the pages selected in the rule. It now respects the chosen "Content to restrict" list, consistent with user- and logged-out-based rules.
-*   Improvement - Both redirect rules and content restriction rules now match against all of a user's roles instead of only the primary role, so multi-role users are handled correctly.
-
-= 4.2.1 - 2026-05-31 =
-*   Security - Modal login brute-force protection now uses a transient instead of the non-persistent object cache, so the rate limiter works on sites without Redis/Memcached.
-*   Security - Client IP detection now trusts only REMOTE_ADDR by default; spoofable proxy headers (X-Forwarded-For, CF-Connecting-IP) are opt-in via the slr_rate_limit_ip filter, closing a rate-limit bypass.
-*   Fix - Fatal error on the modal login form caused by a missing get_current_url() import.
-*   Fix - WooCommerce registration redirect no longer discards the default destination when the custom redirect is disabled.
-*   Fix - Possible TypeError when building a nav-menu login/logout link with no saved link type.
-*   Internal - Removed redundant wp_set_current_user()/wp_set_auth_cookie() after wp_signon() in AJAX login.
-*   Internal - PERF-005 migration: removed a duplicate option read and guarded upgrader array keys.
-
-= 4.2.0 - 2026-05-29 =
-*   New - IPs are now correctly detected, when behind a proxy.
-*   New - Migrate 5 fields to CF association with lazy-loaded paginated search.
-*   Fix - Two separate CookieManager instances were created.
-*   Fix - Restrict rule header template now displays the selected content-to-restrict title at a glance
-*   Fix - Rule header template: defensive typeof check for slr_xrole[0] against future association field format changes
-*   New - carbonade_pipe(): reconstructs CF complex (repeater) fields from flat pipe-delimited wp_option rows without Carbon Fields being booted — safe on wp-login.php and any frontend context
-*   Internal - slr_options_cache() shared cache loader: carbonade() and carbonade_pipe() share a single get_cached_options() call per request
-
 Older versions changes can be found in [the changelog](https://utopique.net/products/sky-login-redirect-premium/#changelog "Sky Login Redirect changelog")
 
 == Upgrade Notice ==
 
-= 4.2.5 =
-**Maintenance & UI release.** Fixes a fatal error when WooCommerce is deactivated while the plugin's menu-link shortcode is still in use. Includes a refreshed admin UI with vertical settings tabs and Save Changes in the title bar.
-
-= 4.2.4 =
-**New security feature.** Optional generic login error messages (Starter) hide whether a username or email address exists on your site, helping prevent account enumeration. Cloudflare Turnstile anti-spam protection for the login, registration and lost-password forms (Platinum). Configure it under Login Redirect → Tweaks → Spam protection.
-
-= 4.2.3 =
-**Fatal error fix.** Prevents a crash on wp-login.php when another plugin returns a non-string value through the `login_redirect`/`logout_redirect` filter. Recommended for everyone, especially sites running other login/redirect plugins.
-
-= 4.2.2 =
-**Important redirect fix.** Resolves a bug where users not matched by a redirect rule (including administrators) were sent to the homepage instead of their normal destination. Role rules now apply only to the selected roles and correctly handle multi-role users. Recommended for everyone using role- or user-specific rules.
-
-= 4.2.1 =
-**Security & stability fix.** Restores modal login brute-force protection (the rate limiter was inactive on sites without a persistent object cache) and hardens client-IP detection against header spoofing. Also fixes a fatal error on the modal login form and a WooCommerce registration redirect regression. Recommended for all users. NOTE: if your site is behind Cloudflare or a reverse proxy, add the slr_rate_limit_ip filter to keep trusting forwarded IP headers (see changelog/docs).
-
-= 4.2.0 =
-**Content Restriction & Redirect Fix!** Fixed a critical bug where content restriction rules and redirect rules were silently not applied due to how Carbon Fields stores complex fields. Also fixes the "Content to restrict" field showing 0 results. Upgrade recommended for all users of the Restrict Content feature.
+= 4.2.6 =
+**WooCommerce redirect fix.** Resolves a long-standing issue where all per-user and per-role redirect rules were silently bypassed for WooCommerce logins. Also fixes "previous page" redirects on WooCommerce and custom login pages, prevents a loop when the login page itself was returned as the "previous page", and fixes a potential wp-admin redirect when a rule had no action configured for the current event. Recommended for all WooCommerce sites.

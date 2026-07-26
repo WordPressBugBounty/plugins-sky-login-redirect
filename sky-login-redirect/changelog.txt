@@ -1,5 +1,24 @@
 == Changelog ==
 
+= 4.2.6 - 2026-07-23 =
+*   Fix - WooCommerce login bypassed all per-user/role redirect rules. WooCommerce fires `woocommerce_login_redirect` instead of WordPress's `login_redirect`, so the rule engine never ran for WC logins. `getCurrentAction()` now maps WC and EDD filter names to the correct action types; `handleLogin()` now delegates to the rule engine before falling through to WC-specific defaults.
+*   Fix - "Previous page" redirect was ignored on WooCommerce and custom login pages. `slr-login-injector.js` was only enqueued on `wp-login.php`. It now also loads on all frontend pages for logged-out users (self-exits on pages without a login form), covering My Account, custom `/login/` pages, and any page embedding a WC login form shortcode.
+*   Fix - Custom login page used as the redirect target on login, creating a loop. `isRefererLoginPage()` now also recognises the WooCommerce My Account URL and the plugin's configured custom login page as login page referers, preventing `wp_get_referer()` from returning the login page itself as "previous page".
+*   Fix - A redirect rule with no action configured for the current event (e.g. login-only rule triggering on logout) silently sent users to wp-admin. `getRedirectUrlForRule()` now returns `null` for unconfigured actions, allowing the next rule or the WordPress default to apply.
+*   Fix - Potential TypeError in PHP strict mode when a page assigned to a rule was deleted: `get_permalink()` returns `false` for missing posts, which violated the `?string` return type of `getPageUrl()`. Both code paths now coerce `false` to `null`.
+*   Fix - Easy Digital Downloads logins now use the main per-user and per-role redirect rules.
+*   Fix - Previous-page tracking no longer overwrites the stored URL on embedded or modal login forms.
+*   Fix - Custom login URLs preserve nested paths, respect the selected login mode, and no longer double-encode redirect destinations.
+*   Fix - Disabling custom session timeout now preserves WordPress's native Remember Me duration.
+*   Hardening - Prior-page tracking loads only when required and stores a same-origin URL for at most 30 minutes with sensitive parameters removed.
+*   Fix - Modal rate limiting now counts failed attempts only and resets after a successful login.
+*   Performance - Empty option caches are now treated as valid cache hits.
+*   Fix - WooCommerce logout now uses the supported logout redirect hook and applies per-user/per-role rules to the departing user.
+*   Fix - Previous-page redirects now support both EDD login shortcode and Login block forms.
+*   Privacy - Prior-page storage no longer persists query strings or fragments.
+*   Development - Added automated PHP and JavaScript regression tests plus verified WordPress.org package exclusions.
+*   Fix - Removed malformed generated CSS from the customized login logo.
+
 = 4.2.5 - 2026-06-14 =
 *   Fix - Fatal errors when WooCommerce is deactivated while the menu-link shortcode is still in use: add_lost_password_link() now checks for wc_get_page_id() before accessing the My Account page, and wc_page_id_cached() returns early when WooCommerce is inactive.
 *   UI - Settings tabs are now displayed vertically for a cleaner, easier-to-navigate layout.

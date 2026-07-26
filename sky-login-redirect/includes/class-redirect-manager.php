@@ -17,6 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use WP_User;
+use function SkyLoginRedirect\carbonade;
 use function SkyLoginRedirect\carbonade_pipe;
 
 /**
@@ -44,7 +45,7 @@ final class RedirectManager {
 	public function processRedirect(
 		?string $redirect_to,
 		?string $requested_redirect_to,
-		$user
+		?WP_User $user
 	): string {
 		// Honor explicit redirect_to parameter if present
 		$explicit_redirect = $this->getExplicitRedirect();
@@ -131,7 +132,7 @@ final class RedirectManager {
 	 * @param WP_User|null $user Current user object.
 	 * @return bool True if rule applies.
 	 */
-	private function ruleApplies( array $rule, $user ): bool {
+	private function ruleApplies( array $rule, ?WP_User $user ): bool {
 		$rule_type = $rule['slr_xselect_redirect'] ?? '';
 
 		return match ( $rule_type ) {
@@ -149,8 +150,8 @@ final class RedirectManager {
 	 * @param WP_User|null $user Current user object.
 	 * @return bool True if rule applies to user.
 	 */
-	private function ruleAppliesToUser( array $rule, $user ): bool {
-		if ( ! $user || ! is_a( $user, 'WP_User' ) ) {
+	private function ruleAppliesToUser( array $rule, ?WP_User $user ): bool {
+		if ( ! $user instanceof WP_User ) {
 			return false;
 		}
 
@@ -185,8 +186,8 @@ final class RedirectManager {
 	 * @param WP_User|null $user Current user object.
 	 * @return bool True if rule applies to role.
 	 */
-	private function ruleAppliesToRole( array $rule, $user ): bool {
-		if ( ! isset( $user->roles ) || ! is_array( $user->roles ) ) {
+	private function ruleAppliesToRole( array $rule, ?WP_User $user ): bool {
+		if ( ! $user instanceof WP_User || ! is_array( $user->roles ) ) {
 			return false;
 		}
 
@@ -211,7 +212,7 @@ final class RedirectManager {
 		array $rule,
 		?string $redirect_to,
 		?string $requested_redirect_to,
-		$user
+		?WP_User $user
 	): ?string {
 		// Determine action type (login, logout, register)
 		$action = $this->getCurrentAction();
@@ -220,26 +221,38 @@ final class RedirectManager {
 		$redirect_type = $rule[ "slr_xselect_{$action}" ] ?? '';
 
 		return match ( $redirect_type ) {
-			'prior' => $this->getPriorUrl( $redirect_to, $requested_redirect_to, $user ),
-			'page' => $this->getPageUrl( $rule, $action ),
+			'prior'  => $this->getPriorUrl( $redirect_to, $requested_redirect_to, $user ),
+			'page'   => $this->getPageUrl( $rule, $action ),
 			'custom' => $this->getCustomUrl( $rule, $action ),
-			default => admin_url( '/' ),
+			default  => null, // Action not configured for this rule — skip, let next rule or default apply.
 		};
 	}
 
 	/**
 	 * Get current action type from filter context.
 	 *
+	 * Uses an explicit map so WooCommerce/EDD redirect filters (which bypass
+	 * WordPress's standard login_redirect) resolve to the same action keys as
+	 * the core filters.
+	 *
 	 * @return string Action type (login, logout, register).
 	 */
 	private function getCurrentAction(): string {
-		$filter = current_filter();
-
-		return str_replace(
-			[ '_redirect', 'wp_ajax_nopriv_ajax' ],
-			'',
-			$filter
-		);
+		return match ( current_filter() ) {
+			'login_redirect',
+			'woocommerce_login_redirect',
+			'edd_login_redirect',
+			'wp_ajax_nopriv_ajaxlogin' => 'login',
+			'logout_redirect',
+			'woocommerce_logout_default_redirect_url' => 'logout',
+			'woocommerce_registration_redirect',
+			'edd_register_redirect'    => 'register',
+			default                    => str_replace(
+				[ '_redirect', 'wp_ajax_nopriv_ajax' ],
+				'',
+				current_filter()
+			),
+		};
 	}
 
 	/**
@@ -257,14 +270,14 @@ final class RedirectManager {
 			$first_item = $page_data[0];
 			if ( is_array( $first_item ) && isset( $first_item['id'] ) ) {
 				$page_id = (int) $first_item['id'];
-				return $page_id ? get_permalink( $page_id ) : null;
+				return $page_id ? ( get_permalink( $page_id ) ?: null ) : null;
 			}
 		}
 
 		// Legacy format: direct page ID (for backward compatibility during migration)
 		if ( is_numeric( $page_data ) ) {
 			$page_id = (int) $page_data;
-			return $page_id ? get_permalink( $page_id ) : null;
+			return $page_id ? ( get_permalink( $page_id ) ?: null ) : null;
 		}
 
 		return null;
@@ -293,9 +306,9 @@ final class RedirectManager {
 	private function getPriorUrl(
 		?string $redirect_to,
 		?string $requested_redirect_to,
-		$user
+		?WP_User $user
 	): ?string {
-		$referer = get_last_page_visited_cookie();
+		$referer = get_pre_login_url();
 
 		// Redirect loop protection
 		if ( $this->isRedirectLoop( $redirect_to, $user ) ) {
@@ -360,7 +373,7 @@ final class RedirectManager {
 	 * @param WP_User|null $user Current user.
 	 * @return bool True if looping detected.
 	 */
-	private function isRedirectLoop( ?string $redirect_to, $user ): bool {
+	private function isRedirectLoop( ?string $redirect_to, ?WP_User $user ): bool {
 		$attempts = (int) wp_cache_get( $this->getRedirectKey( $redirect_to, $user ), 'slr_loop' );
 
 		return $attempts > self::REDIRECT_LOOP_THRESHOLD;
@@ -373,7 +386,7 @@ final class RedirectManager {
 	 * @param WP_User|null $user Current user.
 	 * @return void
 	 */
-	private function trackRedirectAttempt( ?string $redirect_to, $user ): void {
+	private function trackRedirectAttempt( ?string $redirect_to, ?WP_User $user ): void {
 		$key      = $this->getRedirectKey( $redirect_to, $user );
 		$attempts = (int) wp_cache_get( $key, 'slr_loop' );
 
@@ -387,8 +400,8 @@ final class RedirectManager {
 	 * @param WP_User|null $user Current user.
 	 * @return string Cache key.
 	 */
-	private function getRedirectKey( ?string $redirect_to, $user ): string {
-		$user_id = is_object( $user ) && isset( $user->ID ) ? $user->ID : 0;
+	private function getRedirectKey( ?string $redirect_to, ?WP_User $user ): string {
+		$user_id = $user instanceof WP_User ? $user->ID : 0;
 		return 'slr_redirect_' . md5( $redirect_to . $user_id . current_filter() );
 	}
 
@@ -399,7 +412,7 @@ final class RedirectManager {
 	 * @return bool True if login loop detected.
 	 */
 	private function isLoginToLoginPage( ?string $redirect_to ): bool {
-		return false !== strpos( (string) $redirect_to, 'wp-login.php' )
+		return str_contains( (string) $redirect_to, 'wp-login.php' )
 			&& current_filter() === 'login_redirect';
 	}
 
@@ -431,7 +444,7 @@ final class RedirectManager {
 		$endpoints = [ 'customer-logout', 'lost-password' ];
 
 		foreach ( $endpoints as $endpoint ) {
-			if ( false !== strpos( (string) $redirect_to, $endpoint ) ) {
+			if ( str_contains( (string) $redirect_to, $endpoint ) ) {
 				return true;
 			}
 		}
@@ -449,7 +462,7 @@ final class RedirectManager {
 			return null;
 		}
 
-		return get_permalink( $this->getWooCommerceMyAccountId() );
+		return get_permalink( $this->getWooCommerceMyAccountId() ) ?: null;
 	}
 
 	/**
@@ -473,7 +486,7 @@ final class RedirectManager {
 	 * @return bool True if should redirect to admin.
 	 */
 	private function shouldRedirectToAdmin( ?string $requested_redirect_to ): bool {
-		return false !== strpos( (string) $requested_redirect_to, 'wp-admin' )
+		return str_contains( (string) $requested_redirect_to, 'wp-admin' )
 			&& current_filter() === 'login_redirect';
 	}
 
@@ -484,20 +497,77 @@ final class RedirectManager {
 	 * @return bool True if logout from admin.
 	 */
 	private function isLogoutFromAdmin( ?string $referer ): bool {
-		return false !== strpos( (string) $referer, 'wp-admin' )
+		return str_contains( (string) $referer, 'wp-admin' )
 			&& current_filter() === 'logout_redirect';
 	}
 
 	/**
-	 * Check if referer is login page.
+	 * Check if referer is a login page (wp-login.php or WooCommerce My Account).
+	 *
+	 * WooCommerce My Account doubles as the WC login page. If the HTTP referer is
+	 * My Account we must not treat it as the "previous page" for prior-page
+	 * redirects — doing so creates a My Account redirect loop.
 	 *
 	 * @param string|null $referer Referer URL.
 	 * @return bool True if referer is login page.
 	 */
 	private function isRefererLoginPage( ?string $referer ): bool {
-		$home_url  = trailingslashit( home_url() );
-		$login_url = $home_url . 'wp-login.php';
+		$login_url = wp_login_url();
 
-		return $referer === $login_url;
+		if ( $this->urlsMatch( $referer, $login_url ) ) {
+			return true;
+		}
+
+		// Only apply the checks below for login contexts — not logout.
+		// A user logging OUT from My Account / a custom login page should not have
+		// those pages treated as "the login page" (getPriorUrl() would then return
+		// the WP logout URL and redirect to wp-login.php).
+		$login_filters = [ 'login_redirect', 'woocommerce_login_redirect', 'wp_ajax_nopriv_ajaxlogin' ];
+		if ( ! in_array( current_filter(), $login_filters, true ) ) {
+			return false;
+		}
+
+		// WooCommerce My Account page doubles as the WC login page.
+		// phpcs:ignore WordPress.WP.AlternativeFunctions -- wc_get_page_id is WC's own API
+		if ( function_exists( 'wc_get_page_id' ) ) {
+			$my_account_url = get_permalink( wc_get_page_id( 'myaccount' ) );
+			if ( $my_account_url && $this->urlsMatch( $referer, $my_account_url ) ) {
+				return true;
+			}
+		}
+
+		// Custom login URL configured in the Shop tweaks.
+		$custom_login_url = (string) carbonade( 'slr_custom_login_url', '' );
+		if ( 'custom' === carbonade( 'slr_login_url_select' )
+			&& $custom_login_url
+			&& $this->urlsMatch( $referer, $custom_login_url )
+		) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Compare two URLs without query strings, fragments, or trailing-slash differences.
+	 *
+	 * @param string|null $first  First URL.
+	 * @param string|null $second Second URL.
+	 * @return bool Whether both URLs identify the same page.
+	 */
+	private function urlsMatch( ?string $first, ?string $second ): bool {
+		if ( ! $first || ! $second ) {
+			return false;
+		}
+
+		$normalize = static function ( string $url ): string {
+			$host   = strtolower( (string) wp_parse_url( $url, PHP_URL_HOST ) );
+			$path   = (string) wp_parse_url( $url, PHP_URL_PATH );
+			$scheme = strtolower( (string) wp_parse_url( $url, PHP_URL_SCHEME ) );
+
+			return $scheme . '://' . $host . untrailingslashit( '/' . ltrim( $path, '/' ) );
+		};
+
+		return $normalize( $first ) === $normalize( $second );
 	}
 }

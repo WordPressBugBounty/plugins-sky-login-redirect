@@ -3,4 +3,4 @@
 *.tar.gz
 *.zip
 *.code-workspace
-svn-clean-and-install.sh
+.phpunit.cache/

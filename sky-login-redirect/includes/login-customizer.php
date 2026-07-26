@@ -103,16 +103,19 @@ final class LoginPageCustomizer {
 			return $url;
 		}
 
-		$page = carbonade( 'slr_custom_login_url' );
-		if ( ! $page ) {
+		if ( 'custom' !== carbonade( 'slr_login_url_select' ) ) {
 			return $url;
 		}
 
-		$slug = trailingslashit( basename( (string) wp_parse_url( (string) $page, PHP_URL_PATH ) ) );
-		$url  = site_url( $slug );
+		$page = (string) carbonade( 'slr_custom_login_url', '' );
+		if ( ! wp_http_validate_url( $page ) ) {
+			return $url;
+		}
+
+		$url = wp_validate_redirect( $page, $url );
 
 		if ( $redirect ) {
-			$url = add_query_arg( 'redirect_to', rawurlencode( wp_validate_redirect( $redirect, $url ) ), $url );
+			$url = add_query_arg( 'redirect_to', wp_validate_redirect( $redirect, $url ), $url );
 		}
 		if ( $force_reauth ) {
 			$url = add_query_arg( 'reauth', '1', $url );
@@ -155,7 +158,7 @@ final class LoginPageCustomizer {
 		?>
 <div id="slr-login-iframe" style="width:100%;border:0;display:none">
 	<h3 style="margin-left:1.4rem;font-weight:400;"><?php esc_html_e( 'Save your settings first to see changes &#8623;', 'sky-login-redirect' ); ?></h3>
-	<iframe src="<?php echo esc_url( home_url( '/wp-login.php' ) ); ?>" height="540px" width="100%" sandbox="allow-same-origin allow-scripts allow-forms" title="<?php echo $preview_title; ?>" aria-label="<?php echo $preview_title; ?>"></iframe>
+	<iframe src="<?php echo esc_url( home_url( '/wp-login.php' ) ); ?>" height="540px" width="100%" sandbox="allow-same-origin allow-scripts allow-forms" title="<?php echo esc_attr( $preview_title ); ?>" aria-label="<?php echo esc_attr( $preview_title ); ?>"></iframe>
 </div>
 		<?php
 	}
@@ -325,7 +328,7 @@ final class LoginPageCustomizer {
 			->add( 'height', "{$height}px" );
 		$link_styles = $this->css->build();
 
-		return ".login h1{{$h1_styles}}.login h1 a{{$link_styles}!important}";
+		return ".login h1{{$h1_styles}}.login h1 a{{$link_styles}}";
 	}
 
 	/**
@@ -624,4 +627,4 @@ add_action( 'login_footer', $login_customizer->checkRememberMe( ... ), 10 );
 add_action( 'woocommerce_login_form_end', $login_customizer->checkRememberMe( ... ), 10 );
 add_filter( 'edd_login_form', $login_customizer->customizeEddLoginForm( ... ) );
 
-add_filter(	'login_display_language_dropdown',$login_customizer->maybeDisplayLanguageDropdown( ... ) );
+add_filter( 'login_display_language_dropdown', $login_customizer->maybeDisplayLanguageDropdown( ... ) );

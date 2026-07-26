@@ -1,1 +1,16 @@
 svn-clean-and-install.sh
+dev
+tests
+.DS_Store
+.git
+.gitignore
+.editorconfig
+.eslintrc.json
+.vscode
+.wordpress-org
+composer.json
+composer.lock
+phpcs.xml
+phpunit.xml.dist
+.distignore
+.phpunit.cache
