@@ -5,7 +5,7 @@ Tags: login redirect, logout redirect, custom login, woocommerce login, login cu
 Requires at least: 5.6
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 4.2.6
+Stable tag: 4.2.7
 License: GPLv3 or later
 
 Control where users land after login/logout. Redirect by role, user, or previous page. Includes a powerful login customizer and WooCommerce support.
@@ -174,6 +174,16 @@ Free support is available through the [WordPress.org support forum](https://word
 
 == Changelog ==
 
+= 4.2.7 - 2026-07-27 =
+*   Fix - Prevented a fatal error during logout caused by an incorrect `wp_logout` callback signature.
+*   Development - Added real WordPress integration and browser authentication test layers.
+*   Fix - Previous-page redirects now work when the modal login form is enabled globally.
+*   Fix - The global modal login now refreshes the page on which it was opened. It no longer consumes or follows the previous-page redirect used by dedicated WordPress, WooCommerce, and EDD login forms.
+*   Fix - Previous-page tracking works when the modal is rendered globally, and dedicated WooCommerce and EDD forms receive the correct referrer without duplicate fields.
+*   Fix - Prevented a fatal error during logout caused by an incorrect `wp_logout` callback signature.
+*   Development - Added isolated PHP/JavaScript tests, real WordPress integration tests, browser authentication and commerce journeys, dependency audits, and release-package validation.
+*   Packaging - PHPUnit cache artifacts are excluded from release archives and repeated release builds overwrite their target non-interactively.
+
 = 4.2.6 - 2026-07-23 =
 *   Fix - WooCommerce login bypassed all per-user/role redirect rules. WooCommerce fires `woocommerce_login_redirect` instead of WordPress's `login_redirect`, so the rule engine never ran for WC logins. `getCurrentAction()` now maps WC and EDD filter names to the correct action types; `handleLogin()` now delegates to the rule engine before falling through to WC-specific defaults.
 *   Fix - "Previous page" redirect was ignored on WooCommerce and custom login pages. `slr-login-injector.js` was only enqueued on `wp-login.php`. It now also loads on all frontend pages for logged-out users (self-exits on pages without a login form), covering My Account, custom `/login/` pages, and any page embedding a WC login form shortcode.
@@ -200,5 +210,5 @@ Older versions changes can be found in [the changelog](https://utopique.net/prod
 
 == Upgrade Notice ==
 
-= 4.2.6 =
-**WooCommerce redirect fix.** Resolves a long-standing issue where all per-user and per-role redirect rules were silently bypassed for WooCommerce logins. Also fixes "previous page" redirects on WooCommerce and custom login pages, prevents a loop when the login page itself was returned as the "previous page", and fixes a potential wp-admin redirect when a rule had no action configured for the current event. Recommended for all WooCommerce sites.
+= 4.2.7 =
+**Reliability and testing update.** Fixes modal, WooCommerce, EDD, and logout redirect edge cases and adds full automated test coverage. Recommended for all sites.

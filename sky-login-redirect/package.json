@@ -1,0 +1,18 @@
+{
+  "name": "sky-login-redirect-tests",
+  "private": true,
+  "scripts": {
+    "env:start": "wp-env start",
+    "env:stop": "wp-env stop",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@wordpress/env": "^11.11.0"
+  },
+  "overrides": {
+    "adm-zip": "0.6.0",
+    "brace-expansion": "5.0.8"
+  }
+}

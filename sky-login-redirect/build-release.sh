@@ -15,6 +15,8 @@ trap cleanup EXIT
 mkdir -p "${staging_plugin}"
 rsync -a \
 	--exclude='.git/' \
+	--exclude='.phpunit.cache/' \
+	--exclude='.phpunit.result.cache' \
 	--exclude='node_modules/' \
 	--exclude='sky-login-redirect.zip' \
 	"${plugin_root}/" "${staging_plugin}/"
@@ -26,6 +28,6 @@ composer install \
 	--no-interaction \
 	--optimize-autoloader
 
-wp dist-archive "${staging_plugin}" "${output_path}" --format=zip
+wp dist-archive "${staging_plugin}" "${output_path}" --format=zip --force
 
 printf 'Release archive created: %s\n' "${output_path}"

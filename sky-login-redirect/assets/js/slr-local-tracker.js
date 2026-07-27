@@ -8,9 +8,10 @@
 		document.getElementById('loginform') ||
 		document.getElementById('edd_login_form') ||
 		document.getElementById('edd-blocks-form__login') ||
-		document.querySelector('form.woocommerce-form-login, form#login');
+		document.querySelector('form.woocommerce-form-login');
 
-	// Never overwrite the previous page while viewing an embedded login form.
+	// Dedicated login pages must not replace the true prior page. A modal
+	// form#login may exist on every page, so it intentionally is not included.
 	if (
 		loginForm ||
 		document.body.classList.contains('wp-admin') ||

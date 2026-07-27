@@ -1,8 +1,8 @@
 <?php return array(
     'root' => array(
         'name' => 'skyminds/sky-login-redirect',
-        'pretty_version' => '4.2.6',
-        'version' => '4.2.6.0',
+        'pretty_version' => '4.2.7',
+        'version' => '4.2.7.0',
         'reference' => null,
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
@@ -59,8 +59,8 @@
             ),
         ),
         'skyminds/sky-login-redirect' => array(
-            'pretty_version' => '4.2.6',
-            'version' => '4.2.6.0',
+            'pretty_version' => '4.2.7',
+            'version' => '4.2.7.0',
             'reference' => null,
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',

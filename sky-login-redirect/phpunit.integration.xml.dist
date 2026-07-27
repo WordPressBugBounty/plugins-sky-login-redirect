@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+	bootstrap="tests/integration/bootstrap.php"
+	cacheResultFile=".phpunit.cache/integration-results"
+	colors="true"
+	failOnWarning="true"
+>
+	<testsuites>
+		<testsuite name="Sky Login Redirect — WordPress integration">
+			<directory>tests/integration/php</directory>
+		</testsuite>
+	</testsuites>
+	<php>
+		<env name="WP_TESTS_MULTISITE" value="0"/>
+	</php>
+</phpunit>

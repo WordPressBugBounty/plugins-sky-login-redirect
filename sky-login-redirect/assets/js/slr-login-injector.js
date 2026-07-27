@@ -34,26 +34,28 @@
 			return;
 		}
 
-		// Target WordPress, WooCommerce, modal, and EDD login forms.
+		// The global modal refreshes its host page and must never consume the
+		// previous-page value intended for a dedicated login form.
 		const loginForm =
 			document.getElementById('loginform') ||
 			document.getElementById('edd_login_form') ||
 			document.getElementById('edd-blocks-form__login') ||
-			document.querySelector('form.woocommerce-form-login, form#login');
+			document.querySelector('form.woocommerce-form-login');
 		if (!loginForm) {
 			return;
 		}
 
-		// Create hidden input field
-		const hiddenField = document.createElement('input');
-		hiddenField.type = 'hidden';
-		hiddenField.name = 'slr_referrer';
+		// Update the server-rendered fallback when present; otherwise create it.
+		const hiddenField =
+			loginForm.querySelector?.('input[name="slr_referrer"]') ||
+			document.createElement('input');
+		if (!hiddenField.parentNode) {
+			hiddenField.type = 'hidden';
+			hiddenField.name = 'slr_referrer';
+			loginForm.appendChild(hiddenField);
+		}
 		hiddenField.value = lastPage;
 
-		// Inject into form
-		loginForm.appendChild(hiddenField);
-
-		// Clear after use so it does not persist beyond the login attempt.
 		localStorage.removeItem('slr_last_page');
 	} catch (e) {
 		// localStorage may be blocked (e.g., strict privacy settings) — silently fail.

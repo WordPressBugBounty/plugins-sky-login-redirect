@@ -1,0 +1,102 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    name: Unit, JavaScript and static checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+          tools: composer:v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: composer install --prefer-dist --no-interaction
+      - run: npm ci
+      - run: composer test
+      - run: composer audit
+      - run: find . -path ./vendor -prune -o -path ./node_modules -prune -o -name '*.php' -type f -print0 | xargs -0 -n1 php -l
+      - run: npx eslint assets/js/slr-local-tracker.js assets/js/slr-login-injector.js tests/e2e/*.js playwright.config.js
+      - run: bash -n build-release.sh svn-clean-and-install.sh tests/bin/install-wp-tests.sh
+      - run: git diff --check
+
+  integration:
+    name: WordPress ${{ matrix.wordpress }} / PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - wordpress: '6.7'
+            php: '8.1'
+          - wordpress: '6.8'
+            php: '8.2'
+          - wordpress: 'latest'
+            php: '8.3'
+          - wordpress: 'latest'
+            php: '8.4'
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: slr_tests
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: composer:v2
+      - run: composer install --prefer-dist --no-interaction
+      - name: Install WordPress test library
+        run: tests/bin/install-wp-tests.sh slr_tests root root 127.0.0.1 ${{ matrix.wordpress }} true
+      - name: Run real WordPress integration tests
+        run: composer test:integration
+
+  e2e:
+    name: Browser authentication flows
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run env:start
+      - name: Run browser tests
+        env:
+          SLR_E2E_ALLOW_MUTATION: '1'
+        run: npm run test:e2e
+      - name: Export wp-env logs
+        if: always()
+        run: npx wp-env logs || true
+      - name: Stop wp-env
+        if: always()
+        run: npm run env:stop
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

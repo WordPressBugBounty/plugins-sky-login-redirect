@@ -1,5 +1,12 @@
 == Changelog ==
 
+= 4.2.7 - 2026-07-27 =
+*   Fix - The global modal login now refreshes the page on which it was opened and does not consume or follow previous-page redirects.
+*   Fix - Dedicated WooCommerce and EDD login forms receive the correct previous-page referrer without duplicate fields.
+*   Fix - Prevented a fatal error during logout caused by an incorrect `wp_logout` callback signature.
+*   Development - Added isolated, WordPress integration, and browser test layers plus dependency and release-package validation.
+*   Packaging - Excluded PHPUnit cache artifacts and made repeated release builds non-interactive.
+
 = 4.2.6 - 2026-07-23 =
 *   Fix - WooCommerce login bypassed all per-user/role redirect rules. WooCommerce fires `woocommerce_login_redirect` instead of WordPress's `login_redirect`, so the rule engine never ran for WC logins. `getCurrentAction()` now maps WC and EDD filter names to the correct action types; `handleLogin()` now delegates to the rule engine before falling through to WC-specific defaults.
 *   Fix - "Previous page" redirect was ignored on WooCommerce and custom login pages. `slr-login-injector.js` was only enqueued on `wp-login.php`. It now also loads on all frontend pages for logged-out users (self-exits on pages without a login form), covering My Account, custom `/login/` pages, and any page embedding a WC login form shortcode.
@@ -18,6 +25,9 @@
 *   Privacy - Prior-page storage no longer persists query strings or fragments.
 *   Development - Added automated PHP and JavaScript regression tests plus verified WordPress.org package exclusions.
 *   Fix - Removed malformed generated CSS from the customized login logo.
+*   Fix - Prevented a fatal error on WordPress logout by accepting the single user ID supplied by the `wp_logout` action.
+*   Development - Added real WordPress integration tests, WooCommerce/EDD browser tests, callback contract checks, and a PHP/WordPress CI matrix.
+*   Fix - Global modal forms no longer block or prematurely consume previous-page tracking; dedicated WooCommerce and EDD forms take priority, and existing referrer fields are updated instead of duplicated.
 
 = 4.2.5 - 2026-06-14 =
 *   Fix - Fatal errors when WooCommerce is deactivated while the menu-link shortcode is still in use: add_lost_password_link() now checks for wc_get_page_id() before accessing the My Account page, and wc_page_id_cached() returns early when WooCommerce is inactive.

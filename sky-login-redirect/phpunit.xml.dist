@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
 	bootstrap="tests/bootstrap.php"
-	cacheDirectory=".phpunit.cache"
+	cacheResultFile=".phpunit.cache/test-results"
 	colors="true"
 	failOnWarning="true"
 >

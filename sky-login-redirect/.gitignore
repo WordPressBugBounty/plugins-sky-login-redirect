@@ -1,6 +1,10 @@
 /vendor/
+/node_modules/
 .idea
 *.tar.gz
 *.zip
 *.code-workspace
 .phpunit.cache/
+.phpunit.result.cache
+/playwright-report/
+/test-results/
