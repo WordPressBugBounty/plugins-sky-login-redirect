@@ -238,5 +238,4 @@ return array(
     'Composer\\Installers\\YawikInstaller' => $vendorDir . '/composer/installers/src/Composer/Installers/YawikInstaller.php',
     'Composer\\Installers\\ZendInstaller' => $vendorDir . '/composer/installers/src/Composer/Installers/ZendInstaller.php',
     'Composer\\Installers\\ZikulaInstaller' => $vendorDir . '/composer/installers/src/Composer/Installers/ZikulaInstaller.php',
-    'PAnD' => $vendorDir . '/collizo4sky/persist-admin-notices-dismissal/persist-admin-notices-dismissal.php',
 );

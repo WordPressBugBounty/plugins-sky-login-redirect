@@ -3,8 +3,10 @@ dev
 tests
 .DS_Store
 .git
+.gitattributes
 .gitignore
 .editorconfig
+eslint.config.js
 .eslintrc.json
 .vscode
 .wordpress-org

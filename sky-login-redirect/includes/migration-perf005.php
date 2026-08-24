@@ -25,15 +25,15 @@ declare(strict_types=1);
 
 namespace SkyLoginRedirect\Migration;
 
-if (!defined('ABSPATH')) {
+if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
 /**
  * Data migrator for association field conversion.
  */
-final class AssociationFieldMigrator
-{
+final class AssociationFieldMigrator {
+
     /**
      * Option name to track migration status.
      */
@@ -49,11 +49,10 @@ final class AssociationFieldMigrator
      *
      * @return void
      */
-    public static function run(): void
-    {
+    public static function run(): void {
         // Check if migration already completed
-        $completed = get_option(self::MIGRATION_OPTION, '0');
-        if (version_compare($completed, self::MIGRATION_VERSION, '>=')) {
+        $completed = get_option( self::MIGRATION_OPTION, '0' );
+        if ( version_compare( $completed, self::MIGRATION_VERSION, '>=' ) ) {
             return;
         }
 
@@ -61,7 +60,7 @@ final class AssociationFieldMigrator
         $migrator->migrateAll();
 
         // Mark migration as complete
-        update_option(self::MIGRATION_OPTION, self::MIGRATION_VERSION);
+        update_option( self::MIGRATION_OPTION, self::MIGRATION_VERSION );
     }
 
     /**
@@ -69,8 +68,7 @@ final class AssociationFieldMigrator
      *
      * @return void
      */
-    private function migrateAll(): void
-    {
+    private function migrateAll(): void {
         // Get all redirect rules from the slr_xlogin_logout complex field
         $this->migrateRedirectRules();
 
@@ -83,48 +81,47 @@ final class AssociationFieldMigrator
      *
      * @return void
      */
-    private function migrateRedirectRules(): void
-    {
+    private function migrateRedirectRules(): void {
         // Get all redirect rules
-        $rules = carbon_get_theme_option('slr_xlogin_logout');
-        if (empty($rules) || !is_array($rules)) {
+        $rules = carbon_get_theme_option( 'slr_xlogin_logout' );
+        if ( empty( $rules ) || ! is_array( $rules ) ) {
             return;
         }
 
         $updated = false;
 
-        foreach ($rules as $index => $rule) {
+        foreach ( $rules as $index => $rule ) {
             // Migrate slr_xuser field
-            if (!empty($rule['slr_xuser']) && is_array($rule['slr_xuser'])) {
-                $new_users = $this->migrateUserData($rule['slr_xuser']);
-                if ($new_users !== $rule['slr_xuser']) {
-                    carbon_set_theme_option("slr_xlogin_logout[{$index}]/slr_xuser", $new_users);
+            if ( ! empty( $rule['slr_xuser'] ) && is_array( $rule['slr_xuser'] ) ) {
+                $new_users = $this->migrateUserData( $rule['slr_xuser'] );
+                if ( $new_users !== $rule['slr_xuser'] ) {
+                    carbon_set_theme_option( "slr_xlogin_logout[{$index}]/slr_xuser", $new_users );
                     $updated = true;
                 }
             }
 
             // Migrate slr_xlogin_page field
-            if (!empty($rule['slr_xlogin_page'])) {
-                $new_page = $this->migratePageData($rule['slr_xlogin_page']);
-                if ($new_page !== $rule['slr_xlogin_page']) {
-                    carbon_set_theme_option("slr_xlogin_logout[{$index}]/slr_xlogin_page", $new_page);
+            if ( ! empty( $rule['slr_xlogin_page'] ) ) {
+                $new_page = $this->migratePageData( $rule['slr_xlogin_page'] );
+                if ( $new_page !== $rule['slr_xlogin_page'] ) {
+                    carbon_set_theme_option( "slr_xlogin_logout[{$index}]/slr_xlogin_page", $new_page );
                     $updated = true;
                 }
             }
 
             // Migrate slr_xlogout_page field
-            if (!empty($rule['slr_xlogout_page'])) {
-                $new_page = $this->migratePageData($rule['slr_xlogout_page']);
-                if ($new_page !== $rule['slr_xlogout_page']) {
-                    carbon_set_theme_option("slr_xlogin_logout[{$index}]/slr_xlogout_page", $new_page);
+            if ( ! empty( $rule['slr_xlogout_page'] ) ) {
+                $new_page = $this->migratePageData( $rule['slr_xlogout_page'] );
+                if ( $new_page !== $rule['slr_xlogout_page'] ) {
+                    carbon_set_theme_option( "slr_xlogin_logout[{$index}]/slr_xlogout_page", $new_page );
                     $updated = true;
                 }
             }
         }
 
-        if ($updated) {
+        if ( $updated ) {
             // Clear any cached data
-            wp_cache_delete('slr_cached_options', 'slr');
+            wp_cache_delete( 'slr_cached_options', 'slr' );
         }
     }
 
@@ -133,39 +130,38 @@ final class AssociationFieldMigrator
      *
      * @return void
      */
-    private function migrateRestrictionRules(): void
-    {
+    private function migrateRestrictionRules(): void {
         // Get all restriction rules
-        $rules = carbon_get_theme_option('slr_xrestrict');
-        if (empty($rules) || !is_array($rules)) {
+        $rules = carbon_get_theme_option( 'slr_xrestrict' );
+        if ( empty( $rules ) || ! is_array( $rules ) ) {
             return;
         }
 
         $updated = false;
 
-        foreach ($rules as $index => $rule) {
+        foreach ( $rules as $index => $rule ) {
             // Migrate slr_xcpt_restrict field (posts/pages)
-            if (!empty($rule['slr_xcpt_restrict']) && is_array($rule['slr_xcpt_restrict'])) {
-                $new_posts = $this->migratePostData($rule['slr_xcpt_restrict']);
-                if ($new_posts !== $rule['slr_xcpt_restrict']) {
-                    carbon_set_theme_option("slr_xrestrict[{$index}]/slr_xcpt_restrict", $new_posts);
+            if ( ! empty( $rule['slr_xcpt_restrict'] ) && is_array( $rule['slr_xcpt_restrict'] ) ) {
+                $new_posts = $this->migratePostData( $rule['slr_xcpt_restrict'] );
+                if ( $new_posts !== $rule['slr_xcpt_restrict'] ) {
+                    carbon_set_theme_option( "slr_xrestrict[{$index}]/slr_xcpt_restrict", $new_posts );
                     $updated = true;
                 }
             }
 
             // Migrate slr_xuser_restrict field
-            if (!empty($rule['slr_xuser_restrict']) && is_array($rule['slr_xuser_restrict'])) {
-                $new_users = $this->migrateUserData($rule['slr_xuser_restrict']);
-                if ($new_users !== $rule['slr_xuser_restrict']) {
-                    carbon_set_theme_option("slr_xrestrict[{$index}]/slr_xuser_restrict", $new_users);
+            if ( ! empty( $rule['slr_xuser_restrict'] ) && is_array( $rule['slr_xuser_restrict'] ) ) {
+                $new_users = $this->migrateUserData( $rule['slr_xuser_restrict'] );
+                if ( $new_users !== $rule['slr_xuser_restrict'] ) {
+                    carbon_set_theme_option( "slr_xrestrict[{$index}]/slr_xuser_restrict", $new_users );
                     $updated = true;
                 }
             }
         }
 
-        if ($updated) {
+        if ( $updated ) {
             // Clear any cached data
-            wp_cache_delete('slr_restrict_rules', 'slr');
+            wp_cache_delete( 'slr_restrict_rules', 'slr' );
         }
     }
 
@@ -181,23 +177,22 @@ final class AssociationFieldMigrator
      * @param array $users Old format user data.
      * @return array New format user data.
      */
-    private function migrateUserData(array $users): array
-    {
+    private function migrateUserData( array $users ): array {
         $migrated = [];
 
-        foreach ($users as $user) {
+        foreach ( $users as $user ) {
             // Already in new format
-            if (is_array($user) && isset($user['id'], $user['type'])) {
+            if ( is_array( $user ) && isset( $user['id'], $user['type'] ) ) {
                 $migrated[] = $user;
                 continue;
             }
 
             // Old format: "Display Name (ID=123)"
-            if (is_string($user) && preg_match('/\(ID=(\d+)\)/', $user, $matches)) {
-                $user_id = $matches[1];
-                $user_obj = get_user_by('id', (int) $user_id);
+            if ( is_string( $user ) && preg_match( '/\(ID=(\d+)\)/', $user, $matches ) ) {
+                $user_id  = $matches[1];
+                $user_obj = get_user_by( 'id', (int) $user_id );
 
-                if ($user_obj) {
+                if ( $user_obj ) {
                     $migrated[] = [
                         'id'    => (string) $user_id,
                         'type'  => 'user',
@@ -210,11 +205,11 @@ final class AssociationFieldMigrator
             }
 
             // Legacy format fallback: just an ID
-            if (is_numeric($user)) {
-                $user_id = (int) $user;
-                $user_obj = get_user_by('id', $user_id);
+            if ( is_numeric( $user ) ) {
+                $user_id  = (int) $user;
+                $user_obj = get_user_by( 'id', $user_id );
 
-                if ($user_obj) {
+                if ( $user_obj ) {
                     $migrated[] = [
                         'id'    => (string) $user_id,
                         'type'  => 'user',
@@ -239,14 +234,13 @@ final class AssociationFieldMigrator
      * @param mixed $pages Old format page data (int, array of ints, or already migrated array).
      * @return array New format page data.
      */
-    private function migratePageData($pages): array
-    {
+    private function migratePageData( $pages ): array {
         // Handle single page ID (legacy format)
-        if (is_numeric($pages)) {
+        if ( is_numeric( $pages ) ) {
             $page_id = (int) $pages;
-            $page = get_post($page_id);
+            $page    = get_post( $page_id );
 
-            if ($page && $page->post_type === 'page') {
+            if ( $page && 'page' === $page->post_type ) {
                 return [
                     [
                         'id'      => (string) $page_id,
@@ -262,23 +256,23 @@ final class AssociationFieldMigrator
         }
 
         // Handle array of page IDs or already migrated data
-        if (is_array($pages)) {
+        if ( is_array( $pages ) ) {
             // Check if already in new format
-            if (!empty($pages) && is_array($pages[0]) && isset($pages[0]['id'], $pages[0]['type'])) {
+            if ( ! empty( $pages ) && is_array( $pages[0] ) && isset( $pages[0]['id'], $pages[0]['type'] ) ) {
                 return $pages;
             }
 
             $migrated = [];
 
-            foreach ($pages as $page_id) {
-                if (!is_numeric($page_id)) {
+            foreach ( $pages as $page_id ) {
+                if ( ! is_numeric( $page_id ) ) {
                     continue;
                 }
 
                 $page_id = (int) $page_id;
-                $page = get_post($page_id);
+                $page    = get_post( $page_id );
 
-                if ($page && $page->post_type === 'page') {
+                if ( $page && 'page' === $page->post_type ) {
                     $migrated[] = [
                         'id'      => (string) $page_id,
                         'type'    => 'post',
@@ -303,23 +297,22 @@ final class AssociationFieldMigrator
      * @param array $posts Old format post data.
      * @return array New format post data.
      */
-    private function migratePostData(array $posts): array
-    {
+    private function migratePostData( array $posts ): array {
         $migrated = [];
 
-        foreach ($posts as $post) {
+        foreach ( $posts as $post ) {
             // Already in new format
-            if (is_array($post) && isset($post['id'], $post['type'])) {
+            if ( is_array( $post ) && isset( $post['id'], $post['type'] ) ) {
                 $migrated[] = $post;
                 continue;
             }
 
             // Old format: "Post Title (ID=123)"
-            if (is_string($post) && preg_match('/\(ID=(\d+)\)/', $post, $matches)) {
-                $post_id = (int) $matches[1];
-                $post_obj = get_post($post_id);
+            if ( is_string( $post ) && preg_match( '/\(ID=(\d+)\)/', $post, $matches ) ) {
+                $post_id  = (int) $matches[1];
+                $post_obj = get_post( $post_id );
 
-                if ($post_obj) {
+                if ( $post_obj ) {
                     $migrated[] = [
                         'id'      => (string) $post_id,
                         'type'    => 'post',
@@ -333,11 +326,11 @@ final class AssociationFieldMigrator
             }
 
             // Legacy format: just an ID
-            if (is_numeric($post)) {
-                $post_id = (int) $post;
-                $post_obj = get_post($post_id);
+            if ( is_numeric( $post ) ) {
+                $post_id  = (int) $post;
+                $post_obj = get_post( $post_id );
 
-                if ($post_obj) {
+                if ( $post_obj ) {
                     $migrated[] = [
                         'id'      => (string) $post_id,
                         'type'    => 'post',
@@ -357,10 +350,9 @@ final class AssociationFieldMigrator
      *
      * @return bool True if migration needs to run.
      */
-    public static function isMigrationNeeded(): bool
-    {
-        $completed = get_option(self::MIGRATION_OPTION, '0');
-        return version_compare($completed, self::MIGRATION_VERSION, '<');
+    public static function isMigrationNeeded(): bool {
+        $completed = get_option( self::MIGRATION_OPTION, '0' );
+        return version_compare( $completed, self::MIGRATION_VERSION, '<' );
     }
 
     /**
@@ -368,9 +360,8 @@ final class AssociationFieldMigrator
      *
      * @return void
      */
-    public static function reset(): void
-    {
-        delete_option(self::MIGRATION_OPTION);
+    public static function reset(): void {
+        delete_option( self::MIGRATION_OPTION );
     }
 }
 
@@ -379,26 +370,25 @@ final class AssociationFieldMigrator
  *
  * @return void
  */
-function run_perf005_migration(): void
-{
+function run_perf005_migration(): void {
     // Only run in admin context when Carbon Fields is available
-    if (!is_admin()) {
+    if ( ! is_admin() ) {
         return;
     }
 
     // Check if function exists (Carbon Fields might not be loaded yet)
-    if (!function_exists('carbon_get_theme_option')) {
+    if ( ! function_exists( 'carbon_get_theme_option' ) ) {
         return;
     }
 
     // Check if migration is actually needed before running
-    if (!AssociationFieldMigrator::isMigrationNeeded()) {
+    if ( ! AssociationFieldMigrator::isMigrationNeeded() ) {
         return;
     }
 
     AssociationFieldMigrator::run();
 }
-add_action('admin_init', __NAMESPACE__ . '\\run_perf005_migration', 100); // Run after Carbon Fields is loaded
+add_action( 'admin_init', __NAMESPACE__ . '\\run_perf005_migration', 100 ); // Run after Carbon Fields is loaded
 
 /**
  * Alternative: Hook to plugin upgrade process for immediate migration on update.
@@ -407,21 +397,20 @@ add_action('admin_init', __NAMESPACE__ . '\\run_perf005_migration', 100); // Run
  * @param array       $options         Upgrade options.
  * @return void
  */
-function run_perf005_migration_on_upgrade($upgrader_object, $options): void
-{
+function run_perf005_migration_on_upgrade( $upgrader_object, $options ): void {
     // Check if this is our plugin being updated
-    if (($options['action'] ?? '') === 'update' && ($options['type'] ?? '') === 'plugin') {
+    if ( ( $options['action'] ?? '' ) === 'update' && ( $options['type'] ?? '' ) === 'plugin' ) {
         // Check if our plugin is in the list of updated plugins
         $plugins = $options['plugins'] ?? [];
-        if (in_array('sky-login-redirect/sky-login-redirect.php', (array) $plugins, true)) {
+        if ( in_array( 'sky-login-redirect/sky-login-redirect.php', (array) $plugins, true ) ) {
             // Schedule a one-time event to run migration after the update is complete
-            if (!wp_next_scheduled('slr_run_migration')) {
-                wp_schedule_single_event(time() + 5, 'slr_run_migration');
+            if ( ! wp_next_scheduled( 'slr_run_migration' ) ) {
+                wp_schedule_single_event( time() + 5, 'slr_run_migration' );
             }
         }
     }
 }
-add_action('upgrader_process_complete', __NAMESPACE__ . '\\run_perf005_migration_on_upgrade', 10, 2);
+add_action( 'upgrader_process_complete', __NAMESPACE__ . '\\run_perf005_migration_on_upgrade', 10, 2 );
 
 /**
  * Manual migration trigger via WP-CLI or admin action.
@@ -430,9 +419,8 @@ add_action('upgrader_process_complete', __NAMESPACE__ . '\\run_perf005_migration
  *
  * @return void
  */
-function manual_migration_trigger(): void
-{
+function manual_migration_trigger(): void {
     AssociationFieldMigrator::reset();
     AssociationFieldMigrator::run();
 }
-add_action('slr_run_migration', __NAMESPACE__ . '\\manual_migration_trigger');
+add_action( 'slr_run_migration', __NAMESPACE__ . '\\manual_migration_trigger' );

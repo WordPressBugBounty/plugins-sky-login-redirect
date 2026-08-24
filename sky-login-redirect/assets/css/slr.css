@@ -246,11 +246,89 @@ img.security {
   display: none;
 }
 
+.slr-plugins-panel {
+    overflow: hidden;
+    border: 1px solid #dcdcde;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 6px 24px rgba(23, 32, 51, .045);
+}
+
+.slr-plugins-heading {
+    padding: 20px 24px;
+    border-bottom: 1px solid #dcdcde;
+}
+
+.slr-plugins-heading h2,
+.slr-plugins-heading p {
+    margin: 0;
+}
+
+.slr-plugins-heading p {
+    margin-top: 6px;
+    color: #646970;
+}
+
+.slr-plugin-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px 24px 24px;
+}
+
+.slr-plugin-card {
+    display: grid;
+    grid-template-columns: 128px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 24px;
+}
+
+.slr-plugin-image {
+    display: block;
+    width: 112px;
+    height: 112px;
+    object-fit: contain;
+}
+
+.slr-plugin-body strong {
+    display: block;
+    font-size: 15px;
+}
+
+.slr-plugin-body strong a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.slr-plugin-body p {
+    margin: 8px 0 0;
+    color: #646970;
+    line-height: 1.5;
+}
+
+.slr-plugin-card > .button {
+    white-space: nowrap;
+}
+
 @media (max-width: 768px) {
     .carbon-theme-options #post-body.columns-2 #postbox-container-1.fixed,
     .carbon-network #post-body.columns-2 #postbox-container-1.fixed {
     position: static !important;
     right: auto !important;
     margin-right: auto !important;
+    }
+
+    .slr-plugin-grid {
+        padding: 16px 18px 18px;
+    }
+
+    .slr-plugin-card {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .slr-plugin-image {
+        width: 96px;
+        height: 96px;
     }
 }

@@ -23,14 +23,14 @@ use function SkyLoginRedirect\sky_login_redirect_fs;
 use const SkyLoginRedirect\PLUGIN_SCREENS;
 
 /** Allowed HTML for links in footer. */
-const LINK_ALLOWED_HTML = array(
-	'a'      => array(
-		'href'   => array(),
-		'target' => array(),
-		'rel'    => array(),
-	),
-	'strong' => array(),
-);
+const LINK_ALLOWED_HTML = [
+	'a'      => [
+		'href'   => [],
+		'target' => [],
+		'rel'    => [],
+	],
+	'strong' => [],
+];
 
 /**
  * Get plugin basename (works for both free and pro versions).
@@ -68,7 +68,7 @@ add_filter( 'plugin_action_links_' . get_plugin_basename(), __NAMESPACE__ . '\\a
  * @return array Modified links.
  */
 function add_row_meta( array $links, string $file ): array {
-	if ( $file !== get_plugin_basename() ) {
+	if ( get_plugin_basename() !== $file ) {
 		return $links;
 	}
 
@@ -76,7 +76,7 @@ function add_row_meta( array $links, string $file ): array {
 
 	return array_merge(
 		$links,
-		array(
+		[
 			'docs'    => sprintf(
 				'<a href="%s" title="%s">%s</a>',
 				esc_url( apply_filters( 'slr_docs_url', 'https://utopique.net/docs/' ) ),
@@ -95,7 +95,7 @@ function add_row_meta( array $links, string $file ): array {
 				esc_attr__( 'Rate Sky Login Redirect', 'sky-login-redirect' ),
 				esc_html__( 'Rate us', 'sky-login-redirect' )
 			),
-		)
+		]
 	);
 }
 add_filter( 'plugin_row_meta', __NAMESPACE__ . '\\add_row_meta', 10, 2 );

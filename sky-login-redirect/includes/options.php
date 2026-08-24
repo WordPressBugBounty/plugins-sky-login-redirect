@@ -23,6 +23,19 @@ use Carbon_Fields\Container;
 use Carbon_Fields\Field;
 
 /**
+ * Create a Carbon Fields field through its dynamic factory.
+ *
+ * Carbon Fields resolves the concrete field subclass from the first argument at
+ * runtime, so the facade cannot expose a more specific static return type.
+ *
+ * @param mixed ...$arguments Field factory arguments.
+ * @return mixed Concrete Carbon Fields field instance.
+ */
+function make_field( mixed ...$arguments ): mixed {
+    return Field::make( ...$arguments );
+}
+
+/**
  * Import the sky_login_redirect_fs() function as defined in the plugin
  * and rename it as SLR_FS so we can use it
  */
@@ -45,6 +58,11 @@ function options_initialize_admin_page() {
     }
 
     // On crée la page d'options.
+    /**
+     * Theme options container.
+     *
+     * @var \Carbon_Fields\Container\Theme_Options_Container $theme_options
+     */
     $theme_options = Container::make(
         'theme_options',
         __( 'Sky Login Redirect', 'sky-login-redirect' )
@@ -109,13 +127,13 @@ add_action(
 /**
  * Liste des onglets dans lesquels seront rangés les champs de notre page d'options.
  *
- * @param array $tabs []
+ * @param array $_tabs Existing tabs.
  *
  * @return array $tabs Tableau des onglets :
  * la clé d'une entrée est utilisée par le filtre chargeant les champs de l'onglet,
  * la valeur d'une entrée est le titre de l'onglet.
  */
-function options_set_tabs( $tabs ) {
+function options_set_tabs( $_tabs ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Filter replaces the complete tab collection.
     return [
         'login_logout' => __( 'Redirects', 'sky-login-redirect' ),
         'customizer'   => __( 'Customizer', 'sky-login-redirect' ),
@@ -138,7 +156,7 @@ add_filter( 'sky_login_redirect_options_tabs', __NAMESPACE__ . '\\options_set_ta
 function options_login_logout_tab_theme_fields() {
     $fields = [];
 
-    $fields[] = Field::make( 'html', 'login_logout_h2' )
+    $fields[] = make_field( 'html', 'login_logout_h2' )
     ->set_html(
         sprintf(
             '<h2>%s</h2>',
@@ -146,7 +164,7 @@ function options_login_logout_tab_theme_fields() {
         )
     );
 
-    $fields[] = Field::make( 'html', 'slr_login_logout_p' )
+    $fields[] = make_field( 'html', 'slr_login_logout_p' )
     ->set_html(
         sprintf(
             '<p class="widgets">%s<p>',
@@ -175,7 +193,7 @@ function options_login_logout_tab_theme_fields() {
         __( 'Upgrade for more rules.', 'sky-login-redirect' )
     );
     $maroilles = apply_filters( 'maroilles', $maroilles );
-    $fields[]  = Field::make(
+    $fields[]  = make_field(
         'complex',
         'slr_xlogin_logout',
         __( 'Add a new rule:', 'sky-login-redirect' )
@@ -193,7 +211,7 @@ function options_login_logout_tab_theme_fields() {
         ->add_fields(
             [
 
-				Field::make(
+				make_field(
 					'select',
 					'slr_xselect_redirect',
 					__( 'Redirect:', 'sky-login-redirect' )
@@ -201,7 +219,7 @@ function options_login_logout_tab_theme_fields() {
 				->set_options( $categories ),
 
 				// USER association field (replaces multiselect)
-				Field::make(
+				make_field(
 					'association',
 					'slr_xuser',
 					__( 'User(s):', 'sky-login-redirect' )
@@ -219,7 +237,7 @@ function options_login_logout_tab_theme_fields() {
 				),
 
 				// ROLE multiselect
-				Field::make(
+				make_field(
 					'multiselect',
 					'slr_xrole',
 					__(
@@ -239,7 +257,7 @@ function options_login_logout_tab_theme_fields() {
 					),
 
 				// Login redirect type
-				Field::make(
+				make_field(
 					'select',
 					'slr_xselect_login',
 					__( 'Redirect login to:', 'sky-login-redirect' )
@@ -247,7 +265,7 @@ function options_login_logout_tab_theme_fields() {
 				->set_options( $redirects ),
 
 				// LOGIN URL for all types
-				Field::make(
+				make_field(
 					'text',
 					'slr_xlogin_url',
 					__( 'Redirect login to:', 'sky-login-redirect' )
@@ -265,7 +283,7 @@ function options_login_logout_tab_theme_fields() {
 					),
 
 				// select page for the login redirect (association field)
-				Field::make( 'association', 'slr_xlogin_page', __( 'Page:', 'sky-login-redirect' ) )
+				make_field( 'association', 'slr_xlogin_page', __( 'Page:', 'sky-login-redirect' ) )
 					->set_types(
 						[
 							[
@@ -289,13 +307,13 @@ function options_login_logout_tab_theme_fields() {
 
                 // USER meta : login
                 /*
-                Field::make( 'text', 'slr_xlogin_meta_key', __( 'User meta key:', 'sky-login-redirect' ) )
+                make_field( 'text', 'slr_xlogin_meta_key', __( 'User meta key:', 'sky-login-redirect' ) )
                     ->set_help_text( __( 'The user meta key.', 'sky-login-redirect' ) )
                     ->set_attribute( 'placeholder', 'User meta key' )
                     ->set_classes( 'indent' )
                     ->set_conditional_logic( [ [ 'field' => 'slr_xselect_login', 'value' => 'meta' ] ] ),
 
-                Field::make( 'text', 'slr_xlogin_meta_value', __( 'User meta value:', 'sky-login-redirect' ) )
+                make_field( 'text', 'slr_xlogin_meta_value', __( 'User meta value:', 'sky-login-redirect' ) )
                     ->set_help_text( __( 'The user meta value.', 'sky-login-redirect' ) )
                     ->set_attribute( 'placeholder', 'User meta value' )
                     ->set_classes( 'indent' )
@@ -303,7 +321,7 @@ function options_login_logout_tab_theme_fields() {
                 */
 
             // Logout redirect type
-            Field::make(
+            make_field(
                 'select',
                 'slr_xselect_logout',
                 __(
@@ -314,7 +332,7 @@ function options_login_logout_tab_theme_fields() {
                 ->set_options( $redirects ),
 
 				// LOGOUT URL for all types
-					Field::make(
+					make_field(
 						'text',
 						'slr_xlogout_url',
 						__(
@@ -342,7 +360,7 @@ function options_login_logout_tab_theme_fields() {
 						),
 
 				// select page for the logout redirect (association field)
-				Field::make(
+				make_field(
 					'association',
 					'slr_xlogout_page',
 					__(
@@ -373,13 +391,13 @@ function options_login_logout_tab_theme_fields() {
 
             // USER meta : logout
             /*
-            Field::make( 'text', 'slr_xlogout_meta_key', __( 'User meta key:', 'sky-login-redirect' ) )
+            make_field( 'text', 'slr_xlogout_meta_key', __( 'User meta key:', 'sky-login-redirect' ) )
                 ->set_help_text( __( 'The user meta key.', 'sky-login-redirect' ) )
                 ->set_attribute( 'placeholder', 'User meta key' )
                 ->set_classes( 'indent' )
                 ->set_conditional_logic( [ [ 'field' => 'slr_xselect_logout', 'value' => 'meta' ] ] ),
 
-                Field::make( 'text', 'slr_xlogout_meta_value', __( 'User meta value:', 'sky-login-redirect' ) )
+                make_field( 'text', 'slr_xlogout_meta_value', __( 'User meta value:', 'sky-login-redirect' ) )
                     ->set_help_text( __( 'The user meta value.', 'sky-login-redirect' ) )
                     ->set_attribute( 'placeholder', 'User meta value' )
                     ->set_classes( 'indent' )
@@ -403,57 +421,57 @@ add_filter( 'sky_login_redirect_options_fields_tab_login_logout', __NAMESPACE__ 
  */
 function options_tweaks_tab_theme_fields() {
     $fields   = [];
-    $fields[] = Field::make( 'html', 'extra_login_tweaks' )
+    $fields[] = make_field( 'html', 'extra_login_tweaks' )
         ->set_html( sprintf( '<h2>%s</h2>', __( 'Extra Login tweaks', 'sky-login-redirect' ) ) );
 
-    $fields[] = Field::make( 'checkbox', 'slr_logo_link', __( 'Point login logo link to the site\'s URL', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'checkbox', 'slr_logo_link', __( 'Point login logo link to the site\'s URL', 'sky-login-redirect' ) )
         ->set_classes( 'slider-checkbox' )
         ->set_option_value( 'yes' );
 
-    $fields[] = Field::make( 'checkbox', 'slr_logo_text', __( 'Set site\'s name to login logo text', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'checkbox', 'slr_logo_text', __( 'Set site\'s name to login logo text', 'sky-login-redirect' ) )
         ->set_classes( 'slider-checkbox' )
         ->set_option_value( 'yes' );
 
-    $fields[] = Field::make( 'checkbox', 'slr_check_remember_me', __( 'Check the Remember Me checkbox by default', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'checkbox', 'slr_check_remember_me', __( 'Check the Remember Me checkbox by default', 'sky-login-redirect' ) )
         ->set_classes( 'slider-checkbox' )
         ->set_option_value( 'yes' );
 
-    $fields[] = Field::make( 'checkbox', 'slr_hide_remember_me', __( 'Hide the Remember Me checkbox', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'checkbox', 'slr_hide_remember_me', __( 'Hide the Remember Me checkbox', 'sky-login-redirect' ) )
         ->set_classes( 'slider-checkbox' )
         ->set_option_value( 'yes' );
 
-    $fields[] = Field::make( 'checkbox', 'slr_hide_backtoblog', sprintf( 'Remove the "Go to %s" link', get_bloginfo( 'name' ) ) )
+    $fields[] = make_field( 'checkbox', 'slr_hide_backtoblog', sprintf( 'Remove the "Go to %s" link', get_bloginfo( 'name' ) ) )
         ->set_classes( 'slider-checkbox' )
         ->set_option_value( 'yes' );
 
-    $fields[] = Field::make( 'checkbox', 'slr_hide_privacy_policy', __( 'Remove privacy policy link', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'checkbox', 'slr_hide_privacy_policy', __( 'Remove privacy policy link', 'sky-login-redirect' ) )
         ->set_classes( 'slider-checkbox' )
         ->set_option_value( 'yes' );
 
-    $fields[] = Field::make( 'checkbox', 'slr_hide_language_switcher', __( 'Remove language switcher dropdown', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'checkbox', 'slr_hide_language_switcher', __( 'Remove language switcher dropdown', 'sky-login-redirect' ) )
         ->set_classes( 'slider-checkbox' )
         ->set_option_value( 'yes' );
 
-    $fields[] = Field::make( 'html', 'admin_login_tweaks' )
+    $fields[] = make_field( 'html', 'admin_login_tweaks' )
         ->set_html( sprintf( '<h2>%s</h2>', __( 'Admin tweaks', 'sky-login-redirect' ) ) );
 
-    $fields[] = Field::make( 'checkbox', 'slr_remove_login_shake', __( 'Remove login error shake effect', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'checkbox', 'slr_remove_login_shake', __( 'Remove login error shake effect', 'sky-login-redirect' ) )
         ->set_classes( 'slider-checkbox starter' )
         ->set_option_value( 'yes' );
 
-    $fields[] = Field::make( 'checkbox', 'slr_norobots', __( 'Noindex and nofollow login page', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'checkbox', 'slr_norobots', __( 'Noindex and nofollow login page', 'sky-login-redirect' ) )
         ->set_classes( 'slider-checkbox starter' )
         ->set_option_value( 'yes' );
 
-    $fields[] = Field::make( 'checkbox', 'slr_generic_login_errors', __( 'Use generic login error messages', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'checkbox', 'slr_generic_login_errors', __( 'Use generic login error messages', 'sky-login-redirect' ) )
         ->set_classes( 'slider-checkbox starter' )
         ->set_help_text( __( 'Hide whether a username or email address exists by replacing username-revealing login, lost-password and email-login errors with a single neutral message. Helps prevent account enumeration by attackers.', 'sky-login-redirect' ) )
         ->set_option_value( 'yes' );
 
-    $fields[] = Field::make( 'checkbox', 'slr_change_user_session', __( 'Change user\'s session timeout', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'checkbox', 'slr_change_user_session', __( 'Change user\'s session timeout', 'sky-login-redirect' ) )
         ->set_classes( 'slider-checkbox starter' );
 
-    $fields[] = Field::make( 'select', 'slr_user_session_time', __( 'Session timeout', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'select', 'slr_user_session_time', __( 'Session timeout', 'sky-login-redirect' ) )
         ->set_conditional_logic( [ [ 'field' => 'slr_change_user_session', 'value' => true ] ] )
         ->set_help_text( __( 'WordPress default is 2 days.', 'sky-login-redirect' ) )
         ->set_classes( 'indent starter' )
@@ -471,15 +489,15 @@ function options_tweaks_tab_theme_fields() {
         )
         ->set_conditional_logic( [ [ 'field' => 'slr_change_user_session', 'value' => true ] ] );
 
-    $fields[] = Field::make( 'html', 'spam_protection' )
+    $fields[] = make_field( 'html', 'spam_protection' )
         ->set_html( sprintf( '<h2>%s</h2>', __( 'Spam protection', 'sky-login-redirect' ) ) );
 
-    $fields[] = Field::make( 'checkbox', 'slr_turnstile_enable', __( 'Enable Cloudflare Turnstile', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'checkbox', 'slr_turnstile_enable', __( 'Enable Cloudflare Turnstile', 'sky-login-redirect' ) )
         ->set_classes( 'slider-checkbox platinum' )
         ->set_help_text( __( 'Add a free, privacy-friendly, no-puzzle CAPTCHA to the login, registration and lost-password forms to stop spam bots.', 'sky-login-redirect' ) )
         ->set_option_value( 'yes' );
 
-    $fields[] = Field::make( 'text', 'slr_turnstile_site_key', __( 'Site key', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'text', 'slr_turnstile_site_key', __( 'Site key', 'sky-login-redirect' ) )
         ->set_classes( 'indent platinum' )
         ->set_conditional_logic( [ [ 'field' => 'slr_turnstile_enable', 'value' => true ] ] )
         ->set_attribute( 'placeholder', '0x4AAAA...' )
@@ -491,13 +509,13 @@ function options_tweaks_tab_theme_fields() {
             )
         );
 
-    $fields[] = Field::make( 'text', 'slr_turnstile_secret_key', __( 'Secret key', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'text', 'slr_turnstile_secret_key', __( 'Secret key', 'sky-login-redirect' ) )
         ->set_classes( 'indent platinum' )
         ->set_conditional_logic( [ [ 'field' => 'slr_turnstile_enable', 'value' => true ] ] )
         ->set_attribute( 'type', 'password' )
         ->set_attribute( 'placeholder', '0x4AAAA...' );
 
-    $fields[] = Field::make( 'select', 'slr_turnstile_theme', __( 'Widget theme', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'select', 'slr_turnstile_theme', __( 'Widget theme', 'sky-login-redirect' ) )
         ->set_classes( 'indent platinum' )
         ->set_conditional_logic( [ [ 'field' => 'slr_turnstile_enable', 'value' => true ] ] )
         ->add_options(
@@ -508,22 +526,22 @@ function options_tweaks_tab_theme_fields() {
             ]
         );
 
-    $fields[] = Field::make( 'html', 'login_design' )
+    $fields[] = make_field( 'html', 'login_design' )
         ->set_html( sprintf( '<h2>%s</h2>', __( 'Custom login page code', 'sky-login-redirect' ) ) );
 
-    $fields[] = Field::make( 'textarea', 'slr_login_css', __( 'Add CSS code', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'textarea', 'slr_login_css', __( 'Add CSS code', 'sky-login-redirect' ) )
         ->set_classes( 'indent-grid starter codemirror-css' );
 
-    $fields[] = Field::make( 'textarea', 'slr_header_code', __( 'Add login header code', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'textarea', 'slr_header_code', __( 'Add login header code', 'sky-login-redirect' ) )
         ->set_classes( 'indent-grid starter codemirror-js' );
 
-    $fields[] = Field::make( 'textarea', 'slr_form_code', __( 'Add login form code', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'textarea', 'slr_form_code', __( 'Add login form code', 'sky-login-redirect' ) )
         ->set_classes( 'indent-grid starter codemirror-js' );
 
-    $fields[] = Field::make( 'textarea', 'slr_footer_code', __( 'Add login footer code', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'textarea', 'slr_footer_code', __( 'Add login footer code', 'sky-login-redirect' ) )
         ->set_classes( 'indent-grid starter codemirror-js' );
 
-    $fields[] = Field::make( 'html', 'tweaks_upsell' )
+    $fields[] = make_field( 'html', 'tweaks_upsell' )
         ->set_html( sprintf( '<div class="upselly"><div id="buy"><a class="button" href="%s">%s</a></div></div>', SLR_FS()->get_upgrade_url(), __( 'Upgrade your plan', 'sky-login-redirect' ) ) );
 
     return $fields;
@@ -553,7 +571,7 @@ function options_woocommerce_tab_theme_fields() {
 
     // EASY DIGITAL DOWNLOADS
 
-    $fields[] = Field::make( 'html', 'slr_edd' )
+    $fields[] = make_field( 'html', 'slr_edd' )
         ->set_html( sprintf( '<h2 class="slr_edd">%s</h2>', __( 'Easy Digital Downloads', 'sky-login-redirect' ) ) );
 
     // EDD is simply installed, not active
@@ -576,18 +594,18 @@ function options_woocommerce_tab_theme_fields() {
 
     if ( ! class_exists( 'Easy_Digital_Downloads' ) ) {
         // code that requires EDD
-        $fields[] = Field::make( 'html', 'edd_missing' )
+        $fields[] = make_field( 'html', 'edd_missing' )
             ->set_html( $edd );
     }
 
     $login_urls['custom'] = __( 'Custom URL', 'sky-login-redirect' );
 
     // register
-    $fields[] = Field::make( 'checkbox', 'slr_edd_register_redirect', __( 'Redirect Easy Digital Downloads customers after they register', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'checkbox', 'slr_edd_register_redirect', __( 'Redirect Easy Digital Downloads customers after they register', 'sky-login-redirect' ) )
         ->set_classes( 'slider-checkbox starter' )
         ->set_option_value( 'yes' );
 
-    $fields[] = Field::make( 'text', 'slr_edd_register_redirect_url', __( 'Redirect to:', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'text', 'slr_edd_register_redirect_url', __( 'Redirect to:', 'sky-login-redirect' ) )
         ->set_classes( 'indent show-field' )
         ->set_conditional_logic( [ [ 'field' => 'slr_edd_register_redirect', 'value' => true ] ] )
         ->set_attribute( 'placeholder', 'https://' )
@@ -595,7 +613,7 @@ function options_woocommerce_tab_theme_fields() {
         ->set_required( true );
 
     // login
-    $fields[] = Field::make(
+    $fields[] = make_field(
         'checkbox',
         'slr_edd_login_redirect',
         __( 'Redirect Easy Digital Downloads customers after they login', 'sky-login-redirect' )
@@ -603,7 +621,7 @@ function options_woocommerce_tab_theme_fields() {
         ->set_classes( 'slider-checkbox starter' )
         ->set_option_value( 'yes' );
 
-    $fields[] = Field::make( 'text', 'slr_edd_login_redirect_url', __( 'Redirect to:', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'text', 'slr_edd_login_redirect_url', __( 'Redirect to:', 'sky-login-redirect' ) )
         ->set_classes( 'indent show-field' )
         ->set_conditional_logic( [ [ 'field' => 'slr_edd_login_redirect', 'value' => true ] ] )
         ->set_attribute( 'placeholder', 'https://' )
@@ -612,7 +630,7 @@ function options_woocommerce_tab_theme_fields() {
 
     // WOOOCOMMERCE
 
-    $fields[] = Field::make( 'html', 'slr_woocommerce' )
+    $fields[] = make_field( 'html', 'slr_woocommerce' )
         ->set_html( sprintf( '<h2>%s</h2>', __( 'WooCommerce', 'sky-login-redirect' ) ) );
 
     // WooCommerce is simply installed, not active
@@ -635,7 +653,7 @@ function options_woocommerce_tab_theme_fields() {
 
     if ( ! class_exists( 'WooCommerce' ) ) {
         // code that requires WooCommerce
-        $fields[]     = Field::make( 'html', 'woocommerce_missing' )
+        $fields[]     = make_field( 'html', 'woocommerce_missing' )
                                     ->set_html( $woocommerce );
         $wc_shop      = '';
         $wc_myaccount = '';
@@ -646,11 +664,11 @@ function options_woocommerce_tab_theme_fields() {
     }
 
     // register :ok
-    $fields[] = Field::make( 'checkbox', 'slr_wc_register_redirect', __( 'Redirect WooCommerce customers after they register', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'checkbox', 'slr_wc_register_redirect', __( 'Redirect WooCommerce customers after they register', 'sky-login-redirect' ) )
         ->set_classes( 'slider-checkbox starter' )
         ->set_option_value( 'yes' );
 
-    $fields[] = Field::make( 'text', 'slr_wc_register_redirect_url', __( 'Redirect to:', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'text', 'slr_wc_register_redirect_url', __( 'Redirect to:', 'sky-login-redirect' ) )
         ->set_classes( 'indent show-field' )
         ->set_conditional_logic( [ [ 'field' => 'slr_wc_register_redirect', 'value' => true ] ] )
         ->set_attribute( 'placeholder', 'https://' )
@@ -665,11 +683,11 @@ function options_woocommerce_tab_theme_fields() {
         ->set_default_value( $wc_shop );
 
     // login : ok
-    $fields[] = Field::make( 'checkbox', 'slr_wc_login_redirect', __( 'Redirect WooCommerce customers after they login', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'checkbox', 'slr_wc_login_redirect', __( 'Redirect WooCommerce customers after they login', 'sky-login-redirect' ) )
         ->set_classes( 'slider-checkbox starter' )
         ->set_option_value( 'yes' );
 
-    $fields[] = Field::make( 'text', 'slr_wc_login_redirect_url', __( 'Redirect to:', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'text', 'slr_wc_login_redirect_url', __( 'Redirect to:', 'sky-login-redirect' ) )
         ->set_classes( 'indent show-field' )
         ->set_conditional_logic(
             [ [ 'field' => 'slr_wc_login_redirect', 'value' => true ] ]
@@ -679,11 +697,11 @@ function options_woocommerce_tab_theme_fields() {
         ->set_required( true );
 
     // logout
-    $fields[] = Field::make( 'checkbox', 'slr_wc_logout_redirect', __( 'Redirect WooCommerce customers after they logout', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'checkbox', 'slr_wc_logout_redirect', __( 'Redirect WooCommerce customers after they logout', 'sky-login-redirect' ) )
         ->set_classes( 'slider-checkbox starter' )
         ->set_option_value( 'yes' );
 
-    $fields[] = Field::make( 'text', 'slr_wc_logout_redirect_url', __( 'Redirect to:', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'text', 'slr_wc_logout_redirect_url', __( 'Redirect to:', 'sky-login-redirect' ) )
         ->set_classes( 'indent show-field' )
         ->set_conditional_logic(
             [ [ 'field' => 'slr_wc_logout_redirect', 'value' => true ] ]
@@ -694,25 +712,25 @@ function options_woocommerce_tab_theme_fields() {
         ->set_default_value( $wc_shop );
 
     // WooCommerce customizer
-    $fields[] = Field::make( 'html', 'slr_woocommerce_customizer' )
+    $fields[] = make_field( 'html', 'slr_woocommerce_customizer' )
         ->set_html( sprintf( '<h2>%s</h2>', __( 'WooCommerce Customizer', 'sky-login-redirect' ) ) );
 
-    $fields[] = Field::make( 'checkbox', 'slr_wc_login_customizer', __( 'Customize WooCommerce login', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'checkbox', 'slr_wc_login_customizer', __( 'Customize WooCommerce login', 'sky-login-redirect' ) )
         ->set_classes( 'slider-checkbox business' )
         ->set_option_value( 'yes' );
 
-    $fields[] = Field::make( 'html', 'woo_login_block' )
+    $fields[] = make_field( 'html', 'woo_login_block' )
         ->set_html(
             sprintf( '<h3 class="separator">%s</h3>', __( 'Login block', 'sky-login-redirect' ) )
         );
 
-    $fields[] = Field::make( 'color', 'slr_wc_login_block_color', __( 'Background color', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_wc_login_block_color', __( 'Background color', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_conditional_logic(
             [ [ 'field' => 'slr_wc_login_customizer', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'text', 'slr_wc_login_block_radius', __( 'Border radius (px)', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'text', 'slr_wc_login_block_radius', __( 'Border radius (px)', 'sky-login-redirect' ) )
         ->set_classes( 'indent inline-flex' )
         ->set_attribute( 'type', 'number' )
         ->set_attribute( 'min', 0 )
@@ -722,16 +740,16 @@ function options_woocommerce_tab_theme_fields() {
             [ [ 'field' => 'slr_wc_login_customizer', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'html', 'woo_login_form' )
+    $fields[] = make_field( 'html', 'woo_login_form' )
         ->set_html( sprintf( '<h3 class="separator">%s</h3>', __( 'Login form', 'sky-login-redirect' ) ) );
 
-    $fields[] = Field::make( 'color', 'slr_wc_login_form_color', __( 'Background color', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_wc_login_form_color', __( 'Background color', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_conditional_logic(
             [ [ 'field' => 'slr_wc_login_customizer', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'text', 'slr_wc_login_form_radius', __( 'Border radius (px)', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'text', 'slr_wc_login_form_radius', __( 'Border radius (px)', 'sky-login-redirect' ) )
         ->set_classes( 'indent inline-flex' )
         ->set_attribute( 'type', 'number' )
         ->set_attribute( 'min', 0 )
@@ -741,7 +759,7 @@ function options_woocommerce_tab_theme_fields() {
             [ [ 'field' => 'slr_wc_login_customizer', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'text', 'slr_wc_login_form_padding', __( 'Padding (px)', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'text', 'slr_wc_login_form_padding', __( 'Padding (px)', 'sky-login-redirect' ) )
         ->set_classes( 'indent inline-flex' )
         ->set_attribute( 'type', 'number' )
         ->set_attribute( 'min', 0 )
@@ -751,54 +769,54 @@ function options_woocommerce_tab_theme_fields() {
             [ [ 'field' => 'slr_wc_login_customizer', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'color', 'slr_wc_login_labels_color', __( 'Labels color', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_wc_login_labels_color', __( 'Labels color', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_conditional_logic(
             [ [ 'field' => 'slr_wc_login_customizer', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'color', 'slr_wc_login_links_color', __( 'Links color', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_wc_login_links_color', __( 'Links color', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_conditional_logic(
             [ [ 'field' => 'slr_wc_login_customizer', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'html', 'woo_login_button' )
+    $fields[] = make_field( 'html', 'woo_login_button' )
         ->set_html(
             sprintf( '<h3 class="separator">%s</h3>', __( 'Login button', 'sky-login-redirect' ) )
         );
 
-    $fields[] = Field::make( 'color', 'slr_wc_login_button_background_color', __( 'Background color', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_wc_login_button_background_color', __( 'Background color', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_conditional_logic(
             [ [ 'field' => 'slr_wc_login_customizer', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'color', 'slr_wc_login_button_background_color_hover', __( 'Background color (hover)', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_wc_login_button_background_color_hover', __( 'Background color (hover)', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_conditional_logic(
             [ [ 'field' => 'slr_wc_login_customizer', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'color', 'slr_wc_login_button_text_color', __( 'Text color', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_wc_login_button_text_color', __( 'Text color', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_conditional_logic(
             [ [ 'field' => 'slr_wc_login_customizer', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'color', 'slr_wc_login_button_text_color_hover', __( 'Text color (hover)', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_wc_login_button_text_color_hover', __( 'Text color (hover)', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_conditional_logic(
             [ [ 'field' => 'slr_wc_login_customizer', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'color', 'slr_wc_login_button_border_color', __( 'Border color', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_wc_login_button_border_color', __( 'Border color', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_conditional_logic(
             [ [ 'field' => 'slr_wc_login_customizer', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'text', 'slr_wc_login_button_radius', __( 'Border radius (px)', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'text', 'slr_wc_login_button_radius', __( 'Border radius (px)', 'sky-login-redirect' ) )
         ->set_classes( 'indent inline-flex' )
         ->set_attribute( 'type', 'number' )
         ->set_attribute( 'min', 0 )
@@ -810,7 +828,7 @@ function options_woocommerce_tab_theme_fields() {
 
     // align
 
-    $fields[] = Field::make( 'select', 'slr_wc_login_button_align', __( 'Alignment', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'select', 'slr_wc_login_button_align', __( 'Alignment', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_width( 50 )
         ->set_options(
@@ -820,14 +838,14 @@ function options_woocommerce_tab_theme_fields() {
             [ [ 'field' => 'slr_wc_login_customizer', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'select', 'slr_wc_login_button_size', __( 'Button size', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'select', 'slr_wc_login_button_size', __( 'Button size', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_options( [ '' => 'default', 'custom' => 'custom', 'full-width' => 'full-width' ] )
         ->set_conditional_logic(
             [ [ 'field' => 'slr_wc_login_customizer', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'text', 'slr_wc_login_button_width', __( 'Custom width (px)', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'text', 'slr_wc_login_button_width', __( 'Custom width (px)', 'sky-login-redirect' ) )
         ->set_classes( 'indent inline-flex' )
         ->set_attribute( 'type', 'number' )
         ->set_attribute( 'min', 110 )
@@ -837,7 +855,7 @@ function options_woocommerce_tab_theme_fields() {
             [ [ 'field' => 'slr_wc_login_button_size', 'value' => 'custom' ] ]
         );
 
-    $fields[] = Field::make( 'text', 'slr_wc_login_button_height', __( 'Custom height (px)', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'text', 'slr_wc_login_button_height', __( 'Custom height (px)', 'sky-login-redirect' ) )
         ->set_classes( 'indent inline-flex' )
         ->set_attribute( 'type', 'number' )
         ->set_attribute( 'min', 10 )
@@ -848,15 +866,15 @@ function options_woocommerce_tab_theme_fields() {
         );
 
     // TWEAKS
-    $fields[] = Field::make( 'html', 'slr_shop_tweaks' )
+    $fields[] = make_field( 'html', 'slr_shop_tweaks' )
         ->set_html( sprintf( '<h2>%s</h2>', __( 'Tweaks', 'sky-login-redirect' ) ) );
 
-    $fields[] = Field::make( 'select', 'slr_login_url_select', __( 'Set login URL to:', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'select', 'slr_login_url_select', __( 'Set login URL to:', 'sky-login-redirect' ) )
         ->set_classes( 'indent business' )
         ->set_width( 50 )
         ->set_options( $login_urls );
 
-    $fields[] = Field::make( 'text', 'slr_custom_login_url', __( 'Login page:', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'text', 'slr_custom_login_url', __( 'Login page:', 'sky-login-redirect' ) )
         ->set_classes( 'indent business' )
         ->set_conditional_logic( [ [ 'field' => 'slr_login_url_select', 'value' => 'custom' ] ] )
         ->set_attribute( 'placeholder', 'https://' )
@@ -867,10 +885,10 @@ function options_woocommerce_tab_theme_fields() {
         );
 
     /*
-    $fields[] = Field::make( 'checkbox', 'slr_custom_register', __( 'Set custom register page', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'checkbox', 'slr_custom_register', __( 'Set custom register page', 'sky-login-redirect' ) )
     ->set_classes( 'slider-checkbox' );
 
-    $fields[] = Field::make( 'text', 'slr_custom_register_url', __( 'Register page:', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'text', 'slr_custom_register_url', __( 'Register page:', 'sky-login-redirect' ) )
     ->set_classes( 'indent' )
     ->set_conditional_logic( [ [ 'field' => 'slr_custom_register', 'value' => true ] ] )
     ->set_attribute( 'placeholder', 'https://' )
@@ -879,7 +897,7 @@ function options_woocommerce_tab_theme_fields() {
     ->set_help_text( __( 'Page URL where users register to the site.', 'sky-login-redirect' ) );
     */
 
-    $fields[] = Field::make( 'html', 'woo_upsell' )
+    $fields[] = make_field( 'html', 'woo_upsell' )
         ->set_html(
             sprintf( '<div class="upselly business"><div id="buy"><a class="button" href="%s">%s</a></div></div>', SLR_FS()->get_upgrade_url(), __( 'Upgrade your plan', 'sky-login-redirect' ) )
         );
@@ -902,110 +920,110 @@ function options_customizer_tab_theme_fields() {
     $fields = [];
 
     // wp_head extra scripts/styles.
-    //$fields[] = Field::make( 'header_scripts', 'extra_header_code' );
+    //$fields[] = make_field( 'header_scripts', 'extra_header_code' );
 
     // wp_footer extra scripts/styles.
-    //$fields[] = Field::make( 'footer_scripts', 'extra_footer_code' );
+    //$fields[] = make_field( 'footer_scripts', 'extra_footer_code' );
 
-    $fields[] = Field::make( 'html', 'customizer_preview' )
+    $fields[] = make_field( 'html', 'customizer_preview' )
         ->set_html(
             sprintf( '<h2>%s</h2>', __( 'Login customizer preview', 'sky-login-redirect' ) )
         );
 
-    $fields[] = Field::make( 'html', 'customizer_page' )
+    $fields[] = make_field( 'html', 'customizer_page' )
         ->set_html( sprintf( '<h2>%s</h2>', __( 'Login page', 'sky-login-redirect' ) ) )
         ->set_classes( 'babar' );
 
-    $fields[] = Field::make( 'image', 'slr_custom_logo', __( 'Login logo', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'image', 'slr_custom_logo', __( 'Login logo', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_value_type( 'url' );
 
-    $fields[] = Field::make( 'color', 'slr_page_background_color', __( 'Background color', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_page_background_color', __( 'Background color', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_default_value( '#f0f0f1' );
 
-    $fields[] = Field::make( 'image', 'slr_page_background_image', __( 'Background image', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'image', 'slr_page_background_image', __( 'Background image', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_value_type( 'url' );
 
-    $fields[] = Field::make( 'html', 'customizer_form' )
+    $fields[] = make_field( 'html', 'customizer_form' )
         ->set_html( sprintf( '<h2>%s</h2>', __( 'Login form', 'sky-login-redirect' ) ) );
 
-    $fields[] = Field::make( 'color', 'slr_form_background_color', __( 'Background color', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_form_background_color', __( 'Background color', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_default_value( '#ffffff' );
 
-    $fields[] = Field::make( 'image', 'slr_form_background_image', __( 'Background image', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'image', 'slr_form_background_image', __( 'Background image', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_value_type( 'url' );
 
-    $fields[] = Field::make( 'color', 'slr_form_labels_color', __( 'Labels color', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_form_labels_color', __( 'Labels color', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_default_value( '#3c434a' );
 
-    $fields[] = Field::make( 'color', 'slr_form_nav_color', __( 'Navigation links color', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_form_nav_color', __( 'Navigation links color', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_default_value( '#50575e' );
 
-    $fields[] = Field::make( 'color', 'slr_form_backtoblog_color', __( 'Back to blog link color', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_form_backtoblog_color', __( 'Back to blog link color', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_default_value( '#50575e' );
 
-    $fields[] = Field::make( 'color', 'slr_form_privacy_color', __( 'Privacy page link color', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_form_privacy_color', __( 'Privacy page link color', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_default_value( '#50575e' );
 
-    $fields[] = Field::make( 'html', 'customizer_submit' )
+    $fields[] = make_field( 'html', 'customizer_submit' )
         ->set_html( sprintf( '<h2>%s</h2>', __( 'Login button', 'sky-login-redirect' ) ) );
 
-    $fields[] = Field::make( 'color', 'slr_form_submit_background_color', __( 'Background color', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_form_submit_background_color', __( 'Background color', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_default_value( '#2271b1' );
 
-    $fields[] = Field::make( 'color', 'slr_form_submit_background_color_hover', __( 'Background color (hover)', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_form_submit_background_color_hover', __( 'Background color (hover)', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_default_value( '#135e96' );
 
-    $fields[] = Field::make( 'color', 'slr_form_submit_border_color', __( 'Border color', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_form_submit_border_color', __( 'Border color', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_default_value( '#2271b1' );
 
-    $fields[] = Field::make( 'text', 'slr_form_submit_radius', __( 'Border radius (px)', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'text', 'slr_form_submit_radius', __( 'Border radius (px)', 'sky-login-redirect' ) )
         ->set_classes( 'indent inline-flex' )
         ->set_attribute( 'type', 'number' )
         ->set_attribute( 'min', 0 )
         ->set_attribute( 'max', 50 )
         ->set_attribute( 'step', 1 );
 
-    $fields[] = Field::make( 'text', 'slr_form_submit_border_width', __( 'Border width (px)', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'text', 'slr_form_submit_border_width', __( 'Border width (px)', 'sky-login-redirect' ) )
         ->set_classes( 'indent inline-flex' )
         ->set_attribute( 'type', 'number' )
         ->set_attribute( 'min', 0 )
         ->set_attribute( 'max', 50 )
         ->set_attribute( 'step', 0.1 );
 
-    $fields[] = Field::make( 'color', 'slr_form_submit_text_color', __( 'Text color', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_form_submit_text_color', __( 'Text color', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_default_value( '#ffffff' );
 
-    $fields[] = Field::make( 'color', 'slr_form_submit_text_color_hover', __( 'Text color (hover)', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_form_submit_text_color_hover', __( 'Text color (hover)', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_default_value( '#ffffff' );
 
-    $fields[] = Field::make( 'select', 'slr_form_submit_align', __( 'Alignment', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'select', 'slr_form_submit_align', __( 'Alignment', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_width( 50 )
         ->set_options(
             [ 'default' => __( 'default', 'sky-login-redirect' ), 'end' => __( 'end', 'sky-login-redirect' ), 'start' => __( 'start', 'sky-login-redirect' ), 'center' => __( 'center', 'sky-login-redirect' ) ]
         );
 
-    $fields[] = Field::make( 'select', 'slr_form_submit_size', __( 'Button size', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'select', 'slr_form_submit_size', __( 'Button size', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_options(
             [ '' => 'default', 'custom' => 'custom', 'full-width' => 'full-width' ]
         );
 
-    $fields[] = Field::make( 'text', 'slr_form_submit_size_width', __( 'Custom width (px)', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'text', 'slr_form_submit_size_width', __( 'Custom width (px)', 'sky-login-redirect' ) )
         ->set_classes( 'indent inline-flex' )
         ->set_attribute( 'type', 'number' )
         ->set_attribute( 'min', 65 )
@@ -1015,7 +1033,7 @@ function options_customizer_tab_theme_fields() {
             [ [ 'field' => 'slr_form_submit_size', 'value' => 'custom' ] ]
         );
 
-    $fields[] = Field::make( 'text', 'slr_form_submit_size_height', __( 'Custom height (px)', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'text', 'slr_form_submit_size_height', __( 'Custom height (px)', 'sky-login-redirect' ) )
         ->set_classes( 'indent inline-flex' )
         ->set_attribute( 'type', 'number' )
         ->set_attribute( 'min', 10 )
@@ -1078,19 +1096,16 @@ function options_plugins_tab_theme_fields() {
         $class                     = $classy;
     }
 
-    $fields[] = Field::make( 'html', 'utopique_plugins' )
+    $fields[] = make_field( 'html', 'utopique_plugins' )
         ->set_html(
-            sprintf(
-                '<h2 class="security-title">%s</h2>',
-                __( 'Utopique Plugins', 'sky-login-redirect' )
-            )
-            . '<div id="security-grid"><div class="security-block"><a href="https://wordpress.org/plugins/better-comments/" rel="noopener" target="_blank"><img src="'
-            . esc_url( plugins_url( 'banners/better-comments.png', __DIR__ ) )
-            . '" class="alignleft security" /></a><a href="https://wordpress.org/plugins/better-comments/" rel="noopener" target="_blank">Better Comments</a> is a great tool to help you style and customize your comment form and your comments section, in just a few clicks. It saves you from having to meddle with your child theme\'s CSS, just select the options you need and you\'re all set. <span class="plugin-installed ' . $class . '">'
-            . $better_comments_installed . '</span></div></div>'
+            '<section class="slr-plugins-panel">'
+            . '<div class="slr-plugins-heading"><h2>' . esc_html__( 'Our plugins', 'sky-login-redirect' ) . '</h2>'
+            . '<p>' . esc_html__( 'Discover more WordPress tools from SkyMinds.', 'sky-login-redirect' ) . '</p></div>'
+            . '<div id="slr-plugins-grid" class="slr-plugin-grid" aria-live="polite"></div>'
+            . '</section>'
         );
 
-    $fields[] = Field::make( 'html', 'ithemes_security' )
+    $fields[] = make_field( 'html', 'ithemes_security' )
         ->set_html(
             sprintf( '<h2 class="security-title">%s</h2>', __( 'Login security plugins', 'sky-login-redirect' ) )
             . '<div id="security-grid"><div class="security-block"><a href="https://wordpress.org/plugins/block-bad-queries/" rel="noopener" target="_blank"><img src="'
@@ -1124,10 +1139,10 @@ function options_restrict_tab_theme_fields() {
     $post_types = get_post_types( $args, $output, $operator );
 
     if ( $post_types ) { // If there are any custom public post types.
-        $fields[] = Field::make( 'html', 'sky_restrict_on_cpt' )
+        $fields[] = make_field( 'html', 'sky_restrict_on_cpt' )
                                 ->set_html( sprintf( '<h2>%s</h2>', __( 'Restrict content', 'sky-login-redirect' ) ) );
 
-        $fields[] = Field::make( 'html', 'slr_restrict_p' )
+        $fields[] = make_field( 'html', 'slr_restrict_p' )
                                 ->set_html(
                                     sprintf(
                                         '<p class="widgets platinum">%s<p><p class="widgets platinum">%s<p>',
@@ -1147,7 +1162,7 @@ function options_restrict_tab_theme_fields() {
         $maroilles = sprintf( '<span class="more-rules"><a href="%s">%s</a></span>', SLR_FS()->get_upgrade_url(), __( 'Upgrade for more rules.', 'sky-login-redirect' ) );
         $maroilles = apply_filters( 'maroilles', $maroilles );
         // create a new rule complex field
-        $fields[] = Field::make( 'complex', 'slr_xrestrict', __( 'Create a new rule:', 'sky-login-redirect' ) )
+        $fields[] = make_field( 'complex', 'slr_xrestrict', __( 'Create a new rule:', 'sky-login-redirect' ) )
             ->set_max( $bistoule )
             ->set_help_text( __( 'Click on [+] to add a new rule. Reorder rules via drag and drop.', 'sky-login-redirect' ) . ' ' . $maroilles )
             ->set_classes( 'platinum' )
@@ -1157,7 +1172,7 @@ function options_restrict_tab_theme_fields() {
                     // rule name?
 
                     // restrict content association field (replaces multiselect)
-                    Field::make( 'association', 'slr_xcpt_restrict', __( 'Content to restrict:', 'sky-login-redirect' ) )
+                    make_field( 'association', 'slr_xcpt_restrict', __( 'Content to restrict:', 'sky-login-redirect' ) )
                         ->set_types(
 							[
 								[
@@ -1175,11 +1190,11 @@ function options_restrict_tab_theme_fields() {
 						),
 
                     // restrict for $categories
-                    Field::make( 'select', 'slr_xselect_restrict', __( 'Restrict for:', 'sky-login-redirect' ) )
+                    make_field( 'select', 'slr_xselect_restrict', __( 'Restrict for:', 'sky-login-redirect' ) )
                         ->set_options( $categories ),
 
                     // USER association field for restriction (replaces multiselect)
-                    Field::make( 'association', 'slr_xuser_restrict', __( 'User(s):', 'sky-login-redirect' ) )
+                    make_field( 'association', 'slr_xuser_restrict', __( 'User(s):', 'sky-login-redirect' ) )
                         ->set_types(
 							[
 								[
@@ -1195,7 +1210,7 @@ function options_restrict_tab_theme_fields() {
                         ),
 
                     // ROLE multiselect
-                    Field::make( 'multiselect', 'slr_xrole_restrict', __( 'Role(s):', 'sky-login-redirect' ) )
+                    make_field( 'multiselect', 'slr_xrole_restrict', __( 'Role(s):', 'sky-login-redirect' ) )
                         ->add_options(
                             function () {
                                 global $wp_roles;
@@ -1208,14 +1223,14 @@ function options_restrict_tab_theme_fields() {
                         ),
 
                     // Message to display
-                    Field::make( 'textarea', 'slr_restrict_message', __( 'Custom message', 'sky-login-redirect' ) ),
+                    make_field( 'textarea', 'slr_restrict_message', __( 'Custom message', 'sky-login-redirect' ) ),
                                             /*
                                             // Login redirect type
-                                            Field::make( 'select', 'slr_xselect_login_restrict', __( 'Redirect login to:', 'sky-login-redirect' ) )
+                                            make_field( 'select', 'slr_xselect_login_restrict', __( 'Redirect login to:', 'sky-login-redirect' ) )
                                             ->set_options( $redirects ),
 
                                             // LOGIN URL for all types
-                                            Field::make( 'text', 'slr_xlogin_url_restrict', __( 'Redirect login to:', 'sky-login-redirect' ) )
+                                            make_field( 'text', 'slr_xlogin_url_restrict', __( 'Redirect login to:', 'sky-login-redirect' ) )
                                             ->set_help_text( __( 'Redirect to this URL after a successful login.', 'sky-login-redirect' ) )
                                             ->set_attribute( 'placeholder', 'https://' )
                                             ->set_attribute( 'type', 'url' )
@@ -1226,11 +1241,11 @@ function options_restrict_tab_theme_fields() {
 
                                             /*
                                             // Logout redirect type
-                                            Field::make( 'select', 'slr_xselect_logout_restrict', __( 'Redirect logout to:', 'sky-login-redirect' ) )
+                                            make_field( 'select', 'slr_xselect_logout_restrict', __( 'Redirect logout to:', 'sky-login-redirect' ) )
                                             ->set_options( $redirects ),
 
                                             // LOGOUT URL for all types
-                                            Field::make( 'text', 'slr_xlogout_url_restrict', __( 'Redirect logout to:', 'sky-login-redirect' ) )
+                                            make_field( 'text', 'slr_xlogout_url_restrict', __( 'Redirect logout to:', 'sky-login-redirect' ) )
                                             ->set_help_text( __( 'Redirect to this URL after a successful logout.', 'sky-login-redirect' ) )
                                             ->set_attribute( 'placeholder', 'https://' )
                                             ->set_attribute( 'type', 'url' )
@@ -1248,11 +1263,11 @@ function options_restrict_tab_theme_fields() {
         foreach ( $post_types  as $post_type ) {
         $name = strtolower( $post_type->name );
         $Name = ucfirst( $name );
-        $fields[] = Field::make( 'checkbox', 'slr_restrict_on_' . $name, sprintf( __( 'Restrict content on %s', 'sky-login-redirect' ), $Name.'s' ) )
+        $fields[] = make_field( 'checkbox', 'slr_restrict_on_' . $name, sprintf( __( 'Restrict content on %s', 'sky-login-redirect' ), $Name.'s' ) )
         ->set_classes( 'slider-checkbox platinum' )
         ->set_option_value( 'yes' );
 
-        $fields[] = Field::make( 'select', 'slr_restrict_type_on_' . $name, __( 'Type', 'sky-login-redirect' ) )
+        $fields[] = make_field( 'select', 'slr_restrict_type_on_' . $name, __( 'Type', 'sky-login-redirect' ) )
         ->set_classes( 'indent inline-flex' )
         ->set_width( 50 )
         ->set_options( [ 'include' => __( 'include', 'sky-login-redirect' ), 'exclude' => __( 'exclude', 'sky-login-redirect' ) ])
@@ -1263,7 +1278,7 @@ function options_restrict_tab_theme_fields() {
         */
     }
 
-    $fields[] = Field::make( 'html', 'restrict_upsell' )
+    $fields[] = make_field( 'html', 'restrict_upsell' )
         ->set_html( sprintf( '<div class="upselly platinum"><div id="buy"><a class="button" href="%s">%s</a></div></div>', SLR_FS()->get_upgrade_url(), __( 'Upgrade your plan', 'sky-login-redirect' ) ) );
 
     return $fields;
@@ -1285,14 +1300,14 @@ function options_modal_tab_theme_fields() {
 
     // modal
 
-    $fields[] = Field::make( 'html', 'slr_modal_login' )
+    $fields[] = make_field( 'html', 'slr_modal_login' )
         ->set_html( sprintf( '<h2>%s</h2>', __( 'Modal login', 'sky-login-redirect' ) ) );
 
-    $fields[] = Field::make( 'checkbox', 'slr_modal_login_enable', __( 'Enable modal login link', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'checkbox', 'slr_modal_login_enable', __( 'Enable modal login link', 'sky-login-redirect' ) )
         ->set_classes( 'slider-checkbox platinum' )
         ->set_option_value( 'yes' );
 
-    $fields[] = Field::make( 'html', 'slr_modal_login_p' )
+    $fields[] = make_field( 'html', 'slr_modal_login_p' )
         ->set_html(
             sprintf(
                 '<p class="widgets platinum">%s<p>',
@@ -1302,25 +1317,25 @@ function options_modal_tab_theme_fields() {
 
     // modal customizer
 
-    $fields[] = Field::make( 'html', 'modal_login_customizer_h2' )
+    $fields[] = make_field( 'html', 'modal_login_customizer_h2' )
         ->set_html( sprintf( '<h2>%s</h2>', __( 'Modal login form customizer', 'sky-login-redirect' ) ) );
 
-    $fields[] = Field::make( 'checkbox', 'slr_modal_login_customizer', __( 'Customize modal login form', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'checkbox', 'slr_modal_login_customizer', __( 'Customize modal login form', 'sky-login-redirect' ) )
         ->set_classes( 'slider-checkbox platinum' )
         ->set_option_value( 'yes' );
 
-    $fields[] = Field::make( 'html', 'modal_login_form' )
+    $fields[] = make_field( 'html', 'modal_login_form' )
         ->set_html(
             sprintf( '<h3 class="separator">%s</h3>', __( 'Login form', 'sky-login-redirect' ) )
         );
 
-    $fields[] = Field::make( 'color', 'slr_modal_login_form_color', __( 'Background color', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_modal_login_form_color', __( 'Background color', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_conditional_logic(
             [ [ 'field' => 'slr_modal_login_customizer', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'text', 'slr_modal_login_form_radius', __( 'Border radius (px)', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'text', 'slr_modal_login_form_radius', __( 'Border radius (px)', 'sky-login-redirect' ) )
         ->set_classes( 'indent inline-flex' )
         ->set_attribute( 'type', 'number' )
         ->set_attribute( 'min', 0 )
@@ -1330,7 +1345,7 @@ function options_modal_tab_theme_fields() {
             [ [ 'field' => 'slr_modal_login_customizer', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'text', 'slr_modal_login_form_padding', __( 'Padding (px)', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'text', 'slr_modal_login_form_padding', __( 'Padding (px)', 'sky-login-redirect' ) )
         ->set_classes( 'indent inline-flex' )
         ->set_attribute( 'type', 'number' )
         ->set_attribute( 'min', 0 )
@@ -1340,60 +1355,60 @@ function options_modal_tab_theme_fields() {
             [ [ 'field' => 'slr_modal_login_customizer', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'color', 'slr_modal_login_h1_color', __( 'Title color', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_modal_login_h1_color', __( 'Title color', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_conditional_logic(
             [ [ 'field' => 'slr_modal_login_customizer', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'color', 'slr_modal_login_labels_color', __( 'Labels color', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_modal_login_labels_color', __( 'Labels color', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_conditional_logic(
             [ [ 'field' => 'slr_modal_login_customizer', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'color', 'slr_modal_login_links_color', __( 'Links color', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_modal_login_links_color', __( 'Links color', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_conditional_logic(
             [ [ 'field' => 'slr_modal_login_customizer', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'html', 'modal_login_button' )
+    $fields[] = make_field( 'html', 'modal_login_button' )
         ->set_html(
             sprintf( '<h3 class="separator">%s</h3>', __( 'Login button', 'sky-login-redirect' ) )
         );
 
-    $fields[] = Field::make( 'color', 'slr_modal_login_button_background_color', __( 'Background color', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_modal_login_button_background_color', __( 'Background color', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_conditional_logic(
             [ [ 'field' => 'slr_modal_login_customizer', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'color', 'slr_modal_login_button_background_color_hover', __( 'Background color (hover)', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_modal_login_button_background_color_hover', __( 'Background color (hover)', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_conditional_logic(
             [ [ 'field' => 'slr_modal_login_customizer', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'color', 'slr_modal_login_button_text_color', __( 'Text color', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_modal_login_button_text_color', __( 'Text color', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_conditional_logic(
             [ [ 'field' => 'slr_modal_login_customizer', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'color', 'slr_modal_login_button_text_color_hover', __( 'Text color (hover)', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_modal_login_button_text_color_hover', __( 'Text color (hover)', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_conditional_logic(
             [ [ 'field' => 'slr_modal_login_customizer', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'color', 'slr_modal_login_button_border_color', __( 'Border color', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_modal_login_button_border_color', __( 'Border color', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_conditional_logic(
             [ [ 'field' => 'slr_modal_login_customizer', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'text', 'slr_modal_login_button_radius', __( 'Border radius (px)', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'text', 'slr_modal_login_button_radius', __( 'Border radius (px)', 'sky-login-redirect' ) )
         ->set_classes( 'indent inline-flex' )
         ->set_attribute( 'type', 'number' )
         ->set_attribute( 'min', 0 )
@@ -1405,51 +1420,51 @@ function options_modal_tab_theme_fields() {
 
     // modal login/logout button
 
-    $fields[] = Field::make( 'html', 'slr_modal_loginout_button' )
+    $fields[] = make_field( 'html', 'slr_modal_loginout_button' )
         ->set_html(
             sprintf( '<h2>%s</h2>', __( 'Modal login/logout button', 'sky-login-redirect' ) )
         );
 
-    $fields[] = Field::make( 'html', 'slr_modal_loginout_button_p' )
+    $fields[] = make_field( 'html', 'slr_modal_loginout_button_p' )
         ->set_html(
             sprintf( '<p class="widgets platinum">%s<p>', __( 'This setting turns the login/logout link into a button in content only (i.e. menu links are not targeted).', 'sky-login-redirect' ) )
         );
 
-    $fields[] = Field::make( 'checkbox', 'slr_modal_loginout_button_enable', __( 'Turn modal login/logout into a button', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'checkbox', 'slr_modal_loginout_button_enable', __( 'Turn modal login/logout into a button', 'sky-login-redirect' ) )
         ->set_classes( 'slider-checkbox platinum' )
         ->set_option_value( 'yes' );
 
-    $fields[] = Field::make( 'color', 'slr_modal_loginout_bg', __( 'Background color', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_modal_loginout_bg', __( 'Background color', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_conditional_logic(
             [ [ 'field' => 'slr_modal_loginout_button_enable', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'color', 'slr_modal_loginout_bg_hover', __( 'Background color (hover)', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_modal_loginout_bg_hover', __( 'Background color (hover)', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_conditional_logic(
             [ [ 'field' => 'slr_modal_loginout_button_enable', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'color', 'slr_modal_loginout_color', __( 'Text color', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_modal_loginout_color', __( 'Text color', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_conditional_logic(
             [ [ 'field' => 'slr_modal_loginout_button_enable', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'color', 'slr_modal_loginout_color_hover', __( 'Text color (hover)', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_modal_loginout_color_hover', __( 'Text color (hover)', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_conditional_logic(
             [ [ 'field' => 'slr_modal_loginout_button_enable', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'color', 'slr_modal_loginout_border_color', __( 'Border color', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'color', 'slr_modal_loginout_border_color', __( 'Border color', 'sky-login-redirect' ) )
         ->set_classes( 'indent' )
         ->set_conditional_logic(
             [ [ 'field' => 'slr_modal_loginout_button_enable', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'text', 'slr_modal_loginout_radius', __( 'Border radius (px)', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'text', 'slr_modal_loginout_radius', __( 'Border radius (px)', 'sky-login-redirect' ) )
         ->set_classes( 'indent inline-flex' )
         ->set_attribute( 'type', 'number' )
         ->set_attribute( 'min', 0 )
@@ -1459,13 +1474,13 @@ function options_modal_tab_theme_fields() {
             [ [ 'field' => 'slr_modal_loginout_button_enable', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'text', 'slr_modal_loginout_padding', __( 'Padding (px)', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'text', 'slr_modal_loginout_padding', __( 'Padding (px)', 'sky-login-redirect' ) )
         ->set_classes( 'indent inline-flex w132' )
         ->set_conditional_logic(
             [ [ 'field' => 'slr_modal_loginout_button_enable', 'value' => true ] ]
         );
 
-    $fields[] = Field::make( 'select', 'slr_modal_loginout_align', __( 'Alignment', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'select', 'slr_modal_loginout_align', __( 'Alignment', 'sky-login-redirect' ) )
         ->set_classes( 'indent inline-flex' )
         ->set_width( 50 )
         ->set_options(
@@ -1477,18 +1492,18 @@ function options_modal_tab_theme_fields() {
 
     // align
     /*
-    $fields[] = Field::make( 'select', 'slr_modal_login_button_align', __( 'Alignment', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'select', 'slr_modal_login_button_align', __( 'Alignment', 'sky-login-redirect' ) )
     ->set_classes( 'indent' )
     ->set_width( 50 )
     ->set_options( [ 'default' => __( 'default', 'sky-login-redirect' ), 'align-right' => __( 'right', 'sky-login-redirect' ), 'align-left' => __( 'left', 'sky-login-redirect' ), 'align-center' => __( 'center', 'sky-login-redirect' ) ])
     ->set_conditional_logic( [ [ 'field' => 'slr_modal_login_customizer', 'value' => true ] ] );
 
-    $fields[] = Field::make( 'select', 'slr_modal_login_button_size', __( 'Button size', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'select', 'slr_modal_login_button_size', __( 'Button size', 'sky-login-redirect' ) )
     ->set_classes( 'indent' )
     ->set_options( [ '' => 'default', 'custom' => 'custom', 'full-width' => 'full-width'])
     ->set_conditional_logic( [ [ 'field' => 'slr_modal_login_customizer', 'value' => true ] ] );
 
-    $fields[] = Field::make( 'text', 'slr_modal_login_button_width', __( 'Custom width (px)', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'text', 'slr_modal_login_button_width', __( 'Custom width (px)', 'sky-login-redirect' ) )
     ->set_classes( 'indent inline-flex' )
     ->set_attribute( 'type', 'number' )
     ->set_attribute( 'min', 110 )
@@ -1496,7 +1511,7 @@ function options_modal_tab_theme_fields() {
     ->set_attribute( 'step', 1 )
     ->set_conditional_logic( [ [ 'field' => 'slr_modal_login_button_size', 'value' => 'custom' ] ] );
 
-    $fields[] = Field::make( 'text', 'slr_modal_login_button_height', __( 'Custom height (px)', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'text', 'slr_modal_login_button_height', __( 'Custom height (px)', 'sky-login-redirect' ) )
     ->set_classes( 'indent inline-flex' )
     ->set_attribute( 'type', 'number' )
     ->set_attribute( 'min', 10 )
@@ -1505,7 +1520,7 @@ function options_modal_tab_theme_fields() {
     ->set_conditional_logic( [ [ 'field' => 'slr_modal_login_button_size', 'value' => 'custom' ] ] );
     */
 
-    $fields[] = Field::make( 'html', 'modal_upsell' )
+    $fields[] = make_field( 'html', 'modal_upsell' )
         ->set_html(
             sprintf( '<div class="upselly platinum"><div id="buy"><a class="button" href="%s">%s</a></div></div>', SLR_FS()->get_upgrade_url(), __( 'Upgrade your plan', 'sky-login-redirect' ) )
         );
@@ -1527,12 +1542,12 @@ add_filter(
 function options_blocks_tab_theme_fields() {
     $fields = [];
 
-    $fields[] = Field::make( 'html', 'slr_link_shortcode' )
+    $fields[] = make_field( 'html', 'slr_link_shortcode' )
         ->set_html(
             sprintf( '<h2>%s</h2>', __( 'Login/Logout link', 'sky-login-redirect' ) )
         );
 
-    $fields[] = Field::make( 'html', 'slr_link_shortcode_p' )
+    $fields[] = make_field( 'html', 'slr_link_shortcode_p' )
         ->set_html(
             sprintf( '<p class="widgets">%s<p>', __( 'Add a login/logout link with this shortcode:', 'sky-login-redirect' ) )
             . '<ul class="slr-shortcode"><li>'
@@ -1543,7 +1558,7 @@ function options_blocks_tab_theme_fields() {
 
     // premium
 
-    $fields[] = Field::make( 'html', 'slr_link_menu_h2' )
+    $fields[] = make_field( 'html', 'slr_link_menu_h2' )
         ->set_html(
             sprintf( '<h2>%s</h2>', __( 'Login/Logout link in menu(s)', 'sky-login-redirect' ) )
         );
@@ -1551,7 +1566,7 @@ function options_blocks_tab_theme_fields() {
     $menus = get_terms( 'nav_menu' );
 
     if ( empty( $menus ) ) {
-        $fields[] = Field::make( 'html', 'slr_link_menu_choice' )
+        $fields[] = make_field( 'html', 'slr_link_menu_choice' )
             ->set_html(
 				sprintf(
 					'<span class="widgets business">%s</span>',
@@ -1564,7 +1579,7 @@ function options_blocks_tab_theme_fields() {
 				)
 			);
     } else {
-        $fields[] = Field::make( 'html', 'slr_link_menu_choice' )
+        $fields[] = make_field( 'html', 'slr_link_menu_choice' )
             ->set_html(
                 sprintf( '<p class="widgets business">%s</p>', __( 'Select the menu(s) where to add the login/logout link.', 'sky-login-redirect' ) )
             );
@@ -1576,11 +1591,11 @@ function options_blocks_tab_theme_fields() {
     $link_types = [ 'plain' => 'plain link to login page', 'modal' => 'modal login form' ];
 
     foreach ( $menus as $key => $value ) {
-        $fields[] = Field::make( 'checkbox', 'slr_menu_id_' . $key, $value )
+        $fields[] = make_field( 'checkbox', 'slr_menu_id_' . $key, $value )
             ->set_classes( 'slider-checkbox business indent' )
             ->set_option_value( 'yes' );
 
-        $fields[] = Field::make( 'select', 'slr_menu_position_' . $key, __( 'Link position in menu', 'sky-login-redirect' ) )
+        $fields[] = make_field( 'select', 'slr_menu_position_' . $key, __( 'Link position in menu', 'sky-login-redirect' ) )
             ->add_options(
                 function () use ( $key ) {
                     // count nav menu items
@@ -1602,7 +1617,7 @@ function options_blocks_tab_theme_fields() {
             ->set_classes( 'indent business' )
             ->set_required( true );
 
-        $fields[] = Field::make( 'select', 'slr_link_type_' . $key, __( 'Link type', 'sky-login-redirect' ) )
+        $fields[] = make_field( 'select', 'slr_link_type_' . $key, __( 'Link type', 'sky-login-redirect' ) )
             ->add_options( $link_types )
             ->set_conditional_logic(
                 [ [ 'field' => 'slr_menu_id_' . $key, 'value' => true ] ]
@@ -1611,42 +1626,42 @@ function options_blocks_tab_theme_fields() {
             ->set_required( true );
 
         // Custom menu link class
-        $fields[] = Field::make( 'text', 'slr_link_class_' . $key, __( 'Link class', 'sky-login-redirect' ) )
+        $fields[] = make_field( 'text', 'slr_link_class_' . $key, __( 'Link class', 'sky-login-redirect' ) )
             ->set_classes( 'indent inline-flex business w264' )
             ->set_conditional_logic(
                 [ [ 'field' => 'slr_menu_id_' . $key, 'value' => true ] ]
             );
 
         // Custom login text
-        $fields[] = Field::make( 'text', 'slr_link_logintext_' . $key, __( 'Custom login text', 'sky-login-redirect' ) )
+        $fields[] = make_field( 'text', 'slr_link_logintext_' . $key, __( 'Custom login text', 'sky-login-redirect' ) )
             ->set_classes( 'indent inline-flex business w264' )
             ->set_conditional_logic(
                 [ [ 'field' => 'slr_menu_id_' . $key, 'value' => true ] ]
             );
 
         // Custom logout text
-        $fields[] = Field::make( 'text', 'slr_link_logouttext_' . $key, __( 'Custom logout text', 'sky-login-redirect' ) )
+        $fields[] = make_field( 'text', 'slr_link_logouttext_' . $key, __( 'Custom logout text', 'sky-login-redirect' ) )
             ->set_classes( 'indent inline-flex business w264' )
             ->set_conditional_logic(
                 [ [ 'field' => 'slr_menu_id_' . $key, 'value' => true ] ]
             );
 
         // text color
-        $fields[] = Field::make( 'color', 'slr_link_color_' . $key, __( 'Text color', 'sky-login-redirect' ) )
+        $fields[] = make_field( 'color', 'slr_link_color_' . $key, __( 'Text color', 'sky-login-redirect' ) )
             ->set_conditional_logic(
                 [ [ 'field' => 'slr_menu_id_' . $key, 'value' => true ] ]
             )
             ->set_classes( 'indent business' );
 
         // text color hover
-        $fields[] = Field::make( 'color', 'slr_link_hover_' . $key, __( 'Text color (hover)', 'sky-login-redirect' ) )
+        $fields[] = make_field( 'color', 'slr_link_hover_' . $key, __( 'Text color (hover)', 'sky-login-redirect' ) )
             ->set_conditional_logic(
                 [ [ 'field' => 'slr_menu_id_' . $key, 'value' => true ] ]
             )
             ->set_classes( 'indent business' );
 
         // font size
-        $fields[] = Field::make( 'text', 'slr_link_size_' . $key, __( 'Font size (px)', 'sky-login-redirect' ) )
+        $fields[] = make_field( 'text', 'slr_link_size_' . $key, __( 'Font size (px)', 'sky-login-redirect' ) )
             ->set_classes( 'indent inline-flex business' )
             ->set_attribute( 'type', 'number' )
             ->set_attribute( 'min', 8 )
@@ -1657,12 +1672,12 @@ function options_blocks_tab_theme_fields() {
             );
     } // endforeach
 
-    $fields[] = Field::make( 'html', 'slr_login_shortcode' )
+    $fields[] = make_field( 'html', 'slr_login_shortcode' )
         ->set_html(
             sprintf( '<h2>%s</h2>', __( 'Login form', 'sky-login-redirect' ) )
         );
 
-    $fields[] = Field::make( 'html', 'slr_login_shortcode_p' )
+    $fields[] = make_field( 'html', 'slr_login_shortcode_p' )
         ->set_html(
             sprintf( '<p class="widgets business">%s<p>', __( 'Add a login form in your post or page content with this shortcode:', 'sky-login-redirect' ) )
             . '<ul class="slr-shortcode business"><li>'
@@ -1673,16 +1688,16 @@ function options_blocks_tab_theme_fields() {
         );
 
     // custom blocks CSS
-    $fields[] = Field::make( 'html', 'slr_custom_css' )
+    $fields[] = make_field( 'html', 'slr_custom_css' )
         ->set_html(
             sprintf( '<h2>%s</h2>', __( 'Custom blocks CSS', 'sky-login-redirect' ) )
         );
 
-    $fields[] = Field::make( 'textarea', 'slr_custom_css_blocks', __( 'Custom CSS', 'sky-login-redirect' ) )
+    $fields[] = make_field( 'textarea', 'slr_custom_css_blocks', __( 'Custom CSS', 'sky-login-redirect' ) )
         ->set_classes( 'indent-grid business codemirror-css' );
 
     // upsell
-    $fields[] = Field::make( 'html', 'widgets_upsell' )
+    $fields[] = make_field( 'html', 'widgets_upsell' )
         ->set_html(
             sprintf(
                 '<div class="upselly business"><div id="buy"><a class="button" href="%s">%s</a></div></div>',
@@ -1702,7 +1717,7 @@ add_filter(
 /**
  * Count menu items
  *
- * @param mixed $key key
+ * @param mixed $key Menu identifier.
  *
  * @return array
  */
@@ -1807,9 +1822,9 @@ add_action( 'carbon_fields_register_fields',  __NAMESPACE__ . '\\slr_gutenberg_b
 function register_gutenberg_block(){
     Block::make( __( 'My Shiny Gutenberg Block' ) )
         ->add_fields( array(
-    Field::make( 'text', 'heading', __( 'Block Heading' ) ),
-    Field::make( 'image', 'image', __( 'Block Image' ) ),
-    Field::make( 'rich_text', 'content', __( 'Block Content' ) ),
+    make_field( 'text', 'heading', __( 'Block Heading' ) ),
+    make_field( 'image', 'image', __( 'Block Image' ) ),
+    make_field( 'rich_text', 'content', __( 'Block Content' ) ),
     ) )
         ->set_render_callback( function ( $fields, $attributes, $inner_blocks ) {
         ?>

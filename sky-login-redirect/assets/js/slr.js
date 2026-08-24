@@ -340,3 +340,83 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
+
+(function () {
+  function renderCatalog(catalog) {
+    var plugins = Array.isArray(catalog) ? catalog : (catalog && catalog.plugins);
+    var grid = document.getElementById('slr-plugins-grid');
+    if (!grid || !Array.isArray(plugins)) {
+      return;
+    }
+
+    plugins = plugins.filter(function (plugin) {
+      return plugin && plugin.slug !== 'sky-login-redirect';
+    });
+    grid.innerHTML = '';
+
+    plugins.forEach(function (plugin) {
+      var name = plugin.name || plugin.title || '';
+      var description = plugin.description || plugin.body || '';
+      var pluginUrl = plugin.url || '#';
+      var installUrl = pluginUrl;
+      var catalogInstallUrl = SLRPlugins.installUrl || '';
+      if (plugin.install_slug && catalogInstallUrl) {
+        installUrl = catalogInstallUrl.replace(
+          /([?&])s=[^&]*/,
+          '$1s=' + encodeURIComponent(plugin.install_slug)
+        );
+      }
+
+      var block = document.createElement('article');
+      block.className = 'slr-plugin-card';
+      var imageLink = document.createElement('a');
+      imageLink.href = pluginUrl;
+      imageLink.target = '_blank';
+      imageLink.rel = 'noopener';
+      var image = document.createElement('img');
+      image.className = 'slr-plugin-image';
+      image.alt = name;
+      image.src = plugin.icon || '';
+      image.addEventListener('error', function () {
+        imageLink.remove();
+      });
+      imageLink.appendChild(image);
+
+      var body = document.createElement('div');
+      body.className = 'slr-plugin-body';
+      var title = document.createElement('strong');
+      var titleLink = document.createElement('a');
+      titleLink.href = pluginUrl;
+      titleLink.target = '_blank';
+      titleLink.rel = 'noopener';
+      titleLink.textContent = name;
+      title.appendChild(titleLink);
+      var copy = document.createElement('p');
+      copy.textContent = description;
+      body.appendChild(title);
+      body.appendChild(copy);
+
+      var action = document.createElement('a');
+      action.className = 'button button-primary';
+      action.href = installUrl;
+      action.textContent = plugin.cta || SLRPlugins.installText || 'Install';
+
+      block.appendChild(imageLink);
+      block.appendChild(body);
+      block.appendChild(action);
+      grid.appendChild(block);
+    });
+  }
+
+  function loadCatalog() {
+    if (typeof SLRPlugins === 'undefined' || !SLRPlugins.catalogUrl) {
+      return;
+    }
+    fetch(SLRPlugins.catalogUrl, { credentials: 'same-origin' })
+      .then(function (response) { return response.ok ? response.json() : null; })
+      .then(renderCatalog)
+      .catch(function () {});
+  }
+
+  document.addEventListener('DOMContentLoaded', loadCatalog);
+}());

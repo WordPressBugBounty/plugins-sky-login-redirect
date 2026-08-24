@@ -1,9 +1,11 @@
 /.git
+/.gitattributes
 /.gitignore
 /.DS_Store
 **/.DS_Store
 /.distignore
 /.editorconfig
+/eslint.config.js
 /.eslintrc.json
 /.vscode
 /.wordpress-org

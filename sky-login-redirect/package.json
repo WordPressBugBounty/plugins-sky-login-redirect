@@ -5,14 +5,19 @@
     "env:start": "wp-env start",
     "env:stop": "wp-env stop",
     "test:e2e": "playwright test",
-    "test:e2e:headed": "playwright test --headed"
+    "test:e2e:headed": "playwright test --headed",
+    "lint": "eslint assets/js/slr-local-tracker.js tests/e2e/*.js playwright.config.js"
   },
   "devDependencies": {
     "@playwright/test": "^1.55.0",
-    "@wordpress/env": "^11.11.0"
+    "@wordpress/env": "^11.11.0",
+    "eslint": "10.8.1"
   },
   "overrides": {
     "adm-zip": "0.6.0",
-    "brace-expansion": "5.0.8"
+    "brace-expansion": "5.0.9",
+    "fast-uri": "3.1.5",
+    "js-yaml": "3.15.1",
+    "minimatch": "10.2.6"
   }
 }

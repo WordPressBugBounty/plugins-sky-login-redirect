@@ -1,0 +1,85 @@
+{
+    "schema_version": "1.0",
+    "catalog_version": "2026-08-10",
+    "publisher": "SkyMinds",
+    "author": "skyminds",
+    "plugins": [
+        {
+            "slug": "flashspeed",
+            "name": "FlashSpeed",
+            "description": "Remove WordPress bloat before it reaches visitors. FlashSpeed lets you disable unused scripts, styles, discovery links, and optional features one switch at a time—without replacing your cache plugin.",
+            "url": "https://wordpress.org/plugins/flashspeed/",
+            "install_slug": "flashspeed",
+            "repo": "https://github.com/skyminds/flashspeed",
+            "icon": "https://ps.w.org/flashspeed/assets/icon.svg",
+            "banner": "https://ps.w.org/flashspeed/assets/banner-772x250.jpg",
+            "cta": "Install free"
+        },
+        {
+            "slug": "salesaver",
+            "name": "SaleSaver",
+            "description": "Recover failed WooCommerce orders before they become lost revenue. SaleSaver sends branded follow-up emails, prevents duplicate messages, tracks recovery, and keeps unsubscribe handling built in.",
+            "url": "https://wordpress.org/plugins/salesaver/",
+            "install_slug": "salesaver",
+            "repo": "https://github.com/skyminds/failed-order-recovery",
+            "icon": "https://ps.w.org/salesaver/assets/icon.svg",
+            "banner": "https://ps.w.org/salesaver/assets/banner-772x250.png",
+            "cta": "Install free"
+        },
+        {
+            "slug": "sitemapster",
+            "name": "Sitemapster",
+            "description": "Give search engines a clean, cached map of your posts, pages, and images. Sitemapster creates local XML sitemaps with pagination and independent controls—without a heavyweight SEO suite.",
+            "url": "https://wordpress.org/plugins/sitemapster/",
+            "install_slug": "sitemapster",
+            "repo": "https://github.com/skyminds/sitemapster",
+            "icon": "https://ps.w.org/sitemapster/assets/icon.svg",
+            "banner": "https://ps.w.org/sitemapster/assets/banner-772x250.png",
+            "cta": "Install free"
+        },
+        {
+            "slug": "sky-changelog-notifier",
+            "name": "Sky Changelog Notifier",
+            "description": "Know what changed after every automatic update. Sky Changelog Notifier adds the relevant plugin or theme changelog to WordPress update emails, so maintenance decisions take minutes—not detective work.",
+            "url": "https://wordpress.org/plugins/sky-changelog-notifier/",
+            "install_slug": "sky-changelog-notifier",
+            "repo": "https://github.com/skyminds/changelogs-notifier",
+            "icon": "https://ps.w.org/sky-changelog-notifier/assets/icon.svg",
+            "banner": "https://ps.w.org/sky-changelog-notifier/assets/banner-772x250.png",
+            "cta": "Install free"
+        },
+        {
+            "slug": "sky-login-redirect",
+            "name": "Sky Login Redirect",
+            "description": "Send every user to the right place after login or logout. Sky Login Redirect handles roles, individual users, WooCommerce flows, previous-page returns, and loop protection without custom code.",
+            "url": "https://wordpress.org/plugins/sky-login-redirect/",
+            "install_slug": "sky-login-redirect",
+            "repo": "https://github.com/skyminds/sky-login-redirect",
+            "icon": "https://ps.w.org/sky-login-redirect/assets/icon-256x256.png",
+            "banner": "https://ps.w.org/sky-login-redirect/assets/banner-772x250.png",
+            "cta": "Install free"
+        },
+        {
+            "slug": "spamjam",
+            "name": "SpamJam",
+            "description": "Stop automated comment and registration spam without CAPTCHAs. SpamJam adds layered, on-site protection with no puzzles for real visitors and no remote spam-scoring dependency.",
+            "url": "https://wordpress.org/plugins/spamjam/",
+            "install_slug": "spamjam",
+            "repo": "https://github.com/skyminds/spamjam",
+            "icon": "https://ps.w.org/spamjam/assets/icon-256x256.png",
+            "banner": "https://ps.w.org/spamjam/assets/banner-772x250.png",
+            "cta": "Install free"
+        },
+        {
+            "slug": "typo-hunter",
+            "name": "Typo Reporter",
+            "description": "Turn readers into proofreading partners. Typo Reporter lets visitors flag a typo in seconds and gives you a focused WordPress queue with the original text, suggestion, post, and URL.",
+            "url": "https://wordpress.org/plugins/typo-hunter/",
+            "install_slug": "typo-hunter",
+            "repo": "https://github.com/skyminds/typo-hunter",
+            "icon": "https://ps.w.org/typo-hunter/assets/icon-300x300.svg",
+            "banner": "https://ps.w.org/typo-hunter/assets/banner-772x250.jpg",
+            "cta": "Install free"
+        }
+    ]
+}

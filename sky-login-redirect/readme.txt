@@ -3,9 +3,9 @@ Contributors: skyminds
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DNSC3NVBWR66L
 Tags: login redirect, logout redirect, custom login, woocommerce login, login customizer, user redirect, role redirect, login page, redirect users, membership
 Requires at least: 5.6
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 4.2.7
+Stable tag: 4.2.8
 License: GPLv3 or later
 
 Control where users land after login/logout. Redirect by role, user, or previous page. Includes a powerful login customizer and WooCommerce support.
@@ -174,6 +174,13 @@ Free support is available through the [WordPress.org support forum](https://word
 
 == Changelog ==
 
+= 4.2.8 - 2026-08-23 =
+*   Compatibility - Tested with WordPress 7.1 and PHP 8.5.
+*   Performance - Consolidated prior-page tracking and login-form injection into one conditional frontend asset, removed obsolete assets, and gated unused premium frontend hooks.
+*   Security - Made modal login rate-limit updates concurrency-safe and preserved stricter security headers supplied by hosts or other plugins.
+*   Development - Patched vulnerable development tooling, locked ESLint, removed an unused runtime dependency, and restored release-package checks after moving helper scripts to `dev/`.
+*   Fix - Current-page redirects now work when `filter_input()` cannot read `REQUEST_URI`, including WP-CLI server environments.
+
 = 4.2.7 - 2026-07-27 =
 *   Fix - Prevented a fatal error during logout caused by an incorrect `wp_logout` callback signature.
 *   Development - Added real WordPress integration and browser authentication test layers.
@@ -209,6 +216,9 @@ Free support is available through the [WordPress.org support forum](https://word
 Older versions changes can be found in [the changelog](https://utopique.net/products/sky-login-redirect-premium/#changelog "Sky Login Redirect changelog")
 
 == Upgrade Notice ==
+
+= 4.2.8 =
+**WordPress 7.1 compatibility and hardening update.** Reduces frontend work, strengthens modal rate limiting and security-header interoperability, and fixes current-page redirects in additional server environments.
 
 = 4.2.7 =
 **Reliability and testing update.** Fixes modal, WooCommerce, EDD, and logout redirect edge cases and adds full automated test coverage. Recommended for all sites.

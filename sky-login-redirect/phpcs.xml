@@ -18,6 +18,7 @@
 
 	<!-- Show progress. -->
 	<arg value="p"/>
+	<arg name="extensions" value="php"/>
 
 	<!-- Strip the filepaths down to the relevant bit. -->
 	<arg name="basepath" value="./"/>
@@ -55,7 +56,47 @@
 		<exclude name="Squiz.Commenting.InlineComment"/>
 		<!-- Allow tab indentation (WordPress enforces spaces by default). -->
 		<exclude name="Generic.WhiteSpace.DisallowTabIndent"/>
+		<!-- Preserve established public method names and release file paths. -->
+		<exclude name="WordPress.NamingConventions.ValidFunctionName"/>
+		<exclude name="WordPress.Files.FileName"/>
+		<!-- Modern feature modules intentionally colocate small enums and managers. -->
+		<exclude name="Generic.Files.OneObjectStructurePerFile"/>
+		<exclude name="Universal.Files.SeparateFunctionsFromOO"/>
+		<exclude name="Universal.Namespaces.DisallowCurlyBraceSyntax"/>
+		<exclude name="Universal.Namespaces.DisallowDeclarationWithoutName"/>
+		<exclude name="Universal.Namespaces.OneDeclarationPerFile"/>
+		<!-- The plugin's historical slr/SLR public prefixes and hooks are part of its API. -->
+		<exclude name="WordPress.NamingConventions.PrefixAllGlobals"/>
+		<!-- Descriptive comments and archived configuration examples are intentional. -->
+		<exclude name="Squiz.PHP.CommentedOutCode"/>
+		<exclude name="Squiz.Commenting.BlockComment"/>
     </rule>
+
+	<!-- Test fixtures follow PHPUnit and WordPress test-suite conventions. -->
+	<rule ref="Squiz.Commenting.FunctionComment">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.WP.AlternativeFunctions">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+	<rule ref="Generic.CodeAnalysis.UnusedFunctionParameter">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.NamingConventions.ValidVariableName">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+	<rule ref="Squiz.Commenting.ClassComment">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+	<rule ref="Generic.Commenting.DocComment">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+	<rule ref="Universal.NamingConventions.NoReservedKeywordParameterNames">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
 
 	<!-- Minimum supported PHP version. -->
 	<config name="minimum_supported_wp_version" value="5.6"/>

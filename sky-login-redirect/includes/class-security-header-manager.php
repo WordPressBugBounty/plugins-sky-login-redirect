@@ -89,6 +89,18 @@ final class SecurityHeaderManager {
 			return;
 		}
 
-		header( $header->value );
+		$name = $header->getName();
+		foreach ( headers_list() as $existing_header ) {
+			if ( str_starts_with( strtolower( $existing_header ), strtolower( $name . ':' ) ) ) {
+				return;
+			}
+		}
+
+		$value = apply_filters( 'slr_security_header_value', $header->getValue(), $name );
+		if ( ! is_string( $value ) || '' === trim( $value ) || preg_match( '/[\r\n]/', $value ) ) {
+			return;
+		}
+
+		header( $name . ': ' . trim( $value ), false );
 	}
 }

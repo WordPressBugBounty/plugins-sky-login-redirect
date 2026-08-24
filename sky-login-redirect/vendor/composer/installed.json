@@ -1,50 +1,6 @@
 {
     "packages": [
         {
-            "name": "collizo4sky/persist-admin-notices-dismissal",
-            "version": "1.4.5",
-            "version_normalized": "1.4.5.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/w3guy/persist-admin-notices-dismissal.git",
-                "reference": "163b868c98cf97ea15b4d7e1305e2d52c9242e7e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/w3guy/persist-admin-notices-dismissal/zipball/163b868c98cf97ea15b4d7e1305e2d52c9242e7e",
-                "reference": "163b868c98cf97ea15b4d7e1305e2d52c9242e7e",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.4"
-            },
-            "time": "2024-03-10T15:11:42+00:00",
-            "type": "library",
-            "installation-source": "dist",
-            "autoload": {
-                "classmap": [
-                    "persist-admin-notices-dismissal.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-3.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "Collins Agbonghama",
-                    "email": "me@w3guy.com",
-                    "role": "developer"
-                }
-            ],
-            "description": "Simple library to persist dismissal of admin notices across pages in WordPress dashboard.",
-            "support": {
-                "issues": "https://github.com/w3guy/persist-admin-notices-dismissal/issues",
-                "source": "https://github.com/w3guy/persist-admin-notices-dismissal"
-            },
-            "install-path": "../collizo4sky/persist-admin-notices-dismissal"
-        },
-        {
             "name": "composer/installers",
             "version": "v1.12.0",
             "version_normalized": "1.12.0.0",

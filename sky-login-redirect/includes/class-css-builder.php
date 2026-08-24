@@ -19,6 +19,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * CSS builder utility class.
  */
 final class CSSBuilder {
+    /**
+     * Accumulated CSS declarations.
+     *
+     * @var array<int, string>
+     */
     private array $rules = [];
 
     /**
@@ -46,17 +51,17 @@ final class CSSBuilder {
      *
      * @param string $property CSS property name.
      * @param mixed  $value    Value from option (can be string, false, or null).
-     * @param string $default  Default value if option is empty.
-     * @param string $unit     Optional unit suffix.
-     * @param bool   $is_int   Cast value as integer.
+     * @param string $default_value Default value if option is empty.
+     * @param string $unit          Optional unit suffix.
+     * @param bool   $is_int        Cast value as integer.
      * @return self For method chaining.
      */
-    public function addWithDefault( string $property, mixed $value, string $default, string $unit = '', bool $is_int = false ): self {
+    public function addWithDefault( string $property, mixed $value, string $default_value, string $unit = '', bool $is_int = false ): self {
         if ( $value ) {
             $val           = $is_int ? (int) $value : sanitize_text_field( (string) $value );
             $this->rules[] = "{$property}:{$val}{$unit};";
         } else {
-            $this->rules[] = "{$property}:{$default};";
+            $this->rules[] = "{$property}:{$default_value};";
         }
 
         return $this;

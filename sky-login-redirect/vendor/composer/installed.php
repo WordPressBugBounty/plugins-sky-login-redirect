@@ -1,8 +1,8 @@
 <?php return array(
     'root' => array(
         'name' => 'skyminds/sky-login-redirect',
-        'pretty_version' => '4.2.7',
-        'version' => '4.2.7.0',
+        'pretty_version' => '4.2.8',
+        'version' => '4.2.8.0',
         'reference' => null,
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
@@ -10,15 +10,6 @@
         'dev' => false,
     ),
     'versions' => array(
-        'collizo4sky/persist-admin-notices-dismissal' => array(
-            'pretty_version' => '1.4.5',
-            'version' => '1.4.5.0',
-            'reference' => '163b868c98cf97ea15b4d7e1305e2d52c9242e7e',
-            'type' => 'library',
-            'install_path' => __DIR__ . '/../collizo4sky/persist-admin-notices-dismissal',
-            'aliases' => array(),
-            'dev_requirement' => false,
-        ),
         'composer/installers' => array(
             'pretty_version' => 'v1.12.0',
             'version' => '1.12.0.0',
@@ -59,8 +50,8 @@
             ),
         ),
         'skyminds/sky-login-redirect' => array(
-            'pretty_version' => '4.2.7',
-            'version' => '4.2.7.0',
+            'pretty_version' => '4.2.8',
+            'version' => '4.2.8.0',
             'reference' => null,
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',

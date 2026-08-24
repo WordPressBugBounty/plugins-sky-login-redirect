@@ -73,15 +73,20 @@ final class LoginPageCustomizer {
 	 *
 	 * @var string|null
 	 */
-	private ?string $cachedCSS = null;
+	private ?string $cached_css = null;
 
 	/**
 	 * Cached logo data to avoid duplicate image processing.
 	 *
 	 * @var array
 	 */
-	private array $logoDataCache = [];
+	private array $logo_data_cache = [];
 
+	/**
+	 * Create the login page customizer.
+	 *
+	 * @param CSSBuilder $css CSS declaration builder.
+	 */
 	public function __construct(
 		private CSSBuilder $css = new CSSBuilder()
 	) {}
@@ -174,8 +179,8 @@ final class LoginPageCustomizer {
 	private function getLogoData( string|int $logo ): array {
 		$cache_key = is_numeric( $logo ) ? "id_{$logo}" : md5( (string) $logo );
 
-		if ( isset( $this->logoDataCache[ $cache_key ] ) ) {
-			return $this->logoDataCache[ $cache_key ];
+		if ( isset( $this->logo_data_cache[ $cache_key ] ) ) {
+			return $this->logo_data_cache[ $cache_key ];
 		}
 
 		$url    = (string) $logo;
@@ -184,11 +189,11 @@ final class LoginPageCustomizer {
 		if ( is_numeric( $logo ) ) {
 			$src = wp_get_attachment_image_src( (int) $logo, 'full' );
 			if ( $src ) {
-				$this->logoDataCache[ $cache_key ] = [
+				$this->logo_data_cache[ $cache_key ] = [
 					'url'    => $src[0],
 					'height' => (int) ( $src[2] ?? 80 ),
 				];
-				return $this->logoDataCache[ $cache_key ];
+				return $this->logo_data_cache[ $cache_key ];
 			}
 		} else {
 			$uploads   = wp_get_upload_dir();
@@ -206,21 +211,21 @@ final class LoginPageCustomizer {
 				if ( $id ) {
 					$src = wp_get_attachment_image_src( $id, 'full' );
 					if ( $src ) {
-						$this->logoDataCache[ $cache_key ] = [
+						$this->logo_data_cache[ $cache_key ] = [
 							'url'    => $src[0],
 							'height' => (int) ( $src[2] ?? 80 ),
 						];
-						return $this->logoDataCache[ $cache_key ];
+						return $this->logo_data_cache[ $cache_key ];
 					}
 				}
 			}
 		}
 
-		$this->logoDataCache[ $cache_key ] = [
+		$this->logo_data_cache[ $cache_key ] = [
 			'url'    => $url,
 			'height' => $height,
 		];
-		return $this->logoDataCache[ $cache_key ];
+		return $this->logo_data_cache[ $cache_key ];
 	}
 
 	/**
@@ -233,7 +238,7 @@ final class LoginPageCustomizer {
 	 * @return void
 	 */
 	public function customizerCSS(): void {
-		if ( $this->cachedCSS === null ) {
+		if ( null === $this->cached_css ) {
 			$styles = [
 				$this->buildHideElementsStyles(),
 				$this->buildLogoStyles(),
@@ -246,12 +251,12 @@ final class LoginPageCustomizer {
 				$this->buildButtonHoverStyles(),
 			];
 
-			$this->cachedCSS = implode( '', array_filter( $styles ) );
+			$this->cached_css = implode( '', array_filter( $styles ) );
 		}
 
-		if ( $this->cachedCSS ) {
+		if ( $this->cached_css ) {
             // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Intentional inline CSS from admin options, strip_all_tags as defense-in-depth.
-			echo '<style>' . wp_strip_all_tags( $this->cachedCSS ) . '</style>';
+			echo '<style>' . wp_strip_all_tags( $this->cached_css ) . '</style>';
 		}
 	}
 
@@ -594,7 +599,7 @@ final class LoginPageCustomizer {
 
 		return $html;
 	}
-	
+
 	/**
 	 * Control whether the login language dropdown should be displayed.
 	 *

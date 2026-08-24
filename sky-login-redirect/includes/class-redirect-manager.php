@@ -269,15 +269,17 @@ final class RedirectManager {
 		if ( is_array( $page_data ) && ! empty( $page_data ) ) {
 			$first_item = $page_data[0];
 			if ( is_array( $first_item ) && isset( $first_item['id'] ) ) {
-				$page_id = (int) $first_item['id'];
-				return $page_id ? ( get_permalink( $page_id ) ?: null ) : null;
+				$page_id   = (int) $first_item['id'];
+				$permalink = $page_id ? get_permalink( $page_id ) : false;
+				return $permalink ? $permalink : null;
 			}
 		}
 
 		// Legacy format: direct page ID (for backward compatibility during migration)
 		if ( is_numeric( $page_data ) ) {
-			$page_id = (int) $page_data;
-			return $page_id ? ( get_permalink( $page_id ) ?: null ) : null;
+			$page_id   = (int) $page_data;
+			$permalink = $page_id ? get_permalink( $page_id ) : false;
+			return $permalink ? $permalink : null;
 		}
 
 		return null;
@@ -462,7 +464,8 @@ final class RedirectManager {
 			return null;
 		}
 
-		return get_permalink( $this->getWooCommerceMyAccountId() ) ?: null;
+		$permalink = get_permalink( $this->getWooCommerceMyAccountId() );
+		return $permalink ? $permalink : null;
 	}
 
 	/**

@@ -1,5 +1,12 @@
 == Changelog ==
 
+= 4.2.8 - 2026-08-23 =
+*   Compatibility - Tested with WordPress 7.1 and PHP 8.5.
+*   Performance - Consolidated prior-page tracking and login-form injection into one conditional frontend asset and gated unused premium frontend hooks.
+*   Security - Made modal login rate-limit updates concurrency-safe and preserved stricter existing security headers.
+*   Development - Patched and locked development tooling, removed an unused runtime dependency, and updated release helpers under `dev/`.
+*   Fix - Current-page redirects now work when the server SAPI does not expose `REQUEST_URI` through `filter_input()`.
+
 = 4.2.7 - 2026-07-27 =
 *   Fix - The global modal login now refreshes the page on which it was opened and does not consume or follow previous-page redirects.
 *   Fix - Dedicated WooCommerce and EDD login forms receive the correct previous-page referrer without duplicate fields.

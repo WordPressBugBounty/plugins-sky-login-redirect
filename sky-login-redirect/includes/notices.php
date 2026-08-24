@@ -47,10 +47,17 @@ final class NoticeManager {
 		'dashboard',
 	];
 
+	/**
+	 * Create the notice manager.
+	 *
+	 * @param string $sale_end_date Sale end date in Ymd format.
+	 * @param string $discount      Display discount.
+	 * @param string $coupon_code   Upgrade coupon code.
+	 */
 	public function __construct(
-		private string $saleEndDate = '20260131',
+		private string $sale_end_date = '20260131',
 		private string $discount = '25%',
-		private string $couponCode = 'EOY2025'
+		private string $coupon_code = 'EOY2025'
 	) {}
 
 	/**
@@ -108,7 +115,7 @@ final class NoticeManager {
 	 * @return bool True if sale end date has not passed.
 	 */
 	private function isSaleActive(): bool {
-		return gmdate( 'Ymd' ) <= $this->saleEndDate;
+		return gmdate( 'Ymd' ) <= $this->sale_end_date;
 	}
 
 	/**
@@ -199,7 +206,7 @@ final class NoticeManager {
 		}
 
 		$upgrade_url = sky_login_redirect_fs()->get_upgrade_url();
-		$upgrade_url = add_query_arg( 'coupon', $this->couponCode, $upgrade_url );
+		$upgrade_url = add_query_arg( 'coupon', $this->coupon_code, $upgrade_url );
 
 		printf(
 			'<div class="slr-promo notice notice-info is-dismissible"><p>%s <a href="%s" target="_blank" rel="noopener">%s</a>.</p></div>',
