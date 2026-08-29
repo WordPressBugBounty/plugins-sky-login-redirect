@@ -5,7 +5,7 @@ Tags: login redirect, logout redirect, custom login, woocommerce login, login cu
 Requires at least: 5.6
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 4.2.8
+Stable tag: 4.2.9
 License: GPLv3 or later
 
 Control where users land after login/logout. Redirect by role, user, or previous page. Includes a powerful login customizer and WooCommerce support.
@@ -174,51 +174,15 @@ Free support is available through the [WordPress.org support forum](https://word
 
 == Changelog ==
 
-= 4.2.8 - 2026-08-23 =
-*   Compatibility - Tested with WordPress 7.1 and PHP 8.5.
-*   Performance - Consolidated prior-page tracking and login-form injection into one conditional frontend asset, removed obsolete assets, and gated unused premium frontend hooks.
-*   Security - Made modal login rate-limit updates concurrency-safe and preserved stricter security headers supplied by hosts or other plugins.
-*   Development - Patched vulnerable development tooling, locked ESLint, removed an unused runtime dependency, and restored release-package checks after moving helper scripts to `dev/`.
-*   Fix - Current-page redirects now work when `filter_input()` cannot read `REQUEST_URI`, including WP-CLI server environments.
-
-= 4.2.7 - 2026-07-27 =
-*   Fix - Prevented a fatal error during logout caused by an incorrect `wp_logout` callback signature.
-*   Development - Added real WordPress integration and browser authentication test layers.
-*   Fix - Previous-page redirects now work when the modal login form is enabled globally.
-*   Fix - The global modal login now refreshes the page on which it was opened. It no longer consumes or follows the previous-page redirect used by dedicated WordPress, WooCommerce, and EDD login forms.
-*   Fix - Previous-page tracking works when the modal is rendered globally, and dedicated WooCommerce and EDD forms receive the correct referrer without duplicate fields.
-*   Fix - Prevented a fatal error during logout caused by an incorrect `wp_logout` callback signature.
-*   Development - Added isolated PHP/JavaScript tests, real WordPress integration tests, browser authentication and commerce journeys, dependency audits, and release-package validation.
-*   Packaging - PHPUnit cache artifacts are excluded from release archives and repeated release builds overwrite their target non-interactively.
-
-= 4.2.6 - 2026-07-23 =
-*   Fix - WooCommerce login bypassed all per-user/role redirect rules. WooCommerce fires `woocommerce_login_redirect` instead of WordPress's `login_redirect`, so the rule engine never ran for WC logins. `getCurrentAction()` now maps WC and EDD filter names to the correct action types; `handleLogin()` now delegates to the rule engine before falling through to WC-specific defaults.
-*   Fix - "Previous page" redirect was ignored on WooCommerce and custom login pages. `slr-login-injector.js` was only enqueued on `wp-login.php`. It now also loads on all frontend pages for logged-out users (self-exits on pages without a login form), covering My Account, custom `/login/` pages, and any page embedding a WC login form shortcode.
-*   Fix - Custom login page used as the redirect target on login, creating a loop. `isRefererLoginPage()` now also recognises the WooCommerce My Account URL and the plugin's configured custom login page as login page referers, preventing `wp_get_referer()` from returning the login page itself as "previous page".
-*   Fix - A redirect rule with no action configured for the current event (e.g. login-only rule triggering on logout) silently sent users to wp-admin. `getRedirectUrlForRule()` now returns `null` for unconfigured actions, allowing the next rule or the WordPress default to apply.
-*   Fix - Potential TypeError in PHP strict mode when a page assigned to a rule was deleted. `get_permalink()` returns `false` for missing posts, which violated the `?string` return type of `getPageUrl()`. Both code paths now coerce `false` to `null`.
-*   Fix - EDD logins now use per-user and per-role rules; modal and embedded login forms preserve the true previous page.
-*   Fix - Custom login URLs preserve nested paths and WordPress Remember Me duration is unchanged when custom timeout is disabled.
-*   Hardening - Prior-page scripts load only when needed and store a short-lived same-origin URL with sensitive parameters removed.
-*   Fix - Modal throttling counts failures only; empty option caches no longer trigger repeated database reads.
-*   Fix - WooCommerce logout rules now use the supported hook and EDD previous-page redirects support shortcode and block login forms.
-*   Privacy - Prior-page storage excludes query strings and fragments.
-*   Development - Added automated redirect, tracking, session, and release-packaging regression tests.
-*   Packaging - Release archives now contain production dependencies only and exclude nested system metadata.
-*   Fix - Removed a malformed token from generated login-logo CSS.
-
-= 4.2.5 - 2026-06-14 =
-*   Fix - Fatal errors when WooCommerce is deactivated while the menu-link shortcode is still in use: `add_lost_password_link()` now checks for `wc_get_page_id()` before accessing the My Account page, and `wc_page_id_cached()` returns early when WooCommerce is inactive.
-*   UI - Settings tabs are now displayed vertically for a cleaner, easier-to-navigate layout.
-*   UI - Save Changes button moved to the title bar; Carbon Fields sidebar hidden to reduce visual clutter.
-*   UI - Admin menu icon now inlined as SVG in `admin_head`, removing a small async fetch on every admin page load.
+= 4.2.9 - 2026-08-29 =
+*   New - Replaced static Plugins-tab banners with a dynamic catalog of Utopique plugins bundled with the release.
+*   Compatibility - Updated Carbon Fields to 3.6.11 and refreshed development dependencies to their latest compatible patch releases.
+*   Quality - Brought the PHP codebase into full compliance with the project coding standard while preserving established public APIs.
+*   Security - Pinned the CI PHP setup action, excluded local environment files from Git and release packages, and added documented security-scanner policy.
 
 Older versions changes can be found in [the changelog](https://utopique.net/products/sky-login-redirect-premium/#changelog "Sky Login Redirect changelog")
 
 == Upgrade Notice ==
 
-= 4.2.8 =
-**WordPress 7.1 compatibility and hardening update.** Reduces frontend work, strengthens modal rate limiting and security-header interoperability, and fixes current-page redirects in additional server environments.
-
-= 4.2.7 =
-**Reliability and testing update.** Fixes modal, WooCommerce, EDD, and logout redirect edge cases and adds full automated test coverage. Recommended for all sites.
+= 4.2.9 =
+**Plugin discovery, compatibility, and maintenance update.** Adds the bundled Utopique plugin catalog, updates Carbon Fields, and strengthens release tooling.

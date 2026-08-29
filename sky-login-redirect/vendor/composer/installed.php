@@ -1,8 +1,8 @@
 <?php return array(
     'root' => array(
         'name' => 'skyminds/sky-login-redirect',
-        'pretty_version' => '4.2.8',
-        'version' => '4.2.8.0',
+        'pretty_version' => '4.2.9',
+        'version' => '4.2.9.0',
         'reference' => null,
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
@@ -29,9 +29,9 @@
             'dev_requirement' => false,
         ),
         'htmlburger/carbon-fields' => array(
-            'pretty_version' => 'v3.6.9',
-            'version' => '3.6.9.0',
-            'reference' => 'f82e80e3e3469d6e86cc17a8950b918ad448a059',
+            'pretty_version' => 'v3.6.11',
+            'version' => '3.6.11.0',
+            'reference' => 'd040371b5dbdc874aeef8f517045a0e82cedea8c',
             'type' => 'library',
             'install_path' => __DIR__ . '/../htmlburger/carbon-fields',
             'aliases' => array(),
@@ -50,8 +50,8 @@
             ),
         ),
         'skyminds/sky-login-redirect' => array(
-            'pretty_version' => '4.2.8',
-            'version' => '4.2.8.0',
+            'pretty_version' => '4.2.9',
+            'version' => '4.2.9.0',
             'reference' => null,
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',

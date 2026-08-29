@@ -1,5 +1,11 @@
 == Changelog ==
 
+= 4.2.9 - 2026-08-29 =
+*   New - Replaced static Plugins-tab banners with a dynamic catalog of Utopique plugins bundled with the release.
+*   Compatibility - Updated Carbon Fields to 3.6.11 and refreshed development dependencies to their latest compatible patch releases.
+*   Quality - Brought the PHP codebase into full compliance with the project coding standard while preserving established public APIs.
+*   Security - Pinned the CI PHP setup action, excluded local environment files from Git and release packages, and added documented security-scanner policy.
+
 = 4.2.8 - 2026-08-23 =
 *   Compatibility - Tested with WordPress 7.1 and PHP 8.5.
 *   Performance - Consolidated prior-page tracking and login-form injection into one conditional frontend asset and gated unused premium frontend hooks.

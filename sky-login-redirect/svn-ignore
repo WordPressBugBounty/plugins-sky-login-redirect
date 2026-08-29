@@ -6,6 +6,7 @@ tests
 .gitattributes
 .gitignore
 .editorconfig
+.env*
 eslint.config.js
 .eslintrc.json
 .vscode

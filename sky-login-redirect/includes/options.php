@@ -1058,43 +1058,7 @@ add_filter(
  * @link   https://carbonfields.net/docs/fields-usage/
  */
 function options_plugins_tab_theme_fields() {
-    $fields                    = [];
-    $installed                 = __( '✔ Plugin is installed and active.', 'sky-login-redirect' );
-    $classy                    = 'installed';
-    $itsec_installed           = '';
-    $bbq_installed             = '';
-    $class_ithemes             = '';
-    $class_bbq                 = '';
-    $class                     = '';
-    $better_comments_installed = sprintf(
-        '<a href="%s">%s</a>',
-        esc_url( admin_url( '/plugin-install.php?s=better+comments+utopique&tab=search&type=term' ) ),
-        __( 'Install Better Comments', 'sky-login-redirect' )
-    );
-    $better_comments_inactive  = sprintf(
-        '<a href="%s">%s</a>',
-        esc_url( admin_url( '/plugins.php' ) ),
-        __( 'Activate Better Comments', 'sky-login-redirect' )
-    );
-
-    if ( function_exists( 'ithemes_updater_get_licensed_site_url' ) ) {
-        $itsec_installed = $installed;
-        $class_ithemes   = $classy;
-    }
-
-    if ( class_exists( 'BBQ_Pro' ) || is_plugin_active( 'block-bad-queries/block-bad-queries.php' ) ) {
-        $bbq_installed = $installed;
-        $class_bbq     = $classy;
-    }
-
-    // get all plugins list
-    $all_plugins = apply_filters( 'active_plugins', get_option( 'active_plugins' ) );
-
-    // Better Comments is activated
-    if ( stripos( implode( $all_plugins ), 'better-comments.php' ) ) {
-        $better_comments_installed = $installed;
-        $class                     = $classy;
-    }
+    $fields = [];
 
     $fields[] = make_field( 'html', 'utopique_plugins' )
         ->set_html(
@@ -1103,17 +1067,6 @@ function options_plugins_tab_theme_fields() {
             . '<p>' . esc_html__( 'Discover more WordPress tools from SkyMinds.', 'sky-login-redirect' ) . '</p></div>'
             . '<div id="slr-plugins-grid" class="slr-plugin-grid" aria-live="polite"></div>'
             . '</section>'
-        );
-
-    $fields[] = make_field( 'html', 'ithemes_security' )
-        ->set_html(
-            sprintf( '<h2 class="security-title">%s</h2>', __( 'Login security plugins', 'sky-login-redirect' ) )
-            . '<div id="security-grid"><div class="security-block"><a href="https://wordpress.org/plugins/block-bad-queries/" rel="noopener" target="_blank"><img src="'
-            . esc_url( plugins_url( 'banners/block-bad-queries.jpg', __DIR__ ) )
-            . '" class="alignleft security" /></a><a href="https://wordpress.org/plugins/block-bad-queries/" rel="noopener" target="_blank">Block Bad Queries (BBQ)</a> is a simple, super-fast plugin that protects your site against malicious URL requests. BBQ checks all incoming traffic and quietly blocks bad requests containing nasty stuff like eval, base64, and excessively-long request-strings. This is a simple yet solid solution for sites that are unable to use a strong .htaccess firewall. <span class="plugin-installed ' . $class_bbq . '">'
-            . $bbq_installed . '</span></div>
-			<div class="security-block"><a href="https://ithemes.pxf.io/c/2217288/708564/9639" rel="noopener" target="_blank"><img src="' . esc_url( plugins_url( 'banners/ithemes-security-pro.png', __DIR__ ) ) . '" class="alignleft security" /></a><a href="https://ithemes.pxf.io/c/2217288/708564/9639" rel="noopener" target="_blank">iThemes Security Pro</a> improves your WordPress login security with strong password enforcement, bad users lockout, 2FA identification, password management and expiration, magic login links, and trusted devices. It does not just take care about login security, it is an all-around security Swiss Army knife that can keep the baddies at bay. <span class="plugin-installed ' . $class_ithemes . '">' . $itsec_installed . '</span></div>
-			</div>'
         );
 
     return $fields;

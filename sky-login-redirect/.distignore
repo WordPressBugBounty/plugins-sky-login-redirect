@@ -5,6 +5,7 @@
 **/.DS_Store
 /.distignore
 /.editorconfig
+/.env*
 /eslint.config.js
 /.eslintrc.json
 /.vscode
