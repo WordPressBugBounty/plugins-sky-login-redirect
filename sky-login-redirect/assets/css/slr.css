@@ -246,6 +246,10 @@ img.security {
   display: none;
 }
 
+.slr-user-association .cf-association__option-thumb {
+  /*display: none;*/
+}
+
 .slr-plugins-panel {
     overflow: hidden;
     border: 1px solid #dcdcde;

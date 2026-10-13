@@ -229,7 +229,8 @@ function options_login_logout_tab_theme_fields() {
 							'type' => 'user',
 						],
 					]
-				)->set_help_text(
+				)->set_classes( 'slr-user-association' )
+				->set_help_text(
 					__( 'Search and select users. Start typing to filter.', 'sky-login-redirect' )
 				)
 				->set_conditional_logic(
@@ -1155,6 +1156,7 @@ function options_restrict_tab_theme_fields() {
 								],
 							]
 						)
+						->set_classes( 'slr-user-association' )
 						->set_help_text(
 							__( 'Search and select users. Start typing to filter.', 'sky-login-redirect' )
 						)

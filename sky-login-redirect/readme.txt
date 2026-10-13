@@ -5,7 +5,7 @@ Tags: login redirect, logout redirect, custom login, woocommerce login, login cu
 Requires at least: 5.6
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 4.2.9
+Stable tag: 4.2.10
 License: GPLv3 or later
 
 Control where users land after login/logout. Redirect by role, user, or previous page. Includes a powerful login customizer and WooCommerce support.
